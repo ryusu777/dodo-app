@@ -89,5 +89,5 @@ Any other branch is development branch.
 
 ## Branch naming convention
 
-- Feature branch: feature-<feature-name>
-- Hotfix branch: hotfix-<issue-number>
+- Feature branch: feature-\<feature-name\>
+- Hotfix branch: hotfix-\<issue-number\>
