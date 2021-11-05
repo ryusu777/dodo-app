@@ -9,17 +9,13 @@ namespace DodoApp.Data
         : base(options)
         {
         }
-
-        public DodoAppContext()
-        {
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Goods>().ToTable<Goods>("Goods");
-            modelBuilder.Entity<GoodsStock>().ToTable<GoodsStock>("GoodsStock");
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Goods>();
+            modelBuilder.Entity<GoodsStock>();
         }
-        public DbSet<Goods> Goods;
-        public DbSet<GoodsStock> GoodsStocks;
+        public DbSet<Goods> Goods { get; set; }
+        public DbSet<GoodsStock> GoodsStocks { get; set; }
     }
 }

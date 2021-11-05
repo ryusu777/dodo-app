@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DodoApp.Migrations
 {
     [DbContext(typeof(DodoAppContext))]
-    [Migration("20211105133804_GoodsMinimalAvailable")]
-    partial class GoodsMinimalAvailable
+    [Migration("20211105162413_GoodsSchema")]
+    partial class GoodsSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

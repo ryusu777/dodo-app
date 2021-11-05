@@ -2,7 +2,7 @@
 
 namespace DodoApp.Migrations
 {
-    public partial class GoodsStock : Migration
+    public partial class GoodsSchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,9 +12,10 @@ namespace DodoApp.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    MinimalAvailable = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
