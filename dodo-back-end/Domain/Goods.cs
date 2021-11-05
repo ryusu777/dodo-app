@@ -11,13 +11,18 @@ namespace DodoApp.Domain
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(256)]
         public string Name { get; set; }
         [Required]
+        [StringLength(256)]
         public string Code { get; set; }
         [Required]
+        [StringLength(256)]
         public string Category { get; set; }
+        [Required]
+        public int MinimalAvailable { get; set; }
 
         [InverseProperty("Goods")]
-        public IEnumerable<GoodsStock> GoodsStock { get; set; }
+        public virtual IEnumerable<GoodsStock> GoodsStock { get; set; }
     }
 }
