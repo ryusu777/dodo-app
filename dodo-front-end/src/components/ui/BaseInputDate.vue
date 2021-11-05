@@ -1,16 +1,12 @@
 <template>
-  <div class="row items-center justify-between">
-    <slot class="col-4"></slot>
-
     <q-input
-        borderless 
-        dense 
-        class="input col-8" 
-        v-model="date" 
-        mask="date" 
-        :rules="['date']"
+      outlined
+      stack-label
+      v-model="model"
+      class="text-bold"
+      type="date"
     >
-      <template v-slot:append>
+      <!-- <template v-slot:append>
         <q-icon name="event" class="cursor-pointer">
           <q-popup-proxy transition-show="scale" transition-hide="scale">
             <q-date v-model="date">
@@ -20,51 +16,35 @@
             </q-date>
           </q-popup-proxy>
         </q-icon>
-      </template>
+      </template> -->
     </q-input>
-  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
-  emits: ['input'],
+  inheritAttrs: false,
+  emits: ['modelValue:update'],
   props: {
-    value: {
-      type: String,
+    modelValue: {
+      type: Date,
       required: false,
       default: '',
     }
   },
-  data() {
+  setup(props, { emit }) {
+    const model = computed({
+      get(): Date {
+        return props.modelValue;
+      },
+      set(val: Date) {
+        emit('modelValue:update', val);
+      },
+    });
     return {
-      content: this.value,
-    };
-  },
-  watch: {
-    content(value) {
-      this.$emit('input', value);
-    },
-  },
-  setup () {
-    return {
-      date: ref('2020/01/01')
+      model
     }
   }
 });
 </script>
-
-<style lang="scss" scoped>
-.input {
-  font-family: inherit;
-  padding: 0.1rem 0.5rem;
-  border: solid 2px black;
-  border-radius: 10px;
-  color: primary;
-}
-
-.input:focus {
-  outline: none;
-}
-</style>

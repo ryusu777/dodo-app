@@ -5,7 +5,7 @@
       persistent
     >
       <base-card
-        class="q-pa-sm hide-scrollbar my-card"
+        class="q-pa-sm hide-scrollbar"
         style="width: 75vw"
       >
         <q-card-section class="row justify-evenly q-ma-none">
@@ -74,8 +74,4 @@ export default defineComponent({
   lang="scss"
   scoped
 >
-.my-card {
-  position: absolute;
-  top: 30px;
-}
 </style>

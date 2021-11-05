@@ -1,5 +1,5 @@
 <template>
-  <q-field v-model="content" dense class="input">
+  <q-field v-model="content" dense>
     <slot></slot>
   </q-field>
 </template>
@@ -28,12 +28,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.input {
-  font-family: inherit;
-  font-size: 18px;
-  padding: 0.1rem 0.5rem;
-  color: primary;
-}
-</style>

@@ -4,7 +4,7 @@
       v-model="showDialog"
       persistent
     >
-      <base-card class="q-pa-sm hide-scrollbar my-card" style="width: 75vw">
+      <base-card class="q-pa-sm hide-scrollbar" style="width: 75vw">
         <q-card-section class="row justify-evenly q-ma-none">
           <p class="col-10 text-h6 text-center q-ma-none text-bold">{{ title }}</p>
           <q-btn class="col-1" icon=" close" flat round dense v-close-popup />
@@ -58,13 +58,3 @@ export default defineComponent({
 
 })
 </script>
-
-<style
-  lang="scss"
-  scoped
->
-.my-card {
-  position: absolute;
-  top: 30px;
-}
-</style>
