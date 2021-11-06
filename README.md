@@ -33,7 +33,7 @@ This app is going to be made with Quasar, Vue 3 UI Framework and Asp Net Core 3.
 
 ### 4. Commenting and Documenting
 
-- Each function must have at least one-line description about its usage
+- Each function must have at least one-line description about its usage OR a function simply has self-explanatory name
 - Create TODO comment for each tasks that will be done by the next commit
 - Create description about a flow inside the source code if necessary
 
@@ -70,7 +70,7 @@ This app is going to be made with Quasar, Vue 3 UI Framework and Asp Net Core 3.
 
 ### 4. Commenting and Documenting
 
-- Each function must have at least one-line description about its usage
+- Each function must have at least one-line description about its usage OR a function simply has self-explanatory name
 - Create TODO comment for each tasks that will be done by the next commit
 - Create description about a flow inside the source code if necessary
 
