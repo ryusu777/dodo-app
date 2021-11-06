@@ -9,6 +9,8 @@ using DodoApp.Domain;
 using DodoApp.Repository;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
+using AutoMapper;
+using System.Net;
 
 namespace DodoApp.Controllers.V1
 {
@@ -18,93 +20,82 @@ namespace DodoApp.Controllers.V1
     {
         private readonly DodoAppContext _context;
         private readonly IGoodsRepo _goodsRepo;
+        private readonly IMapper _mapper;
 
-        public GoodsController(DodoAppContext context, IGoodsRepo goodsRepo)
+        public GoodsController(DodoAppContext context, IGoodsRepo goodsRepo, IMapper mapper)
         {
             _context = context;
             _goodsRepo = goodsRepo;
+            _mapper = mapper;
         }
 
         // GET: api/Goods
         [HttpGet]
         public async Task<ActionResult<PageWrapper<List<Goods>>>> GetGoods([FromQuery] PageFilter pageFilter)
         {
-            if (pageFilter == null)
-                pageFilter = new PageFilter();
-
-            return await _goodsRepo.GetGoods(pageFilter);
+            return await _goodsRepo.GetGoodsAsync(pageFilter);
         }
 
         // GET: api/Goods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Goods>> GetGoods(int id)
+        public async Task<ActionResult<ReadGoodsDto>> GetGoods(int id)
         {
-            var goods = await _context.Goods.FindAsync(id);
+            var goods = await _goodsRepo.GetGoodsByIdAsync(id);
 
             if (goods == null)
             {
                 return NotFound();
             }
 
-            return goods;
+            return _mapper.Map<ReadGoodsDto>(goods);
         }
 
         // PUT: api/Goods/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGoods(int id, Goods goods)
+        public async Task<IActionResult> PutGoods(int id, UpdateGoodsDto goods)
         {
             if (id != goods.Id)
             {
-                return BadRequest();
+                return BadRequest(new { errors = new string[] { "Id doesn't match" }});
             }
 
-            _context.Entry(goods).State = EntityState.Modified;
+            var result = await _goodsRepo.UpdateGoodsAsync(id, _mapper.Map<Goods>(goods));
 
-            try
+            if (result == HttpStatusCode.Conflict)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GoodsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(new { errors = new string[] {"Code already exists"} });
             }
 
-            return NoContent();
+            return StatusCode((int)result);
         }
 
         // POST: api/Goods
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Goods>> PostGoods(Goods goods)
+        public async Task<ActionResult<ReadGoodsDto>> PostGoods(CreateGoodsDto goods)
         {
-            _context.Goods.Add(goods);
-            await _context.SaveChangesAsync();
+            var result = await _goodsRepo.CreateGoodsAsync(_mapper.Map<Goods>(goods));
 
-            return CreatedAtAction("GetGoods", new { id = goods.Id }, goods);
+            if (result == -2)
+            {
+                return Conflict(new { error = new string[] { "Code already exists" }});
+            }
+            else if (result == -1)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return CreatedAtAction("GetGoods", new { id = result });
         }
 
         // DELETE: api/Goods/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGoods(int id)
         {
-            var goods = await _context.Goods.FindAsync(id);
-            if (goods == null)
-            {
-                return NotFound();
-            }
+            var result = await _goodsRepo.DeleteGoodsAsync(id);
 
-            _context.Goods.Remove(goods);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return StatusCode((int)result);
         }
 
         private bool GoodsExists(int id)
