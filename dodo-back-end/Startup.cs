@@ -47,7 +47,7 @@ namespace DodoApp
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "dodo_back_end v1"));
             }
 
-            app.UseHttpsRedirection();
+            app.UseCors();
 
             app.UseRouting();
 
