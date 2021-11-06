@@ -24,7 +24,7 @@
               <base-button icon="delete" />
             </q-card-section>
             <q-separator />
-            <q-list dense>
+            <q-list dense class="q-pa-sm">
               <q-item v-for="col in props.cols.filter(col => col.name !== 'desc')" :key="col.name">
                 <q-item-section>
                   <q-item-label>{{ col.label }}</q-item-label>
@@ -63,23 +63,23 @@ export default defineComponent({
       rows: [
         {
           id: 1,
-          Name: 'Frozen Yogurt',
-          Code: '159',
-          Category: '6.0',
+          GoodsName: 'Frozen Yogurt',
+          GoodsCode: '159',
+          CarTYpe: '6.0',
           MinimalAvailable : 24
         },
         {
           id: 2,
-          Name: 'Ice cream sandwich',
-          Code: '159',
-          Category: '6.0',
+          GoodsName: 'Frozen Yogurt',
+          GoodsCode: '159',
+          CarTYpe: '6.0',
           MinimalAvailable : 24
         },
         {
           id: 3,
-          Name: 'Frozen Yogurt',
-          Code: '159',
-          Category: '6.0',
+          GoodsName: 'Frozen Yogurt',
+          GoodsCode: '159',
+          CarTYpe: '6.0',
           MinimalAvailable : 24
         },
       ],
@@ -93,28 +93,46 @@ export default defineComponent({
           sortable: true
         },
         {
-          name: 'Name',
+          name: 'GoodsName',
           align: 'left',
           label: 'Nama Barang',
-          field: 'Name',
+          field: 'GoodsName',
         },
         {
-          name: 'Code',
+          name: 'GoodsCode',
           align: 'left',
           label: 'Kode Barang',
-          field: 'Code',
+          field: 'GoodsCode',
         },
         {
-          name: 'Category',
+          name: 'CarType',
           align: 'left',
           label: 'Kategori Barang',
-          field: 'Category',
+          field: 'CarType',
+        },
+        {
+          name: 'PartNumber',
+          align: 'left',
+          label: 'Part Number',
+          field: 'PartNumber',
         },
         {
           name: 'MinimalAvailable',
           align: 'left',
           label: 'Minimal Tersedia',
           field: 'MinimalAvailable',
+        },
+        {
+          name: 'StockAvailable',
+          align: 'left',
+          label: 'Stok Tersedia',
+          field: 'StockAvailable',
+        },
+        {
+          name: 'PurchasePrice',
+          align: 'left',
+          label: 'HargaBeli',
+          field: 'PurchasePrice',
         },
       ],
     });

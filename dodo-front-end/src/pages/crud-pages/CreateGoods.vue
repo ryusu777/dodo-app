@@ -3,28 +3,47 @@
     <h3 class="text-bold q-mt-sm">Tambah Barang</h3>
     <form @submit.prevent="create" class="row justify-start q-gutter-y-lg">
       <BaseInput
-        v-model="Name"
+        v-model="GoodsName"
         class="col-11"
         label="Nama Barang"
-      >
-      </BaseInput>
+      />
 
       <BaseInput
-        v-model="Code"
+        v-model="GoodsCode"
         class="col-11"
         label="Kode Barang"
       />
 
       <BaseInput
-        v-model="Category"
+        v-model="CarType"
         class="col-11"
         label="Kategori Barang"
+      />
+
+      <BaseInput
+        v-model="PartNumber"
+        class="col-11"
+        label="Part Number"
       />
 
       <BaseInput
         v-model="MinimalAvailable"
         class="col-11"
         label="Minimal Tersedia"
+        type="number"
+      />
+
+      <BaseInput
+        v-model="StockAvailable"
+        class="col-11"
+        label="Stok Tersedia"
+        type="number"
+      />
+
+      <BaseInput
+        v-model="PurchasePrice"
+        class="col-11"
+        label="Harga Beli"
         type="number"
       />
 
@@ -59,10 +78,13 @@ export default defineComponent({
   },
   data() {
     return {
-      Name: '' as string,
-      Code: '' as string,
-      Category: '' as string,
+      GoodsName: '' as string,
+      GoodsCode: '' as string,
+      CarType: '' as string,
+      PartNumber: '' as string,
       MinimalAvailable: 0 as number,
+      StockAvailable: 0 as number,
+      PurchasePrice: 0 as number,
       // tanggalMasuk: null as null|Date,
     };
   },
