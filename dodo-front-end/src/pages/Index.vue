@@ -1,12 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
     <div>
-      <!-- <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-      ></example-component> -->
       <base-button
         label="View"
         @click="showView = true" />
@@ -43,7 +37,7 @@
       title="Add"
     >
       <base-input>Tambah</base-input>
-      <base-date >Tanggal</base-date>
+      <base-date>Tanggal</base-date>
       <base-select-input
         :option="options"
         v-model="multiple"
@@ -57,8 +51,6 @@
 </template>
 
 <script lang="ts">
-// import { Todo, Meta } from 'components/models';
-// import ExampleComponent from 'components/CompositionComponent.vue';
 import { defineComponent, ref } from 'vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseInput from 'src/components/ui/BaseInput.vue'
@@ -82,35 +74,7 @@ export default defineComponent({
     BaseSelectInput
     },
   setup() {
-    
-    // const todos = ref<Todo[]>([
-    //   {
-    //     id: 1,
-    //     content: 'ct1'
-    //   },
-    //   {
-    //     id: 2,
-    //     content: 'ct2'
-    //   },
-    //   {
-    //     id: 3,
-    //     content: 'ct3'
-    //   },
-    //   {
-    //     id: 4,
-    //     content: 'ct4'
-    //   },
-    //   {
-    //     id: 5,
-    //     content: 'ct5'
-    //   }
-    // ]);
-    // const meta = ref<Meta>({
-    //   totalCount: 1200
-    // });
   return {
-    // todos,
-    // meta,
     showView: ref(false),
     showAdd: ref(false),
     multiple: ref(null),

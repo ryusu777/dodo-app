@@ -3,9 +3,8 @@
     <slot class="col-4"></slot>
     <q-select
       v-model="content"
-      borderless
       dense 
-      class="input col-8"
+      filled
       multiple
       :options="options"
     >
@@ -41,17 +40,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.input {
-  font-family: inherit;
-  padding: 0.1rem 0.5rem;
-  border: solid 2px black;
-  border-radius: 10px;
-  color: primary;
-}
-
-.input:focus {
-  outline: none;
-}
-</style>

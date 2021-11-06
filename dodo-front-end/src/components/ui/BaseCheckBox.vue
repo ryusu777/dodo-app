@@ -1,5 +1,5 @@
 <template>
-  <q-checkbox v-model="checkBoxValue" id="checkbox" class="my-checkbox" :label="label"/>
+  <q-checkbox v-model="checkBoxValue" id="checkbox" :label="label"/>
 </template>
 
 <script lang="ts">
@@ -24,8 +24,3 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-.my-checkbox {
-  margin-top: 10px;
-}
-</style>
