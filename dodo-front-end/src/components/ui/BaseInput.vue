@@ -1,10 +1,5 @@
 <template>
-  <q-input
-      outlined
-      stack-label
-      v-model="model"
-      class="text-bold"
-    >
+  <q-input outlined stack-label v-model="model" class="text-bold">
     <template #append>
       <slot name="append"></slot>
     </template>
@@ -12,26 +7,29 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
-  emits: ['input'],
+  emits: ['update:modelValue'],
   props: {
-    value: {
-      type: String,
-      required: false,
-      default: '',
+    modelValue: {
+      type: [String, Number],
+      required: false
     }
   },
-  data() {
+  setup(props, { emit }) {
+    const model = computed({
+      get(): string | number | undefined {
+        return props.modelValue;
+      },
+      set(val: string | number | undefined) {
+        emit('update:modelValue', val);
+      }
+    });
+
     return {
-      content: this.value,
+      model
     };
-  },
-  watch: {
-    content(value) {
-      this.$emit('input', value);
-    },
-  },
+  }
 });
 </script>
