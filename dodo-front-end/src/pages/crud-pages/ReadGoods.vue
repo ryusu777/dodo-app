@@ -3,29 +3,37 @@
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
     <q-table
       grid
-      :rows="data.rows"
+      :rows="rows"
       :columns="data.columns"
       row-key="id"
       :filter="filter"
       hide-header
     >
       <template v-slot:top-right>
-        <base-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+        <base-input
+          borderless
+          dense
+          debounce="300"
+          v-model="filter"
+          placeholder="Search"
+        >
           <template v-slot:append>
             <q-icon name="search" />
           </template>
         </base-input>
       </template>
       <template v-slot:item="props">
-        <div class="q-pa-xs col-11"
-        >
+        <div class="q-pa-xs col-11">
           <q-card :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section align="right">
-              <base-button icon="delete" />
+              <base-button
+                @click="sendDeleteRequest(props.row.id)"
+                icon="delete"
+              />
             </q-card-section>
             <q-separator />
             <q-list dense class="q-pa-sm">
-              <q-item v-for="col in props.cols.filter(col => col.name !== 'desc')" :key="col.name">
+              <q-item v-for="col in props.cols" :key="col.name">
                 <q-item-section>
                   <q-item-label>{{ col.label }}</q-item-label>
                 </q-item-section>
@@ -42,15 +50,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, reactive, onMounted } from 'vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
+import { IGoods } from 'src/domain/goods.interface';
+import { IPagination } from 'src/domain/responses.interface';
+import { api } from 'src/boot/axios';
+import { IPageFilter } from 'src/domain/requests.interface';
+import { AxiosResponse } from 'axios';
 // import { api } from 'boot/axios';
 
 export default defineComponent({
   components: {
     BaseInput,
-    BaseButton,
+    BaseButton
   },
   setup() {
     // const Name = ref('');
@@ -60,29 +73,6 @@ export default defineComponent({
     const filter = ref('');
     const selected = ref([]);
     const data = reactive({
-      rows: [
-        {
-          id: 1,
-          GoodsName: 'Frozen Yogurt',
-          GoodsCode: '159',
-          CarTYpe: '6.0',
-          MinimalAvailable : 24
-        },
-        {
-          id: 2,
-          GoodsName: 'Frozen Yogurt',
-          GoodsCode: '159',
-          CarTYpe: '6.0',
-          MinimalAvailable : 24
-        },
-        {
-          id: 3,
-          GoodsName: 'Frozen Yogurt',
-          GoodsCode: '159',
-          CarTYpe: '6.0',
-          MinimalAvailable : 24
-        },
-      ],
       columns: [
         {
           name: 'id',
@@ -93,62 +83,86 @@ export default defineComponent({
           sortable: true
         },
         {
-          name: 'GoodsName',
+          name: 'goodsName',
           align: 'left',
           label: 'Nama Barang',
-          field: 'GoodsName',
+          field: 'goodsName'
         },
         {
-          name: 'GoodsCode',
+          name: 'goodsCode',
           align: 'left',
           label: 'Kode Barang',
-          field: 'GoodsCode',
+          field: 'goodsCode'
         },
         {
-          name: 'CarType',
+          name: 'carType',
           align: 'left',
           label: 'Kategori Barang',
-          field: 'CarType',
+          field: 'carType'
         },
         {
-          name: 'PartNumber',
+          name: 'partNumber',
           align: 'left',
           label: 'Part Number',
-          field: 'PartNumber',
+          field: 'partNumber'
         },
         {
-          name: 'MinimalAvailable',
+          name: 'minimalAvailable',
           align: 'left',
           label: 'Minimal Tersedia',
-          field: 'MinimalAvailable',
+          field: 'minimalAvailable'
         },
         {
-          name: 'StockAvailable',
+          name: 'stockAvailable',
           align: 'left',
           label: 'Stok Tersedia',
-          field: 'StockAvailable',
+          field: 'stockAvailable'
         },
         {
-          name: 'PurchasePrice',
+          name: 'purchasePrice',
           align: 'left',
-          label: 'HargaBeli',
-          field: 'PurchasePrice',
-        },
-      ],
+          label: 'Harga Beli',
+          field: 'purchasePrice'
+        }
+      ]
     });
 
-    // const tanggalMasuk = ref<null | Date>(null);
+    const pagination = ref<IPageFilter>({
+      page: 1,
+      rowsPerPage: 5
+    });
 
-    // function postGoods() {
-    //   const response = api.post('/goods', {
-    //     Name: 'string',
-    //     Code: 'string',
-    //     Category: 'string',
-    //     MinimalAvailable: 0
-    //   });
-    //   console.log(response);
-    // }
+    const rows = ref<IGoods[]>([]);
 
+    onMounted(async () => {
+      try {
+        const response: AxiosResponse<IPagination<IGoods>> = await api.get(
+          '/goods',
+          {
+            params: {
+              ...pagination.value
+            }
+          }
+        );
+
+        if (response.data.data) rows.value = response.data.data;
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    async function sendDeleteRequest(id: number): Promise<void> {
+      try {
+        await api.delete(`/goods/${id}`);
+
+        rows.value.splice(
+          rows.value.findIndex((item) => item.id == id),
+          1
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    }
     // function getGoods() {
     //   const response = api.get('/goods');
     //   console.log(response);
@@ -156,17 +170,11 @@ export default defineComponent({
 
     return {
       data,
+      rows,
       filter,
-      selected,
-      // Name,
-      // Code,
-      // Category,
-      // MinimalAvailable,
-      // columns,
-      // rows,
-      // tanggalMasuk,
-      // getGoods,
-    }
+      sendDeleteRequest,
+      selected
+    };
   }
 });
 </script>

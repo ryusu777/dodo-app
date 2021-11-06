@@ -1,47 +1,34 @@
 <template>
   <q-page class="q-mx-lg q-mt-xl">
     <h3 class="text-bold q-mt-sm">Tambah Barang</h3>
-    <form @submit.prevent="create" class="row justify-start q-gutter-y-lg">
-      <BaseInput
-        v-model="GoodsName"
-        class="col-11"
-        label="Nama Barang"
-      />
+    <form
+      @submit.prevent="sendCreateRequest"
+      class="row justify-start q-gutter-y-lg"
+    >
+      <BaseInput v-model="goodsName" class="col-11" label="Nama Barang" />
+
+      <BaseInput v-model="goodsCode" class="col-11" label="Kode Barang" />
+
+      <BaseInput v-model="carType" class="col-11" label="Kategori Barang" />
+
+      <BaseInput v-model="partNumber" class="col-11" label="Part Number" />
 
       <BaseInput
-        v-model="GoodsCode"
-        class="col-11"
-        label="Kode Barang"
-      />
-
-      <BaseInput
-        v-model="CarType"
-        class="col-11"
-        label="Kategori Barang"
-      />
-
-      <BaseInput
-        v-model="PartNumber"
-        class="col-11"
-        label="Part Number"
-      />
-
-      <BaseInput
-        v-model="MinimalAvailable"
+        v-model="minimalAvailable"
         class="col-11"
         label="Minimal Tersedia"
         type="number"
       />
 
       <BaseInput
-        v-model="StockAvailable"
+        v-model="stockAvailable"
         class="col-11"
         label="Stok Tersedia"
         type="number"
       />
 
       <BaseInput
-        v-model="PurchasePrice"
+        v-model="purchasePrice"
         class="col-11"
         label="Harga Beli"
         type="number"
@@ -53,69 +40,62 @@
       <b>Tanggal Masuk</b>
       </BaseInputDate> -->
 
-      <base-button
-        class="col-2 q-mt-md"
-        type="submit"
-      >
-        Submit
-      </base-button>
+      <base-button class="col-2 q-mt-md" type="submit"> Submit </base-button>
     </form>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import { api } from 'boot/axios';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
+import { ICreateResponse } from 'src/domain/responses.interface';
 // import BaseInputDate from 'components/ui/BaseInputDate.vue';
 // import { EUserActions } from 'src/store/user/types/enumeration';
 
 export default defineComponent({
   components: {
     BaseButton,
-    BaseInput,
+    BaseInput
     // BaseInputDate,
   },
-  data() {
+  setup() {
+    const goodsName = ref('');
+    const goodsCode = ref('');
+    const carType = ref('');
+    const partNumber = ref('');
+    const minimalAvailable = ref(0);
+    const stockAvailable = ref(0);
+    const purchasePrice = ref(0);
+
+    async function sendCreateRequest(): Promise<void> {
+      try {
+        const response = await api.post<ICreateResponse>('/goods', {
+          goodsName: goodsName.value,
+          goodsCode: goodsCode.value,
+          carType: carType.value,
+          partNumber: partNumber.value,
+          minimalAvailable: minimalAvailable.value,
+          stockAvailable: stockAvailable.value,
+          purchasePrice: purchasePrice.value
+        });
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     return {
-      GoodsName: '' as string,
-      GoodsCode: '' as string,
-      CarType: '' as string,
-      PartNumber: '' as string,
-      MinimalAvailable: 0 as number,
-      StockAvailable: 0 as number,
-      PurchasePrice: 0 as number,
-      // tanggalMasuk: null as null|Date,
+      goodsName,
+      goodsCode,
+      carType,
+      partNumber,
+      minimalAvailable,
+      stockAvailable,
+      purchasePrice,
+      sendCreateRequest
     };
-  },
-//   methods: {
-//     async signIn() {
-//       if (!this.userName || !this.password) {
-//         this.$q.notify({ message: 'Please enter valid data' })
-//         return;
-//       }
-//       if (
-//         !await this.$store.dispatch(EUserActions.login, {
-//           userName: this.userName,
-//           password: this.password,
-//         })
-//       ) {
-//         this.$q.notify({
-//           message: 'Incorrect username or password..',
-//         });
-//       } else {
-//         await this.$router.replace('/');
-//       }
-//     },
-//   },
-//   watch: {
-//     async isAuth(value: boolean) {
-//       if (value) {
-//         await this.$router.push('/');
-//       } else {
-//         await this.$router.push('/login');
-//       }
-//     },
-//   },
+  }
 });
 </script>
