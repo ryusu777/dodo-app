@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column items-left q-mt-xl">
+  <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
     <q-table
       grid
@@ -23,26 +23,50 @@
         </base-input>
       </template>
       <template v-slot:item="props">
-        <div class="q-pa-xs col-11">
-          <q-card :class="props.selected ? 'bg-grey-2' : ''">
-            <q-card-section align="right">
-              <base-button
-                @click="sendDeleteRequest(props.row.id)"
-                icon="delete"
-              />
+        <div class="q-pa-xs col-12">
+          <base-card
+            :class="props.selected ? 'bg-grey-2' : ''"
+            style="height: 100px"
+          >
+            <q-card-section horizontal class="row">
+              <q-card-section class="col">
+                <p
+                  class="text-overline q-pa-none q-ma-none"
+                  style="line-height: 15px"
+                >
+                  {{ props.row.goodsCode }}
+                </p>
+                <p class="text-bold text-h5 q-pa-none q-ma-none">
+                  {{ props.row.goodsName }}
+                </p>
+                <div class="row">
+                  <p class="q-pr-md">{{ props.row.partNumber }}</p>
+                  |
+                  <p class="q-pl-md">{{ props.row.carType }}</p>
+                </div>
+              </q-card-section>
+
+              <q-card-section class="text-right">
+                <p class="text-overline q-ma-none" style="line-height: 15px">
+                  Stok: {{ props.row.stockAvailable }}
+                </p>
+                <p
+                  class="text-overline q-ma-none self-end"
+                  style="line-height: 15px"
+                >
+                  Rp {{ props.row.purchasePrice }}
+                </p>
+                <q-card-action>
+                  <base-button
+                    class="q-mt-sm"
+                    @click="sendDeleteRequest(props.row.id)"
+                    icon="delete"
+                  />
+                  <base-button class="q-mt-sm" icon="edit" />
+                </q-card-action>
+              </q-card-section>
             </q-card-section>
-            <q-separator />
-            <q-list dense class="q-pa-sm">
-              <q-item v-for="col in props.cols" :key="col.name">
-                <q-item-section>
-                  <q-item-label>{{ col.label }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-item-label caption>{{ col.value }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-card>
+          </base-card>
         </div>
       </template>
     </q-table>
@@ -53,6 +77,7 @@
 import { defineComponent, ref, reactive, onMounted } from 'vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
+import BaseCard from 'src/components/ui/BaseCard.vue';
 import { IGoods } from 'src/domain/goods.interface';
 import { IPagination } from 'src/domain/responses.interface';
 import { api } from 'src/boot/axios';
@@ -63,7 +88,8 @@ import { AxiosResponse } from 'axios';
 export default defineComponent({
   components: {
     BaseInput,
-    BaseButton
+    BaseButton,
+    BaseCard
   },
   setup() {
     // const Name = ref('');
