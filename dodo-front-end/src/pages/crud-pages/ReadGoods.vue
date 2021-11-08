@@ -81,9 +81,10 @@ import BaseCard from 'src/components/ui/BaseCard.vue';
 import { IGoods } from 'src/domain/goods.interface';
 import { IPagination } from 'src/domain/responses.interface';
 import { api } from 'src/boot/axios';
+import axios from 'axios';
 import { IPageFilter } from 'src/domain/requests.interface';
 import { AxiosResponse } from 'axios';
-// import { api } from 'boot/axios';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   components: {
@@ -92,7 +93,7 @@ export default defineComponent({
     BaseCard
   },
   setup() {
-    // const Name = ref('');
+    const $q = useQuasar();
     // const Code = ref('');
     // const Category = ref('');
     // const MinimalAvailable = ref(0);
@@ -185,14 +186,21 @@ export default defineComponent({
           rows.value.findIndex((item) => item.id == id),
           1
         );
-      } catch (err) {
-        console.log(err);
-      }
+        } catch (err) {
+          if (axios.isAxiosError(err)) {
+            const { response } = err;
+            // eslint-disable-next-line
+            response?.data.errors.forEach((element: string) => {
+              $q.notify({
+                message: element
+              });
+            });
+          }
+        }
+      });
     }
-    // function getGoods() {
+
     //   const response = api.get('/goods');
-    //   console.log(response);
-    // }
 
     return {
       data,

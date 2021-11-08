@@ -11,12 +11,15 @@ import { api } from 'boot/axios';
 import { ICreateResponse } from 'src/domain/responses.interface';
 import GoodsForm from 'src/components/goods/GoodsForm.vue';
 import { IGoods } from 'src/domain/goods.interface';
+import axios from 'axios';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   components: {
     GoodsForm
   },
   setup() {
+    const $q = useQuasar();
     async function sendCreateRequest(goods: IGoods): Promise<void> {
       try {
         const response = await api.post<ICreateResponse>('/goods', {
@@ -30,7 +33,15 @@ export default defineComponent({
         });
         console.log(response);
       } catch (err) {
-        console.log(err);
+        if (axios.isAxiosError(err)) {
+          const { response } = err;
+          // eslint-disable-next-line
+          response?.data.errors.forEach((element: string) => {
+            $q.notify({
+              message: element
+            });
+          });
+        }
       }
     }
 
