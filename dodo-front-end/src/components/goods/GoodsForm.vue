@@ -1,11 +1,11 @@
 <template>
-  <form @submit.prevent="submitData" class="row justify-start q-gutter-y-lg">
+  <div class="row justify-start q-gutter-y-lg">
     <!-- TODO: Id field -->
     <BaseInput v-model="goodsName" class="col-11" label="Nama Barang" />
 
     <BaseInput v-model="goodsCode" class="col-11" label="Kode Barang" />
 
-    <BaseInput v-model="carType" class="col-11" label="Kategori Barang" />
+    <BaseInput v-model="carType" class="col-11" label="Tipe Mobil" />
 
     <BaseInput v-model="partNumber" class="col-11" label="Part Number" />
 
@@ -29,15 +29,8 @@
       label="Harga Beli"
       type="number"
     />
-
-    <!-- <BaseInputDate
-        v-model="tanggalMasuk"
-      >
-      <b>Tanggal Masuk</b>
-      </BaseInputDate> -->
-
-    <base-button class="col-2 q-mt-md" type="submit"> Submit </base-button>
-  </form>
+    <base-button class="col-2 q-mt-md" @click="submitData">Submit</base-button>
+  </div>
 </template>
 
 <script lang="ts">
@@ -69,7 +62,7 @@ export default defineComponent({
 
     function submitData() {
       emit('submit', {
-        goodsId: goodsId.value,
+        id: goodsId.value,
         goodsName: goodsName.value,
         goodsCode: goodsCode.value,
         carType: carType.value,
