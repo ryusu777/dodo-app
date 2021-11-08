@@ -21,6 +21,7 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     async function sendCreateRequest(goods: IGoods): Promise<void> {
+      // TODO: Notify when successfully added and clear all input field
       try {
         const response = await api.post<ICreateResponse>('/goods', {
           goodsName: goods.goodsName,
