@@ -1,5 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
+    <!-- TODO: Create Goods with dialog -->
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
     <q-table
       grid
@@ -56,14 +57,16 @@
                 >
                   Rp {{ props.row.purchasePrice }}
                 </p>
-                <q-card-action>
+                <q-card-actions align="right">
                   <base-button
-                    class="q-mt-sm"
                     @click="sendDeleteRequest(props.row.id)"
                     icon="delete"
                   />
-                  <base-button class="q-mt-sm" icon="edit" />
-                </q-card-action>
+                  <base-button
+                    icon="edit"
+                    @click="showUpdateDialog(props.row)"
+                  />
+                </q-card-actions>
               </q-card-section>
             </q-card-section>
           </base-card>
@@ -85,6 +88,8 @@ import axios from 'axios';
 import { IPageFilter } from 'src/domain/requests.interface';
 import { AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
+import GoodsFormDialog from 'src/components/goods/GoodsFormDialog.vue';
+import BaseDialog from 'src/components/ui/BaseDialog.vue';
 
 export default defineComponent({
   components: {
@@ -94,11 +99,7 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    // const Code = ref('');
-    // const Category = ref('');
-    // const MinimalAvailable = ref(0);
     const filter = ref('');
-    const selected = ref([]);
     const data = reactive({
       columns: [
         {
@@ -178,14 +179,21 @@ export default defineComponent({
       }
     });
 
-    async function sendDeleteRequest(id: number): Promise<void> {
-      try {
-        await api.delete(`/goods/${id}`);
+    function sendDeleteRequest(id: number) {
+      $q.dialog({
+        component: BaseDialog,
+        componentProps: {
+          title: 'Hapus barang',
+          body: 'Yakin ingin menghapus barang?'
+        }
+      }).onOk(async () => {
+        try {
+          await api.delete(`/goods/${id}`);
 
-        rows.value.splice(
-          rows.value.findIndex((item) => item.id == id),
-          1
-        );
+          rows.value.splice(
+            rows.value.findIndex((item) => item.id == id),
+            1
+          );
         } catch (err) {
           if (axios.isAxiosError(err)) {
             const { response } = err;
@@ -200,14 +208,40 @@ export default defineComponent({
       });
     }
 
-    //   const response = api.get('/goods');
+    async function sendUpdateRequest(goods: IGoods) {
+      try {
+        await api.put(`/goods/${goods.id || -1}`, goods);
 
+        rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const { response } = err;
+          // eslint-disable-next-line
+          response?.data.errors.forEach((element: string) => {
+            $q.notify({
+              message: element
+            });
+          });
+        }
+      }
+    }
+
+    function showUpdateDialog(goods: IGoods) {
+      $q.dialog({
+        component: GoodsFormDialog,
+        componentProps: {
+          goods
+        }
+      }).onOk(async (goods: IGoods) => {
+        await sendUpdateRequest(goods);
+      });
+    }
     return {
       data,
       rows,
       filter,
       sendDeleteRequest,
-      selected
+      showUpdateDialog
     };
   }
 });
