@@ -77,6 +77,7 @@ This app is going to be made with Quasar, Vue 3 UI Framework and Asp Net Core 3.
 ### 5. Testing
 
 - Unit testing will be done by using xunit
+- Manual API testing with Postman
 
 # Branching Strategies
 
