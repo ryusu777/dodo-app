@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent} from 'vue';
 import { api } from 'boot/axios';
 import { ICreateResponse } from 'src/domain/responses.interface';
 import GoodsForm from 'src/components/goods/GoodsForm.vue';
@@ -47,9 +47,11 @@ export default defineComponent({
 
     // TODO: validateGoodsInfo()
 
+
     return {
-      sendCreateRequest
+      sendCreateRequest,
     };
   }
 });
 </script>
+

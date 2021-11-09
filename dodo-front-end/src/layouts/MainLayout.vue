@@ -22,9 +22,17 @@
       show-if-above
       bordered
     >
-      <q-list>
+      <q-list class="q-mt-xl">
         <q-item v-for="data in menu" :key="data.id"> 
-          <q-item-section><a :href="data.url" class="text-black" style="text-decoration: none">{{ data.text }}</a></q-item-section>
+          <q-item-section>
+            <a 
+              :href="data.url" 
+              class="text-black text-h5 text-bold" 
+              style="text-decoration: none"
+            >
+              {{ data.text }}
+            </a>
+          </q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
@@ -56,11 +64,6 @@ export default defineComponent({
         },
         {
           id: 2,
-          url: '/#/update',
-          text: 'Ubah Barang'
-        },
-        {
-          id: 3,
           url: '/#/view',
           text: 'Lihat Barang'
         },

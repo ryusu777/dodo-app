@@ -1,6 +1,5 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <!-- TODO: Create Goods with dialog -->
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
     <q-table
       grid
@@ -11,6 +10,11 @@
       hide-header
     >
       <template v-slot:top-right>
+        <base-button
+          label="Tambah Barang"
+          @click="showAddDialog()"
+          class="q-mr-md"
+        />
         <base-input
           borderless
           dense
@@ -82,7 +86,7 @@ import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
 import { IGoods } from 'src/domain/goods.interface';
-import { IPagination } from 'src/domain/responses.interface';
+import { ICreateResponse, IPagination } from 'src/domain/responses.interface';
 import { api } from 'src/boot/axios';
 import axios from 'axios';
 import { IPageFilter } from 'src/domain/requests.interface';
@@ -226,22 +230,63 @@ export default defineComponent({
       }
     }
 
+    async function sendCreateRequest(goods: IGoods): Promise<void> {
+      try {
+        const response = await api.post<ICreateResponse>('/goods', {
+          goodsName: goods.goodsName,
+          goodsCode: goods.goodsCode,
+          carType: goods.carType,
+          partNumber: goods.partNumber,
+          minimalAvailable: goods.minimalAvailable,
+          stockAvailable: goods.stockAvailable,
+          purchasePrice: goods.purchasePrice
+        });
+        console.log(response);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const { response } = err;
+          // eslint-disable-next-line
+          response?.data.errors.forEach((element: string) => {
+            $q.notify({
+              message: element
+            });
+          });
+        }
+      }
+    }
+
     function showUpdateDialog(goods: IGoods) {
       $q.dialog({
         component: GoodsFormDialog,
         componentProps: {
-          goods
+          goods,
         }
       }).onOk(async (goods: IGoods) => {
         await sendUpdateRequest(goods);
       });
     }
+
+    function showAddDialog() {
+      $q.dialog({
+        component: GoodsFormDialog,
+        componentProps: {
+          title: 'Tambah Barang'
+        }
+      }).onOk(async (goods: IGoods) => {
+
+        await sendCreateRequest(goods);
+      });
+    }
+
+
     return {
       data,
       rows,
       filter,
       sendDeleteRequest,
-      showUpdateDialog
+      sendCreateRequest,
+      showUpdateDialog,
+      showAddDialog,
     };
   }
 });

@@ -1,32 +1,60 @@
 <template>
   <div class="row justify-start q-gutter-y-lg">
     <!-- TODO: Id field -->
-    <BaseInput v-model="goodsName" class="col-11" label="Nama Barang" />
+    
+    <BaseInput 
+      v-model="goodsName" 
+      class="col-11 q-my-sm" 
+      label="Nama Barang" 
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
+    />
 
-    <BaseInput v-model="goodsCode" class="col-11" label="Kode Barang" />
+    <BaseInput 
+      v-model="goodsCode" 
+      class="col-11 q-my-sm" 
+      label="Kode Barang" 
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
+    />
 
-    <BaseInput v-model="carType" class="col-11" label="Tipe Mobil" />
+    <BaseInput 
+      v-model="carType" 
+      class="col-11 q-my-sm" 
+      label="Tipe Mobil"
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
+    />
 
-    <BaseInput v-model="partNumber" class="col-11" label="Part Number" />
-
-    <BaseInput
-      v-model="minimalAvailable"
-      class="col-11"
-      label="Minimal Tersedia"
-      type="number"
+    <BaseInput 
+      v-model="partNumber" 
+      class="col-11 q-my-sm" 
+      label="Part Number"
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
     />
 
     <BaseInput
       v-model="stockAvailable"
-      class="col-11"
+      class="col-11 q-my-sm"
       label="Stok Tersedia"
-      type="number"
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
     />
 
     <BaseInput
       v-model="purchasePrice"
-      class="col-11"
+      class="col-11 q-my-sm"
       label="Harga Beli"
+      type="number"
+      lazy-rules
+      :rules="[ val => val && val.length > 0 || 'Please type something']"
+    />
+
+    <BaseInput
+      v-model="minimalAvailable"
+      class="col-11 q-my-sm"
+      label="Minimal Tersedia"
       type="number"
     />
     <base-button class="col-2 q-mt-md" @click="submitData">Submit</base-button>
@@ -59,6 +87,7 @@ export default defineComponent({
     const minimalAvailable = ref(props.goods?.minimalAvailable || 0);
     const stockAvailable = ref(props.goods?.stockAvailable || 0);
     const purchasePrice = ref(props.goods?.purchasePrice || 0);
+    
 
     function submitData() {
       emit('submit', {
@@ -69,10 +98,11 @@ export default defineComponent({
         partNumber: partNumber.value,
         minimalAvailable: minimalAvailable.value,
         stockAvailable: stockAvailable.value,
-        purchasePrice: purchasePrice.value
+        purchasePrice: purchasePrice.value,
       });
     }
-    // TODO: validateGoodsInfo()
+
+      // TODO: validateGoodsInfo()
 
     return {
       goodsId,
@@ -83,7 +113,7 @@ export default defineComponent({
       minimalAvailable,
       stockAvailable,
       purchasePrice,
-      submitData
+      submitData,
     };
   }
 });

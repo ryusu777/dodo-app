@@ -1,11 +1,14 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <base-card>
+      <q-card-sticky position="bottom-right" >
+        <base-button flat fab icon="close" @click="onCancelClick" />
+      </q-card-sticky>
       <q-card-section>
         <!-- TODO: Use q-fab for close button -->
-        <q-card-actions align="right">
+        <!-- <q-card-actions align="right">
           <base-button color="primary" label="X" flat @click="onCancelClick" />
-        </q-card-actions>
+        </q-card-actions> -->
         <goods-form :goods="goods" @submit="onDialogOK"></goods-form>
       </q-card-section>
     </base-card>
