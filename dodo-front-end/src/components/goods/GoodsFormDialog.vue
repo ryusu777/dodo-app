@@ -1,14 +1,16 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <base-card>
-      <q-card-sticky position="bottom-right" >
-        <base-button flat fab icon="close" @click="onCancelClick" />
-      </q-card-sticky>
       <q-card-section>
-        <!-- TODO: Use q-fab for close button -->
-        <!-- <q-card-actions align="right">
-          <base-button color="primary" label="X" flat @click="onCancelClick" />
-        </q-card-actions> -->
+        <q-card-actions class="row justify-between items-start">
+          <p class="text-h5 text-bold">{{ title || 'Dialog' }}</p>
+          <base-button
+            flat
+            icon="close"
+            @click="onCancelClick"
+            class="q-mb-sm"
+          />
+        </q-card-actions>
         <goods-form :goods="goods" @submit="onDialogOK"></goods-form>
       </q-card-section>
     </base-card>
@@ -25,7 +27,8 @@ import { IGoods } from 'src/domain/goods.interface';
 
 export default defineComponent({
   props: {
-    goods: Object as PropType<IGoods>
+    goods: Object as PropType<IGoods>,
+    title: String
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {
