@@ -1,64 +1,62 @@
 <template>
-  <div class="row justify-start q-gutter-y-lg">
-    <!-- TODO: Id field -->
-    
-    <BaseInput 
-      v-model="goodsName" 
-      class="col-11 q-my-sm" 
-      label="Nama Barang" 
+  <q-form class="row justify-start q-gutter-y-lg" @submit.prevent="submitData">
+    <BaseInput
+      v-model="goodsName"
+      class="col-12 q-my-sm"
+      label="Nama Barang"
       lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
-    />
-
-    <BaseInput 
-      v-model="goodsCode" 
-      class="col-11 q-my-sm" 
-      label="Kode Barang" 
-      lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
-    />
-
-    <BaseInput 
-      v-model="carType" 
-      class="col-11 q-my-sm" 
-      label="Tipe Mobil"
-      lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
-    />
-
-    <BaseInput 
-      v-model="partNumber" 
-      class="col-11 q-my-sm" 
-      label="Part Number"
-      lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
+      :rules="[requiredRule]"
     />
 
     <BaseInput
-      v-model="stockAvailable"
-      class="col-11 q-my-sm"
-      label="Stok Tersedia"
+      v-model="goodsCode"
+      class="col-12 q-my-sm"
+      label="Kode Barang"
       lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
+      :rules="[requiredRule]"
+    />
+
+    <BaseInput
+      v-model="carType"
+      class="col-12 q-my-sm"
+      label="Tipe Mobil"
+      lazy-rules
+      :rules="[requiredRule]"
+    />
+
+    <BaseInput
+      v-model="partNumber"
+      class="col-12 q-my-sm"
+      label="Part Number"
+      lazy-rules
+      :rules="[requiredRule]"
     />
 
     <BaseInput
       v-model="purchasePrice"
-      class="col-11 q-my-sm"
+      class="col-12 q-my-sm"
       label="Harga Beli"
       type="number"
       lazy-rules
-      :rules="[ val => val && val.length > 0 || 'Please type something']"
+      :rules="[atLeastOneRule]"
+    />
+
+    <BaseInput
+      v-model="stockAvailable"
+      class="col-12 q-my-sm"
+      label="Stok Tersedia"
     />
 
     <BaseInput
       v-model="minimalAvailable"
-      class="col-11 q-my-sm"
+      class="col-12 q-my-sm"
       label="Minimal Tersedia"
       type="number"
     />
-    <base-button class="col-2 q-mt-md" @click="submitData">Submit</base-button>
-  </div>
+    <div class="row justify-end col-12">
+      <base-button class="col-2 q-mt-md" type="submit">Submit</base-button>
+    </div>
+  </q-form>
 </template>
 
 <script lang="ts">
@@ -68,6 +66,7 @@ import BaseInput from 'components/ui/BaseInput.vue';
 import { IGoods } from 'src/domain/goods.interface';
 
 export default defineComponent({
+  emits: ['submit'],
   components: {
     BaseButton,
     BaseInput
@@ -87,7 +86,6 @@ export default defineComponent({
     const minimalAvailable = ref(props.goods?.minimalAvailable || 0);
     const stockAvailable = ref(props.goods?.stockAvailable || 0);
     const purchasePrice = ref(props.goods?.purchasePrice || 0);
-    
 
     function submitData() {
       emit('submit', {
@@ -98,11 +96,19 @@ export default defineComponent({
         partNumber: partNumber.value,
         minimalAvailable: minimalAvailable.value,
         stockAvailable: stockAvailable.value,
-        purchasePrice: purchasePrice.value,
+        purchasePrice: purchasePrice.value
       });
     }
 
-      // TODO: validateGoodsInfo()
+    function reset() {
+      goodsName.value = '';
+      goodsCode.value = '';
+      carType.value = '';
+      partNumber.value = '';
+      minimalAvailable.value = 0;
+      stockAvailable.value = 0;
+      purchasePrice.value = 0;
+    }
 
     return {
       goodsId,
@@ -114,6 +120,9 @@ export default defineComponent({
       stockAvailable,
       purchasePrice,
       submitData,
+      reset,
+      requiredRule: (val: string) => (val && val.length > 0) || 'Mohon diisi',
+      atLeastOneRule: (val: number) => (val && val > 0) || 'Mohon diisi'
     };
   }
 });
