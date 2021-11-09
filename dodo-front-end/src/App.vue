@@ -3,9 +3,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { useQuasar } from 'quasar';
+import axios, { AxiosError } from 'axios';
+import { defineComponent, provide } from 'vue';
 
 export default defineComponent({
-  name: 'App'
+  name: 'App',
+  setup() {
+    const $q = useQuasar();
+    function notifyError(err: unknown | AxiosError) {
+      if (axios.isAxiosError(err)) {
+        const { response } = err;
+        // eslint-disable-next-line
+        response?.data.errors.forEach((element: string) => {
+          $q.notify({
+            message: element
+          });
+        });
+      }
+    }
+
+    provide('notifyError', notifyError);
+  }
 });
 </script>
