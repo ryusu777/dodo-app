@@ -18,13 +18,11 @@ namespace DodoApp.Controllers.V1
     [ApiController]
     public class GoodsController : ControllerBase
     {
-        private readonly DodoAppContext _context;
         private readonly IGoodsRepo _goodsRepo;
         private readonly IMapper _mapper;
 
-        public GoodsController(DodoAppContext context, IGoodsRepo goodsRepo, IMapper mapper)
+        public GoodsController(IGoodsRepo goodsRepo, IMapper mapper)
         {
-            _context = context;
             _goodsRepo = goodsRepo;
             _mapper = mapper;
         }
@@ -73,13 +71,13 @@ namespace DodoApp.Controllers.V1
         // POST: api/Goods
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ReadGoodsDto>> PostGoods(CreateGoodsDto goods)
+        public async Task<IActionResult> PostGoods(CreateGoodsDto goods)
         {
             var result = await _goodsRepo.CreateGoodsAsync(_mapper.Map<Goods>(goods));
 
             if (result == -2)
             {
-                return Conflict(new { error = new string[] { "Code already exists" }});
+                return Conflict(new { errors = new string[] { "Code already exists" }});
             }
             else if (result == -1)
             {
@@ -96,11 +94,6 @@ namespace DodoApp.Controllers.V1
             var result = await _goodsRepo.DeleteGoodsAsync(id);
 
             return StatusCode((int)result);
-        }
-
-        private bool GoodsExists(int id)
-        {
-            return _context.Goods.Any(e => e.Id == id);
         }
     }
 }
