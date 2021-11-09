@@ -11,23 +11,17 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
-         Dodo App
-        </q-toolbar-title>
+        <q-toolbar-title> Dodo App </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list class="q-mt-xl">
-        <q-item v-for="data in menu" :key="data.id"> 
+        <q-item v-for="data in menu" :key="data.id">
           <q-item-section>
-            <a 
-              :href="data.url" 
-              class="text-black text-h5 text-bold" 
+            <a
+              :href="data.url"
+              class="text-black text-h5 text-bold"
               style="text-decoration: none"
             >
               {{ data.text }}
@@ -44,59 +38,29 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref } from 'vue';
 
-
-
-import { defineComponent, ref } from 'vue'
-
+const menu = [
+  {
+    id: 1,
+    url: '/#/view',
+    text: 'Lihat Barang'
+  }
+];
 export default defineComponent({
   name: 'MainLayout',
 
-  components: {
-  },
-  data(){
-    return{
-      menu: [
-        {
-          id: 1,
-          url: '/#/create',
-          text: 'Tambah Barang'
-        },
-        {
-          id: 2,
-          url: '/#/view',
-          text: 'Lihat Barang'
-        },
-      ],
-    }
-  },
-  setup () {
-    const leftDrawerOpen = ref(false)
+  components: {},
+  setup() {
+    const leftDrawerOpen = ref(false);
 
-    // const menu = [
-    //   {
-    //     id: 1,
-    //     title: 'Tambah Barang',
-    //     link: '/create'
-    //   },
-    //   {
-    //     id: 2,
-    //     title: 'Ubah Barang',
-    //     link: '/update'
-    //   },
-    //   {
-    //     id: 3,
-    //     title: 'Lihat Barang',
-    //     link: '/view'
-    //   },
-    // ];
     return {
-      // menu,
+      menu,
       leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+      toggleLeftDrawer() {
+        leftDrawerOpen.value = !leftDrawerOpen.value;
       }
-    }
+    };
   }
-})
+});
 </script>
