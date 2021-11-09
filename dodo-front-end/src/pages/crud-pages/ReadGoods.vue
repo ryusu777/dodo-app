@@ -1,6 +1,7 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
+    <!-- TODO: Pagination -->
     <q-table
       grid
       :rows="rows"
@@ -81,16 +82,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted } from 'vue';
+import { defineComponent, ref, reactive, onMounted, inject } from 'vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
 import { IGoods } from 'src/domain/goods.interface';
 import { ICreateResponse, IPagination } from 'src/domain/responses.interface';
 import { api } from 'src/boot/axios';
-import axios from 'axios';
 import { IPageFilter } from 'src/domain/requests.interface';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
 import GoodsFormDialog from 'src/components/goods/GoodsFormDialog.vue';
 import BaseDialog from 'src/components/ui/BaseDialog.vue';
@@ -104,6 +104,8 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const filter = ref('');
+    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
+      inject('notifyError');
     const data = reactive({
       columns: [
         {
@@ -179,7 +181,7 @@ export default defineComponent({
 
         if (response.data.data) rows.value = response.data.data;
       } catch (err) {
-        console.log(err);
+        notifyError?.(err);
       }
     });
 
@@ -199,15 +201,7 @@ export default defineComponent({
             1
           );
         } catch (err) {
-          if (axios.isAxiosError(err)) {
-            const { response } = err;
-            // eslint-disable-next-line
-            response?.data.errors.forEach((element: string) => {
-              $q.notify({
-                message: element
-              });
-            });
-          }
+          notifyError?.(err);
         }
       });
     }
@@ -218,15 +212,7 @@ export default defineComponent({
 
         rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          const { response } = err;
-          // eslint-disable-next-line
-          response?.data.errors.forEach((element: string) => {
-            $q.notify({
-              message: element
-            });
-          });
-        }
+        notifyError?.(err);
       }
     }
 
@@ -241,17 +227,18 @@ export default defineComponent({
           stockAvailable: goods.stockAvailable,
           purchasePrice: goods.purchasePrice
         });
-        console.log(response);
+        rows.value.push({
+          id: response.data.id,
+          goodsName: goods.goodsName,
+          goodsCode: goods.goodsCode,
+          carType: goods.carType,
+          partNumber: goods.partNumber,
+          minimalAvailable: goods.minimalAvailable,
+          stockAvailable: goods.stockAvailable,
+          purchasePrice: goods.purchasePrice
+        });
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          const { response } = err;
-          // eslint-disable-next-line
-          response?.data.errors.forEach((element: string) => {
-            $q.notify({
-              message: element
-            });
-          });
-        }
+        notifyError?.(err);
       }
     }
 
@@ -260,6 +247,7 @@ export default defineComponent({
         component: GoodsFormDialog,
         componentProps: {
           goods,
+          title: 'Ubah data barang'
         }
       }).onOk(async (goods: IGoods) => {
         await sendUpdateRequest(goods);
@@ -273,20 +261,17 @@ export default defineComponent({
           title: 'Tambah Barang'
         }
       }).onOk(async (goods: IGoods) => {
-
         await sendCreateRequest(goods);
       });
     }
-
 
     return {
       data,
       rows,
       filter,
       sendDeleteRequest,
-      sendCreateRequest,
       showUpdateDialog,
-      showAddDialog,
+      showAddDialog
     };
   }
 });
