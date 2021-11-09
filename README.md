@@ -39,8 +39,7 @@ This app is going to be made with Quasar, Vue 3 UI Framework and Asp Net Core 3.
 
 ### 5. Testing
 
-- E2E testing with Cypress
-- Unit testing with JEST
+- Manual testing for each test case
 
 ## Back End
 
@@ -76,8 +75,7 @@ This app is going to be made with Quasar, Vue 3 UI Framework and Asp Net Core 3.
 
 ### 5. Testing
 
-- Unit testing will be done by using xunit
-- Manual API testing with Postman
+- Manual API testing with Postman for each test case
 
 # Branching Strategies
 
