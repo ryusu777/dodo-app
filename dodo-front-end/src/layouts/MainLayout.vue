@@ -43,7 +43,7 @@ import { defineComponent, ref } from 'vue';
 const menu = [
   {
     id: 1,
-    url: '/#/view',
+    url: '/goods',
     text: 'Lihat Barang'
   }
 ];
