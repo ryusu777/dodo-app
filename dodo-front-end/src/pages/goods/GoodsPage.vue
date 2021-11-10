@@ -5,7 +5,7 @@
     <q-table
       grid
       :rows="rows"
-      :columns="data.columns"
+      :columns="goodsColumns"
       row-key="id"
       :filter="filter"
       hide-header
@@ -82,18 +82,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, inject } from 'vue';
+import { defineComponent, ref, onMounted, inject } from 'vue';
+import { IGoods } from 'pages/goods/goods.interface';
+import { ICreateResponse, IPagination } from 'src/models/responses.interface';
+import { api } from 'src/boot/axios';
+import { IPageFilter } from 'src/models/requests.interface';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useQuasar } from 'quasar';
+import { goodsColumns } from 'pages/goods/goods-columns';
+import GoodsFormDialog from 'pages/goods/GoodsFormDialog.vue';
+import BaseDialog from 'src/components/ui/BaseDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
-import { IGoods } from 'src/domain/goods.interface';
-import { ICreateResponse, IPagination } from 'src/domain/responses.interface';
-import { api } from 'src/boot/axios';
-import { IPageFilter } from 'src/domain/requests.interface';
-import { AxiosError, AxiosResponse } from 'axios';
-import { useQuasar } from 'quasar';
-import GoodsFormDialog from 'src/components/goods/GoodsFormDialog.vue';
-import BaseDialog from 'src/components/ui/BaseDialog.vue';
 
 export default defineComponent({
   components: {
@@ -106,60 +107,6 @@ export default defineComponent({
     const filter = ref('');
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
-    const data = reactive({
-      columns: [
-        {
-          name: 'id',
-          required: true,
-          label: 'ID',
-          field: 'id',
-          align: 'left',
-          sortable: true
-        },
-        {
-          name: 'goodsName',
-          align: 'left',
-          label: 'Nama Barang',
-          field: 'goodsName'
-        },
-        {
-          name: 'goodsCode',
-          align: 'left',
-          label: 'Kode Barang',
-          field: 'goodsCode'
-        },
-        {
-          name: 'carType',
-          align: 'left',
-          label: 'Kategori Barang',
-          field: 'carType'
-        },
-        {
-          name: 'partNumber',
-          align: 'left',
-          label: 'Part Number',
-          field: 'partNumber'
-        },
-        {
-          name: 'minimalAvailable',
-          align: 'left',
-          label: 'Minimal Tersedia',
-          field: 'minimalAvailable'
-        },
-        {
-          name: 'stockAvailable',
-          align: 'left',
-          label: 'Stok Tersedia',
-          field: 'stockAvailable'
-        },
-        {
-          name: 'purchasePrice',
-          align: 'left',
-          label: 'Harga Beli',
-          field: 'purchasePrice'
-        }
-      ]
-    });
 
     const pagination = ref<IPageFilter>({
       page: 1,
@@ -266,7 +213,7 @@ export default defineComponent({
     }
 
     return {
-      data,
+      goodsColumns,
       rows,
       filter,
       sendDeleteRequest,
