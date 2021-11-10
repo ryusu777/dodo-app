@@ -1,60 +1,53 @@
 <template>
-  <teleport to="body">
-    <q-dialog
-      v-model="showDialog"
-      persistent
-    >
-      <base-card class="q-pa-sm hide-scrollbar" style="width: 75vw">
-        <q-card-section class="row justify-evenly q-ma-none">
-          <p class="col-10 text-h6 text-center q-ma-none text-bold">{{ title }}</p>
-          <q-btn class="col-1" icon=" close" flat round dense v-close-popup />
-        </q-card-section>
-        
-        <q-separator class="q-my-sm" />
+  <q-dialog ref="dialogRef" @hide="onDialogHide">
+    <base-card style="width: 300px">
+      <q-card-section>
+        <p class="text-center text-h6 text-bold">{{ title }}</p>
+        <p class="text-center">{{ body }}</p>
+      </q-card-section>
 
-        <q-card-section class="q-pa-none q-ma-md">
-          <slot></slot>
-        </q-card-section>
-      </base-card>
-    </q-dialog>
-  </teleport>
+      <q-card-actions align="right">
+        <base-button
+          color="primary"
+          label="Close"
+          @click="onCancelClick"
+          flat
+        />
+        <base-button color="primary" label="OK" @click="onOKClick" />
+      </q-card-actions>
+    </base-card>
+  </q-dialog>
 </template>
 
+<script>
+import { useDialogPluginComponent } from 'quasar';
+import BaseCard from './BaseCard.vue';
+import BaseButton from './BaseButton.vue';
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
-
-export default defineComponent({
-  emits: ['update:modelValue'],
-  data() {
-    return {}
-  },
-  components: {
-    BaseCard,
-  },
+export default {
   props: {
     title: {
       type: String,
-      required: true,
+      required: true
     },
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-    width: String,
-    disableClose: Boolean,
-  },
-  computed: {
-    showDialog: {
-      get(): boolean {
-        return this.modelValue;
-      },
-      set(value: boolean) {
-        this.$emit('update:modelValue', value);
-      }
+    body: {
+      type: String,
+      required: true
     }
-  }
-
-})
+  },
+  emits: [...useDialogPluginComponent.emits],
+  setup() {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialogPluginComponent();
+    return {
+      dialogRef,
+      onDialogHide,
+      onOKClick() {
+        onDialogOK();
+      },
+      onCancelClick: onDialogCancel
+    };
+  },
+  components: { BaseCard, BaseButton }
+};
 </script>

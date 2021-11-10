@@ -6,18 +6,19 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Index.vue') },
-      { path: 'create', component: () => import('src/pages/crud-pages/CreateGoods.vue') },
-      { path: 'update', component: () => import('src/pages/crud-pages/UpdateGoods.vue') },
-      { path: 'view', component: () => import('src/pages/crud-pages/ReadGoods.vue') }
-    ],
+      {
+        path: 'goods',
+        component: () => import('pages/goods/GoodsPage.vue')
+      }
+    ]
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue'),
-  },
+    component: () => import('pages/Error404.vue')
+  }
 ];
 
 export default routes;

@@ -1,15 +1,11 @@
 <template>
   <teleport to="body">
-    <q-dialog
-      v-model="showDialog"
-      persistent
-    >
-      <base-card
-        class="q-pa-sm hide-scrollbar"
-        style="width: 75vw"
-      >
+    <q-dialog v-model="showDialog" persistent v-bind="$attrs">
+      <base-card class="q-pa-sm hide-scrollbar" style="width: 75vw">
         <q-card-section class="row justify-evenly q-ma-none">
-          <p class="col-10 text-h6 text-center q-ma-none text-bold">{{ title }}</p>
+          <p class="col-10 text-h6 text-center q-ma-none text-bold">
+            {{ title }}
+          </p>
           <q-btn class="col-1" icon=" close" flat round dense v-close-popup />
         </q-card-section>
         <q-separator />
@@ -36,9 +32,10 @@ import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 
 export default defineComponent({
+  inheritAttrs: false,
   emits: ['update:modelValue', 'submit'],
   data() {
-    return {}
+    return {};
   },
   components: {
     BaseCard,
@@ -47,14 +44,14 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      required: true,
+      required: true
     },
     modelValue: {
       type: Boolean,
-      required: true,
+      required: true
     },
     width: String,
-    disableClose: Boolean,
+    disableClose: Boolean
   },
   computed: {
     showDialog: {
@@ -66,12 +63,7 @@ export default defineComponent({
       }
     }
   }
-
-})
+});
 </script>
 
-<style
-  lang="scss"
-  scoped
->
-</style>
+<style lang="scss" scoped></style>

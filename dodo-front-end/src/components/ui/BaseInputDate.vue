@@ -1,12 +1,6 @@
 <template>
-    <q-input
-      outlined
-      stack-label
-      v-model="model"
-      class="text-bold"
-      type="date"
-    >
-      <!-- <template v-slot:append>
+  <q-input outlined stack-label v-model="model" class="text-bold" type="date">
+    <!-- <template v-slot:append>
         <q-icon name="event" class="cursor-pointer">
           <q-popup-proxy transition-show="scale" transition-hide="scale">
             <q-date v-model="date">
@@ -17,7 +11,7 @@
           </q-popup-proxy>
         </q-icon>
       </template> -->
-    </q-input>
+  </q-input>
 </template>
 
 <script lang="ts">
@@ -30,7 +24,7 @@ export default defineComponent({
     modelValue: {
       type: Date,
       required: false,
-      default: '',
+      default: new Date()
     }
   },
   setup(props, { emit }) {
@@ -40,11 +34,11 @@ export default defineComponent({
       },
       set(val: Date) {
         emit('modelValue:update', val);
-      },
+      }
     });
     return {
       model
-    }
+    };
   }
 });
 </script>

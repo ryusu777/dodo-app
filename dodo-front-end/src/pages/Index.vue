@@ -7,6 +7,9 @@
       <base-button
         label="Add"
         @click="showAdd = true" />
+      <base-button
+        label="Confirm"
+        @click="confirm" />
     </div>
     
     <BaseDialog
@@ -52,6 +55,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useQuasar } from 'quasar'
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseInput from 'src/components/ui/BaseInput.vue'
 import BaseDate from 'src/components/ui/BaseInputDate.vue'
@@ -74,7 +78,27 @@ export default defineComponent({
     BaseSelectInput
     },
   setup() {
+    const $q = useQuasar()
+
+     function confirm () {
+      $q.dialog({
+        title: 'Confirm',
+        message: 'Would you like to turn on the wifi?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        console.log('>>>> OK')
+      }).onOk(() => {
+        console.log('>>>> second OK catcher')
+      }).onCancel(() => {
+        console.log('>>>> Cancel')
+      }).onDismiss(() => {
+        console.log('I am triggered on both OK and Cancel')
+      })
+    }
+
   return {
+    confirm,
     showView: ref(false),
     showAdd: ref(false),
     multiple: ref(null),
