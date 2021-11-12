@@ -28,5 +28,8 @@ namespace DodoApp.Domain
         public int PurchasePrice { get; set; }
         [Required]
         public int MinimalAvailable { get; set; }
+
+        [InverseProperty(nameof(GoodsTransactionDetail.TheGoods))]
+        public virtual ICollection<GoodsTransactionDetail> GoodsTransactionDetails { get; set; }
     }
 }
