@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DodoApp.Contracts.V1.Responses
 {
@@ -11,5 +12,6 @@ namespace DodoApp.Contracts.V1.Responses
         public int TotalPrice { get; set; }
         public string Vendor { get; set; }
         public string TransactionType { get; set; }
+        public List<ReadGoodsTransactionDetailDto> GoodsTransactionDetails { get; set; }
     }
 }

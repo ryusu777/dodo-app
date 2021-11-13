@@ -11,11 +11,12 @@ using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
 using AutoMapper;
 using System.Net;
+using DodoApp.Helpers;
 
 namespace DodoApp.Controllers.V1
 {
     [Route("api/v1/[controller]")]
-    [ApiController]
+    [ModelValidation]
     public class GoodsController : ControllerBase
     {
         private readonly IGoodsRepo _goodsRepo;
@@ -29,7 +30,7 @@ namespace DodoApp.Controllers.V1
 
         // GET: api/Goods
         [HttpGet]
-        public async Task<ActionResult<PageWrapper<List<Goods>>>> GetGoods([FromQuery] PageFilter pageFilter)
+        public async Task<ActionResult<PageWrapper<List<Goods>>>> GetGoods([FromQuery]PageFilter pageFilter)
         {
             return await _goodsRepo.GetGoodsAsync(pageFilter);
         }
