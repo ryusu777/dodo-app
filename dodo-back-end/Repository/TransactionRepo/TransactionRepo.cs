@@ -21,7 +21,7 @@ namespace DodoApp.Repository
             _context = context;
         }
 
-        public async Task<int> CreateTransactionDetail(GoodsTransactionDetail transactionDetail)
+        public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
             await _context.GoodsTransactionsDetails.AddAsync(transactionDetail);
 
@@ -37,7 +37,7 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetail(GoodsTransactionDetail transactionDetail)
+        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
             _context.Entry(transactionDetail).State = EntityState.Modified;
 
@@ -109,16 +109,11 @@ namespace DodoApp.Repository
             return HttpStatusCode.OK;
         }
 
-        public async Task<List<GoodsTransactionDetail>> GetGoodsTransactionDetails(int headerId)
-        {
-            var header = await GetGoodsTransactionHeaderByIdAsync(headerId);
-
-            return header.GoodsTransactionDetails.ToList();
-        }
-
         public async Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id)
         {
-            var goods = await _context.GoodsTransactionHeaders.FirstOrDefaultAsync(g => g.Id == id);
+            var goods = await _context.GoodsTransactionHeaders
+                .Include(g => g.GoodsTransactionDetails)
+                .FirstOrDefaultAsync(g => g.Id == id);
 
             return goods;
         }
@@ -127,7 +122,17 @@ namespace DodoApp.Repository
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
 
-            var qry = _context.GoodsTransactionHeaders.AsQueryable();
+            var qry = from s in _context.GoodsTransactionHeaders
+                      select new GoodsTransactionHeader
+                      {
+                          Id = s.Id,
+                          CreatedDate = s.CreatedDate,
+                          PurchaseDate = s.PurchaseDate,
+                          ReceiveDate = s.ReceiveDate,
+                          TotalPrice = s.TotalPrice,
+                          TransactionType = s.TransactionType,
+                          Vendor = s.Vendor
+                      };
 
             if (!String.IsNullOrEmpty(validPageFilter.SearchText))
             {

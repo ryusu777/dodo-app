@@ -14,9 +14,8 @@ namespace DodoApp.Repository
         Task<HttpStatusCode> DeleteTransactionHeaderAsync(int id);
         Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id);
         Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(PageFilter pageFilter);
-        Task<int> CreateTransactionDetail(GoodsTransactionDetail transactionDetail);
-        Task<HttpStatusCode> UpdateTransactionDetail(GoodsTransactionDetail transactionDetail);
+        Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail);
+        Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail transactionDetail);
         Task<HttpStatusCode> DeleteTransactionDetail(int id);
-        Task<List<GoodsTransactionDetail>> GetGoodsTransactionDetails(int headerId);
     }
 }

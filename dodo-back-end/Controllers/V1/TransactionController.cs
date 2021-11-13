@@ -6,13 +6,14 @@ using DodoApp.Contracts.V1;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
 using DodoApp.Domain;
+using DodoApp.Helpers;
 using DodoApp.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Controllers.V1
 {
     [Route("/api/v1/transaction")]
-    [ApiController]
+    [ModelValidation]
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionRepo _transactionRepo;
@@ -20,8 +21,7 @@ namespace DodoApp.Controllers.V1
 
         public TransactionController(
             ITransactionRepo transactionRepo, 
-            IMapper mapper
-        )
+            IMapper mapper)
         {
             _transactionRepo = transactionRepo;
             _mapper = mapper;
@@ -29,8 +29,7 @@ namespace DodoApp.Controllers.V1
 
         [HttpPost("header")]
         public async Task<ActionResult<int>> CreateGoodsTransactionHeader(
-            CreateGoodsTransactionHeaderDto request
-        )
+            CreateGoodsTransactionHeaderDto request)
         {
             var result = await _transactionRepo
                 .CreateTransactionHeaderAsync(
@@ -48,19 +47,18 @@ namespace DodoApp.Controllers.V1
 
         [HttpGet("header")]
         public async Task<ActionResult<PageWrapper<List<GoodsTransactionHeader>>>> GetGoodsTransactionHeaders(
-            [FromQuery]PageFilter pageFilter
-        )
+            [FromQuery]PageFilter pageFilter)
         {
-            return Ok(await _transactionRepo.GetGoodsTransactionHeadersAsync(pageFilter));
+            return Ok(await _transactionRepo
+                .GetGoodsTransactionHeadersAsync(pageFilter));
         }
 
         [HttpGet("header/{id}")]
-        // TODO: Also get the details, and remove getDetails by headerId
         public async Task<ActionResult<ReadGoodsTransactionHeaderDto>> GetGoodsTransactionHeaderById(
-            int id
-        )
+            int id)
         {
-            var result = await _transactionRepo.GetGoodsTransactionHeaderByIdAsync(id);
+            var result = await _transactionRepo
+                .GetGoodsTransactionHeaderByIdAsync(id);
 
             if (result == null)
             {
@@ -73,8 +71,7 @@ namespace DodoApp.Controllers.V1
         [HttpPut("header/{id}")]
         public async Task<IActionResult> UpdateGoodsTransactionHeader(
             int id, 
-            [FromBody]UpdateGoodsTransactionHeaderDto request
-        )
+            [FromBody]UpdateGoodsTransactionHeaderDto request)
         {
             if (id != request.Id)
             {
@@ -92,6 +89,53 @@ namespace DodoApp.Controllers.V1
 
         [HttpDelete("header/{id}")]
         public async Task<IActionResult> DeleteGoodsTransactionHeader(int id)
+        {
+            var result = await _transactionRepo
+                .DeleteTransactionHeaderAsync(id);
+            
+            return StatusCode((int)result);
+        }
+
+        [HttpPost("detail")]
+        public async Task<IActionResult> CreateGoodsTransactionDetail(
+            CreateGoodsTransactionDetailDto request)
+        {
+            var result = await _transactionRepo
+                .CreateTransactionDetailAsync(
+                    _mapper.Map<GoodsTransactionDetail>(request)
+                );
+            if (result == -1)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return CreatedAtAction("GetGoodsTransactionHeader", new 
+                { id = result }
+            );
+
+        }
+
+        [HttpPut("detail/{id}")]
+        public async Task<IActionResult> UpdateGoodsTransactionDetail(
+            int id, UpdateGoodsTransactionDetailDto request
+        )
+        {
+            if (id != request.Id)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Id doesn't match "}}
+                );
+            }
+
+            var result = await _transactionRepo.UpdateTransactionDetailAsync(
+                _mapper.Map<GoodsTransactionDetail>(request)
+            );
+
+            return StatusCode((int)result);
+        }
+
+        [HttpDelete("detail/{id}")]
+        public async Task<IActionResult> DeleteGoodsTransactionDetail(int id)
         {
             var result = await _transactionRepo
                 .DeleteTransactionHeaderAsync(id);
