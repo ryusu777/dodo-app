@@ -16,7 +16,7 @@ using DodoApp.Helpers;
 namespace DodoApp.Controllers.V1
 {
     [Route("api/v1/[controller]")]
-    [ModelValidation]
+    [ApiController]
     public class GoodsController : ControllerBase
     {
         private readonly IGoodsRepo _goodsRepo;

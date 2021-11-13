@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DodoApp.Controllers.V1
 {
     [Route("/api/v1/transaction")]
-    [ModelValidation]
+    [ApiController]
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionRepo _transactionRepo;
