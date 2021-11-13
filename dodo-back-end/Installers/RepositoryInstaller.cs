@@ -9,6 +9,7 @@ namespace DodoApp.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IGoodsRepo, GoodsRepo>();
+            services.AddScoped<ITransactionRepo, TransactionRepo>();
         }
     }
 }

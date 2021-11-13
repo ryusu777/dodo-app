@@ -10,5 +10,8 @@ namespace DodoApp.Data
         {
         }
         public DbSet<Goods> Goods { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<GoodsTransactionDetail> GoodsTransactionsDetails { get; set; }
+        public DbSet<GoodsTransactionHeader> GoodsTransactionHeaders { get; set; }
     }
 }
