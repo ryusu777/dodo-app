@@ -105,11 +105,23 @@ namespace DodoApp.Controllers.V1
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
+            else if (result == -2)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Transaction Header doesn't exists" }});
+            }
+            else if (result == -3)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Goods doesn't exists" }});
+            }
+            else if (result == -4)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Transaction Detail already exists" }});
+            }
 
-            return CreatedAtAction("GetGoodsTransactionHeader", new 
-                { id = result }
-            );
-
+            return StatusCode((int)HttpStatusCode.Created, new { id = result });
         }
 
         [HttpPut("detail/{id}")]

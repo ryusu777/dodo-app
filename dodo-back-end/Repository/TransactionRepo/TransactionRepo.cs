@@ -21,8 +21,21 @@ namespace DodoApp.Repository
             _context = context;
         }
 
+        /*
+            return values
+            -1 -> Internal error
+            -2 -> TransactionHeader doesn't exists
+            -3 -> Goods doesn't exists
+            -4 -> TransactionDetail exists
+        */
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
+            var validity = await CheckTransferDetailValidity(transactionDetail);
+            if (validity < -1)
+            {
+                return validity;
+            }
+
             await _context.GoodsTransactionsDetails.AddAsync(transactionDetail);
 
             try
@@ -165,6 +178,32 @@ namespace DodoApp.Repository
             }
 
             return HttpStatusCode.NoContent;
+        }
+
+        private async Task<int> CheckTransferDetailValidity(
+            GoodsTransactionDetail transactionDetail)
+        {
+            if (await _context.GoodsTransactionHeaders.AnyAsync(q => 
+                q.Id == transactionDetail.GoodsTransactionHeaderId) == false)
+            {
+                return -2;
+            }
+
+            if (await _context.Goods.AnyAsync(q => 
+                q.Id == transactionDetail.GoodsId) == false)
+            {
+                return -3;
+            }
+
+            if (await _context.GoodsTransactionsDetails.AnyAsync(q =>
+                q.GoodsId == transactionDetail.GoodsId && 
+                q.GoodsTransactionHeaderId == 
+                    transactionDetail.GoodsTransactionHeaderId) == true)
+            {
+                return -4;
+            }
+
+            return 0;
         }
     }
 }
