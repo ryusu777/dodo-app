@@ -1,17 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DodoApp.Data;
 using DodoApp.Domain;
 using DodoApp.Repository;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
 using AutoMapper;
 using System.Net;
-using DodoApp.Helpers;
 
 namespace DodoApp.Controllers.V1
 {

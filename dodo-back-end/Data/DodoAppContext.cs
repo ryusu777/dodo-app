@@ -1,3 +1,4 @@
+using DodoApp.Data.Seeder;
 using DodoApp.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,13 @@ namespace DodoApp.Data
         public DodoAppContext(DbContextOptions<DodoAppContext> options)
         : base(options)
         {
+        }
+        
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            GoodsSeeder.Seed(builder);
+            GoodsTransactionDetailSeeder.Seed(builder);
+            GoodsTransactionHeaderSeeder.Seed(builder);
         }
         public DbSet<Goods> Goods { get; set; }
         public DbSet<Currency> Currencies { get; set; }

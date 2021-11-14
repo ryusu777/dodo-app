@@ -1,7 +1,12 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "BackEnd",
+			"path": "./dodo-back-end"
+		},
+		{
+			"name": "FrontEnd",
+			"path": "./dodo-front-end"
 		}
 	],
 	"settings": {

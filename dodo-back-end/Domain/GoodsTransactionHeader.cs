@@ -13,8 +13,6 @@ namespace DodoApp.Domain
         public DateTime ReceiveDate { get; set; }
         [Required]
         public DateTime CreatedDate { get; set; }
-        [Required]
-        public int TotalPrice { get; set; }
         [StringLength(255)]
         public string Vendor { get; set; }
         [StringLength(10)]

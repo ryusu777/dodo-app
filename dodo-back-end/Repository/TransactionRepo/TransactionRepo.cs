@@ -21,8 +21,21 @@ namespace DodoApp.Repository
             _context = context;
         }
 
+        /*
+            return values
+            -1 -> Internal error
+            -2 -> TransactionHeader doesn't exists
+            -3 -> Goods doesn't exists
+            -4 -> TransactionDetail exists
+        */
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
+            var validity = await CheckTransferDetailValidity(transactionDetail);
+            if (validity < -1)
+            {
+                return validity;
+            }
+
             await _context.GoodsTransactionsDetails.AddAsync(transactionDetail);
 
             try
@@ -37,9 +50,19 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
+        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail request)
         {
+            var transactionDetail = await _context.GoodsTransactionsDetails
+                .FirstOrDefaultAsync(g => g.Id == request.Id);
+
+            if (transactionDetail == null)
+            {
+                return HttpStatusCode.NotFound;
+            }
+
             _context.Entry(transactionDetail).State = EntityState.Modified;
+            transactionDetail.PricePerItem = request.PricePerItem;
+            transactionDetail.GoodsAmount = request.GoodsAmount;
 
             try
             {
@@ -47,14 +70,7 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                if ((await _context.GoodsTransactionsDetails.FirstOrDefaultAsync(g => g.Id == transactionDetail.Id)) == null)
-                {
-                    return HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
+                return HttpStatusCode.InternalServerError;
             }
 
             return HttpStatusCode.NoContent;
@@ -67,6 +83,7 @@ namespace DodoApp.Repository
         */
         public async Task<int> CreateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
         {
+            transactionHeader.CreatedDate = DateTime.Now;
             await _context.GoodsTransactionHeaders.AddAsync(transactionHeader);
 
             try
@@ -106,13 +123,14 @@ namespace DodoApp.Repository
             _context.GoodsTransactionHeaders.Remove(header);
             await _context.SaveChangesAsync();
 
-            return HttpStatusCode.OK;
+            return HttpStatusCode.NoContent;
         }
 
         public async Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id)
         {
             var goods = await _context.GoodsTransactionHeaders
                 .Include(g => g.GoodsTransactionDetails)
+                .ThenInclude(c => c.TheGoods)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
             return goods;
@@ -129,7 +147,6 @@ namespace DodoApp.Repository
                           CreatedDate = s.CreatedDate,
                           PurchaseDate = s.PurchaseDate,
                           ReceiveDate = s.ReceiveDate,
-                          TotalPrice = s.TotalPrice,
                           TransactionType = s.TransactionType,
                           Vendor = s.Vendor
                       };
@@ -165,6 +182,32 @@ namespace DodoApp.Repository
             }
 
             return HttpStatusCode.NoContent;
+        }
+
+        private async Task<int> CheckTransferDetailValidity(
+            GoodsTransactionDetail transactionDetail)
+        {
+            if (await _context.GoodsTransactionHeaders.AnyAsync(q => 
+                q.Id == transactionDetail.GoodsTransactionHeaderId) == false)
+            {
+                return -2;
+            }
+
+            if (await _context.Goods.AnyAsync(q => 
+                q.Id == transactionDetail.GoodsId) == false)
+            {
+                return -3;
+            }
+
+            if (await _context.GoodsTransactionsDetails.AnyAsync(q =>
+                q.GoodsId == transactionDetail.GoodsId && 
+                q.GoodsTransactionHeaderId == 
+                    transactionDetail.GoodsTransactionHeaderId) == true)
+            {
+                return -4;
+            }
+
+            return 0;
         }
     }
 }
