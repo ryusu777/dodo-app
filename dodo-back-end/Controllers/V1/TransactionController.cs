@@ -28,7 +28,7 @@ namespace DodoApp.Controllers.V1
         }
 
         [HttpPost("header")]
-        public async Task<ActionResult<int>> CreateGoodsTransactionHeader(
+        public async Task<IActionResult> CreateGoodsTransactionHeader(
             CreateGoodsTransactionHeaderDto request)
         {
             var result = await _transactionRepo
@@ -40,9 +40,7 @@ namespace DodoApp.Controllers.V1
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
 
-            return CreatedAtAction("GetGoodsTransactionHeader", new 
-                { id = result }
-            );
+            return StatusCode((int)HttpStatusCode.Created, new { id = result });
         }
 
         [HttpGet("header")]
@@ -54,8 +52,7 @@ namespace DodoApp.Controllers.V1
         }
 
         [HttpGet("header/{id}")]
-        public async Task<ActionResult<ReadGoodsTransactionHeaderDto>> GetGoodsTransactionHeaderById(
-            int id)
+        public async Task<ActionResult<ReadGoodsTransactionHeaderDto>> GetGoodsTransactionHeaderById(int id)
         {
             var result = await _transactionRepo
                 .GetGoodsTransactionHeaderByIdAsync(id);
