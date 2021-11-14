@@ -4,14 +4,16 @@ using DodoApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DodoApp.Migrations
 {
     [DbContext(typeof(DodoAppContext))]
-    partial class DodoAppContextModelSnapshot : ModelSnapshot
+    [Migration("20211114134243_GoodsSeeder")]
+    partial class GoodsSeeder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,40 +155,6 @@ namespace DodoApp.Migrations
                     b.HasIndex("GoodsTransactionHeaderId");
 
                     b.ToTable("GoodsTransactionsDetails");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            GoodsAmount = 2,
-                            GoodsId = 2,
-                            GoodsTransactionHeaderId = 1,
-                            PricePerItem = 25000
-                        },
-                        new
-                        {
-                            Id = 2,
-                            GoodsAmount = 1,
-                            GoodsId = 1,
-                            GoodsTransactionHeaderId = 1,
-                            PricePerItem = 100000
-                        },
-                        new
-                        {
-                            Id = 3,
-                            GoodsAmount = 3,
-                            GoodsId = 3,
-                            GoodsTransactionHeaderId = 2,
-                            PricePerItem = 20000
-                        },
-                        new
-                        {
-                            Id = 4,
-                            GoodsAmount = 1,
-                            GoodsId = 1,
-                            GoodsTransactionHeaderId = 1,
-                            PricePerItem = 70000
-                        });
                 });
 
             modelBuilder.Entity("DodoApp.Domain.GoodsTransactionHeader", b =>
@@ -205,6 +173,9 @@ namespace DodoApp.Migrations
                     b.Property<DateTime>("ReceiveDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransactionType")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -217,24 +188,6 @@ namespace DodoApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GoodsTransactionHeaders");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedDate = new DateTime(2021, 11, 14, 20, 59, 43, 527, DateTimeKind.Local).AddTicks(7073),
-                            PurchaseDate = new DateTime(2021, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReceiveDate = new DateTime(2021, 11, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            TransactionType = "sell"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedDate = new DateTime(2021, 11, 14, 20, 59, 43, 528, DateTimeKind.Local).AddTicks(5550),
-                            PurchaseDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ReceiveDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            TransactionType = "purchase"
-                        });
                 });
 
             modelBuilder.Entity("DodoApp.Domain.Currency", b =>
