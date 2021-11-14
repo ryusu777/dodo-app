@@ -83,6 +83,7 @@ namespace DodoApp.Repository
         */
         public async Task<int> CreateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
         {
+            transactionHeader.CreatedDate = DateTime.Now;
             await _context.GoodsTransactionHeaders.AddAsync(transactionHeader);
 
             try
@@ -122,13 +123,14 @@ namespace DodoApp.Repository
             _context.GoodsTransactionHeaders.Remove(header);
             await _context.SaveChangesAsync();
 
-            return HttpStatusCode.OK;
+            return HttpStatusCode.NoContent;
         }
 
         public async Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id)
         {
             var goods = await _context.GoodsTransactionHeaders
                 .Include(g => g.GoodsTransactionDetails)
+                .ThenInclude(c => c.TheGoods)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
             return goods;
@@ -145,7 +147,6 @@ namespace DodoApp.Repository
                           CreatedDate = s.CreatedDate,
                           PurchaseDate = s.PurchaseDate,
                           ReceiveDate = s.ReceiveDate,
-                          TotalPrice = s.TotalPrice,
                           TransactionType = s.TransactionType,
                           Vendor = s.Vendor
                       };
