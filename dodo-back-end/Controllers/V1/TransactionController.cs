@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Controllers.V1
 {
-    [Route("/api/v1/transaction")]
+    [Route("/api/v1/[controller]")]
     [ApiController]
     public class TransactionController : ControllerBase
     {
