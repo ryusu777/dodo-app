@@ -50,9 +50,19 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
+        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail request)
         {
+            var transactionDetail = await _context.GoodsTransactionsDetails
+                .FirstOrDefaultAsync(g => g.Id == request.Id);
+
+            if (transactionDetail == null)
+            {
+                return HttpStatusCode.NotFound;
+            }
+
             _context.Entry(transactionDetail).State = EntityState.Modified;
+            transactionDetail.PricePerItem = request.PricePerItem;
+            transactionDetail.GoodsAmount = request.GoodsAmount;
 
             try
             {
@@ -60,14 +70,7 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                if ((await _context.GoodsTransactionsDetails.FirstOrDefaultAsync(g => g.Id == transactionDetail.Id)) == null)
-                {
-                    return HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
+                return HttpStatusCode.InternalServerError;
             }
 
             return HttpStatusCode.NoContent;
