@@ -11,7 +11,6 @@ namespace DodoApp.Domain
         public int GoodsTransactionHeaderId { get; set; }
         [Required]
         public int GoodsId { get; set; }
-        [Required]
         public int GoodsAmount { get; set; }
         [Required]
         public int PricePerItem { get; set; }
