@@ -1,0 +1,156 @@
+GET /transaction/header:
+    - Input description: Send get request with page filter query params such as pageNumber, rowsPerPage
+    - Expected output: Goods Transaction Header data result according to page filter with a page wrapper response
+
+GET /transaction/header/{id}
+    - Input: id = an id of existing object
+    - Expected output = Goods Transaction Header data including the all transaction Detail and Goods data
+
+    - Input: id = random string
+    - Expected output: Bad request invalid id response
+
+    - Input: id = an Id of non existing transaction header
+    - Expected output: Not found response
+
+POST /transaction/header
+    - Input: 
+    {
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": "sell" or "purchase"
+    }
+    - Expected Output: Created Response with object containing id of the created transaction header
+
+    - Input:
+    {
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": other than "sell" or "purchase"
+    }
+    - Expected Output: Bad request invalid transaction type error message
+
+PUT /transaction/header/{id}
+    - Input: id = an id of existig object
+    {
+        "id": same as route id,
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": "sell" or "purchase"
+    }
+    - Expected Output: No content response
+
+    - Input: id = 1
+    {
+        "id": 2,
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": "sell" or "purchase"
+    }
+    - Expected Output: Bad Request id doesn't match response
+
+    - Input: id = 1
+    {
+        "id": 1,
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": other than "sell" or "purchase"
+    }
+    - Expected Output: Bad Request invalid transaction type response
+
+    - Input: id = an id of non existing object
+    {
+        "id": same as route id,
+        "purchaseDate": valid datetime or null,
+        "receiveDate": valid datetime or null,
+        "vendor": string or null,
+        "transactionType": "sell" or "purchase"
+    }
+    - Expected Output: Not Found response
+
+DELETE /transaction/header/{id}
+    - Input: id = an id of existing object
+    - Expected output: No Content response
+
+    - Input: id = an id of non existing object
+    - Expected output: Not found response
+
+    - Input: id = a random string
+    - Expected output: Bad request invalid route params
+
+POST /transactin/detail
+    - Input:
+    {
+        "goodsTransactionHeaderId": an id of existing object,
+        "goodsId": an id of existing object,
+        "goodsAmount": an integer,
+        "pricePerItem": an integer
+    }
+    - Expected Output: No content response
+
+    - Input:
+    {
+        "goodsTransactionHeaderId": an id of non existing object,
+        "goodsId": any,
+        "goodsAmount": any,
+        "pricePerItem": any
+    }
+    - Expected Output: Bad Request object not exist response
+
+    - Input:
+    {
+        "goodsTransactionHeaderId": an id of existing object,
+        "goodsId": an id of non existing object,
+        "goodsAmount": any,
+        "pricePerItem": any
+    }
+    - Expected Output: Bad Request object not exist response
+
+    - Input: Existing detail with the same PK header id and PK goods id
+    {
+        "goodsTransactionHeaderId": an id of existing object,
+        "goodsId": an id of existing object,
+        "goodsAmount": any,
+        "pricePerItem": any
+    }
+    - Expected Output: Bad Request data already exist response
+
+PUT /transaction/detail/{id}
+    - Input: id = an id of existing object
+    {
+        "id": same as route id,
+        "goodsAmount": an integer,
+        "pricePerItem": an integer
+    }
+    - Expected output: No content response
+
+    - Input: id = an integer
+    {
+        "id": not same as route id,
+        "goodsAmount": an integer,
+        "pricePerItem": an integer
+    }
+    - Expected output: Bad request id doesn't match response
+
+    - Input: id = an integer
+    goodsAmount or pricePerItem equals null
+    {
+        "id": same as route id,
+        "goodsAmount": null,
+        "pricePerItem": null
+    }
+    - Expected output: Bad request invalid object property response
+
+DELETE /transaction/detail/{id}
+    - Input: id = an id of existing object
+    - Expected output: No Content response
+
+    - Input: id = an id of non existing object
+    - Expected output: Not found response
+
+    - Input: id = a random string
+    - Expected output: Bad request invalid route params
