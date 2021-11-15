@@ -58,13 +58,12 @@
           </base-card>
         </div>
       </template>
-      <template v-slot:bottom>
-        <base-button
-            class="q-mt-md"
-            label="Lakukan Transaksi"
-        />
-      </template>
     </q-table>
+    <div class="row justify-end q-mb-md">
+      <base-button
+        label="Lakukan Transaksi"
+    />
+    </div>
   </q-page>
 </template>
 
@@ -98,18 +97,18 @@ export default defineComponent({
 
     const rows = ref<IGoods[]>([]);
 
-    // function removeGoods(id: number) {
-      // try {
-      //       await api.delete(`/transaction/detail/${id}`);
+    async function removeGoods(id: number) {
+      try {
+            await api.delete(`/transaction/detail/${id}`);
 
-      //       rows.value.splice(
-      //         rows.value.findIndex((item) => item.id == id),
-      //         1
-      //       );
-      //     } catch (err) {
-      //       notifyError?.(err);
-      //     }
-    // }
+            rows.value.splice(
+              rows.value.findIndex((item) => item.id == id),
+              1
+            );
+          } catch (err) {
+            notifyError?.(err);
+          }
+    }
 
     // onMounted(async () => {
     //   try {
@@ -142,7 +141,7 @@ export default defineComponent({
       goodsColumns,
       rows,
       filter,
-      // removeGoods,
+      removeGoods,
     };
   }
 });
