@@ -11,6 +11,11 @@
       hide-header
     >
       <template v-slot:top-right>
+        <base-button
+          icon="shopping_cart"
+          to="/selling-goods-basket"
+          class="q-mr-md"
+        />
         <base-input
           borderless
           dense
@@ -59,11 +64,26 @@
                 </p>
                 <q-card-actions align="right">
                   <base-button
-                    icon="remove"
-                  />
-                  <base-button
                     icon="add"
-                  />
+                  >
+                    <q-popup-edit>
+                      <base-input 
+                        v-model="amount"
+                        class="col-12 q-my-sm"
+                        label="Jumlah Barang"
+                        type="number"
+                      />
+                      <base-input 
+                        v-model="sellPrice"
+                        class="col-12 q-my-sm"
+                        label="Harga Jual"
+                        type="number"
+                      />
+                      <base-button 
+                        label="Submit"
+                      />
+                    </q-popup-edit>
+                  </base-button>
                 </q-card-actions>
               </q-card-section>
             </q-card-section>
@@ -96,6 +116,8 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const filter = ref('');
+    const amount = ref(0);
+    const sellPrice = ref(0);
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
@@ -105,16 +127,24 @@ export default defineComponent({
     });
 
     const rows = ref<IGoods[]>([]);
+    // onMounted(async () => {
+    //   try {
+    //     const response = await api.get(
+    //       '/transaction/header/{id}',
+    //       {
+
+    //       }
+
+    //     );
+    //   } catch (err) {
+    //     notifyError?.(err);
+    //   }
+    // });
 
     onMounted(async () => {
       try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
-          {
-            params: {
-              ...pagination.value
-            }
-          }
         );
 
         if (response.data.data) rows.value = response.data.data;
@@ -128,6 +158,8 @@ export default defineComponent({
       goodsColumns,
       rows,
       filter,
+      amount,
+      sellPrice,
     };
   }
 });
