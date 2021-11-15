@@ -13,6 +13,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'selling-goods',
         component: () => import('pages/selling-goods/SellingGoodsPage.vue')
+      },
+      {
+        path: 'selling-goods-basket',
+        component: () => import('pages/selling-goods/SellingGoodsBasket.vue')
       }
     ]
   },
