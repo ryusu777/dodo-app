@@ -11,11 +11,7 @@
       hide-header
     >
       <template v-slot:top-right>
-        <base-button
-          icon="shopping_cart"
-          to="/selling-goods-basket"
-          class="q-mr-md"
-        />
+        <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
           borderless
           dense
@@ -63,26 +59,27 @@
                   Rp {{ props.row.purchasePrice }}
                 </p>
                 <q-card-actions align="right">
-                  <base-button
-                    icon="add"
-                  >
-                    <q-popup-edit>
-                      <base-input 
-                        v-model="amount"
-                        class="col-12 q-my-sm"
-                        label="Jumlah Barang"
-                        type="number"
-                      />
-                      <base-input 
-                        v-model="sellPrice"
-                        class="col-12 q-my-sm"
-                        label="Harga Jual"
-                        type="number"
-                      />
-                      <base-button 
-                        label="Submit"
-                      />
-                    </q-popup-edit>
+                  <base-button icon="add">
+                    <q-popup-proxy :breakpoint="100" ref="popupRef">
+                      <base-card class="q-pa-sm">
+                        <base-input
+                          v-model="amount"
+                          class="col-12 q-my-sm"
+                          label="Jumlah Barang"
+                          type="number"
+                        />
+                        <base-input
+                          v-model="sellPrice"
+                          class="col-12 q-my-sm"
+                          label="Harga Jual"
+                          type="number"
+                        />
+                        <base-button
+                          label="Submit"
+                          @click="sendAddDetail(props.row.id)"
+                        />
+                      </base-card>
+                    </q-popup-proxy>
                   </base-button>
                 </q-card-actions>
               </q-card-section>
@@ -97,27 +94,33 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
 import { IGoods } from 'pages/goods/goods.interface';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
+import { IPagination } from 'src/models/responses.interface';
 import { api } from 'src/boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuasar } from 'quasar';
 import { goodsColumns } from 'pages/goods/goods-columns';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
+import SellingGoodsBasketDialog from './SellingGoodsBasketDialog.vue';
+import { ITransactionHeader } from './selling-goods.interface';
+import { QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({
+  props: {
+    id: String
+  },
   components: {
     BaseInput,
     BaseButton,
     BaseCard
   },
-  setup() {
+  setup(props) {
     const $q = useQuasar();
     const filter = ref('');
     const amount = ref(0);
     const sellPrice = ref(0);
+    const popupRef = ref<InstanceType<typeof QPopupProxy>>();
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
@@ -126,33 +129,65 @@ export default defineComponent({
       rowsPerPage: 5
     });
 
+    const transactionHeader = ref<ITransactionHeader>();
+
     const rows = ref<IGoods[]>([]);
-    // onMounted(async () => {
-    //   try {
-    //     const response = await api.get(
-    //       '/transaction/header/{id}',
-    //       {
-
-    //       }
-
-    //     );
-    //   } catch (err) {
-    //     notifyError?.(err);
-    //   }
-    // });
 
     onMounted(async () => {
       try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
+          {
+            params: {
+              ...pagination.value
+            }
+          }
         );
 
         if (response.data.data) rows.value = response.data.data;
       } catch (err) {
         notifyError?.(err);
       }
+
+      try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${props.id || 0}`
+        );
+
+        transactionHeader.value = response.data;
+      } catch (err) {
+        notifyError?.(err);
+      }
     });
 
+    function showCart() {
+      $q.dialog({
+        component: SellingGoodsBasketDialog,
+        componentProps: {
+          transactionHeader: transactionHeader.value
+        }
+      });
+    }
+
+    async function sendAddDetail(goodsId: number) {
+      try {
+        await api.post('/transaction/detail', {
+          goodsId,
+          goodsTransactionHeaderId: transactionHeader.value?.id || 0,
+          goodsAmount: amount.value,
+          pricePerItem: sellPrice.value
+        });
+
+        $q.notify({
+          message: 'Berhasil menambahkan barang'
+        });
+        amount.value = 0;
+        sellPrice.value = 0;
+        popupRef.value?.hide();
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
 
     return {
       goodsColumns,
@@ -160,6 +195,9 @@ export default defineComponent({
       filter,
       amount,
       sellPrice,
+      showCart,
+      sendAddDetail,
+      popupRef
     };
   }
 });
