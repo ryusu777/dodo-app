@@ -10,6 +10,9 @@
       <base-button
         label="Confirm"
         @click="confirm" />
+      <base-button
+        label="Penjualan"
+        @click="sendTransactionHeader()" />
     </div>
     
     <BaseDialog
@@ -54,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, inject } from 'vue';
 import { useQuasar } from 'quasar'
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import BaseInput from 'src/components/ui/BaseInput.vue'
@@ -64,6 +67,9 @@ import BaseAddDialog from 'src/components/ui/BaseAddDialog.vue';
 import BaseField from 'src/components/ui/BaseField.vue';
 import BaseCheckBox from 'src/components/ui/BaseCheckBox.vue';
 import BaseSelectInput from 'src/components/ui/BaseSelectInput.vue';
+import { ICreateResponse } from 'src/models/responses.interface';
+import { api } from 'src/boot/axios';
+import { AxiosError } from 'axios';
 
 export default defineComponent({
   name: 'PageIndex',
@@ -79,6 +85,8 @@ export default defineComponent({
     },
   setup() {
     const $q = useQuasar()
+    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
+      inject('notifyError');
 
      function confirm () {
       $q.dialog({
@@ -97,14 +105,33 @@ export default defineComponent({
       })
     }
 
+    async function sendTransactionHeader(): Promise<void> {
+      try {
+        const response = await api.post<ICreateResponse>('/transaction/header', {
+          transactionType: 'sell'
+        });
+        
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
+
   return {
     confirm,
     showView: ref(false),
     showAdd: ref(false),
     multiple: ref(null),
-
-    options: ['pilihan1', 'pilihan2', 'pilihan3']
+    sendTransactionHeader,
+    // options: ['pilihan1', 'pilihan2', 'pilihan3']
   };
   }
 });
 </script>
+
+function notifyError(err: unknown) {
+  throw new Error('Function not implemented.');
+}
+
+function notifyError(err: unknown) {
+  throw new Error('Function not implemented.');
+}

@@ -45,6 +45,7 @@
       v-model="stockAvailable"
       class="col-12 q-my-sm"
       label="Stok Tersedia"
+      type="number"
     />
 
     <BaseInput

@@ -45,6 +45,11 @@ const menu = [
     id: 1,
     url: '/goods',
     text: 'Lihat Barang'
+  },
+  {
+    id: 2,
+    url: '/selling-goods',
+    text: 'Menjual Barang'
   }
 ];
 export default defineComponent({
