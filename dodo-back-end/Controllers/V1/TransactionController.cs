@@ -148,7 +148,7 @@ namespace DodoApp.Controllers.V1
         public async Task<IActionResult> DeleteGoodsTransactionDetail(int id)
         {
             var result = await _transactionRepo
-                .DeleteTransactionHeaderAsync(id);
+                .DeleteTransactionDetail(id);
             
             return StatusCode((int)result);
         }
