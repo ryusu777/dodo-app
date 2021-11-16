@@ -18,7 +18,6 @@
 import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
-  inheritAttrs: false,
   emits: ['modelValue:update'],
   props: {
     modelValue: {
