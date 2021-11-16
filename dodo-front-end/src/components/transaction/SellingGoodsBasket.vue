@@ -3,7 +3,7 @@
   <q-table
     grid
     :rows="transactionHeader?.goodsTransactionDetails"
-    :columns="transactionDetailColumns"
+    :columns="goodsColumns"
     row-key="id"
     hide-header
   >
@@ -19,30 +19,54 @@
                 class="text-overline q-pa-none q-ma-none"
                 style="line-height: 15px"
               >
-                {{ props.row.id }}
+                {{ props.row.theGoods.goodsCode }}
               </p>
-              <p class="text-bold text-h5 q-pa-none q-ma-none">
-                {{ props.row.goodsName }}
+              <p class="text-bold text-h7 q-pa-none q-ma-none">
+                {{ props.row.theGoods.goodsName }}
               </p>
-              <div class="row">
-                <p class="q-pr-md">{{ props.row.partNumber }}</p>
-                |
-                <p class="q-pl-md">{{ props.row.carType }}</p>
-              </div>
+              <p class="text-caption q-pa-none q-ma-none">
+                {{ props.row.theGoods.partNumber }}
+              </p>
+              <p class="text-caption q-pa-none q-ma-none">
+                {{ props.row.theGoods.carType }}
+              </p>
+              
             </q-card-section>
 
             <q-card-section class="text-right">
               <p class="text-overline q-ma-none" style="line-height: 15px">
-                Stok: {{ props.row.stockAvailable }}
+                Stok: {{ props.row.theGoods.stockAvailable }}
               </p>
               <p
                 class="text-overline q-ma-none self-end"
                 style="line-height: 15px"
               >
-                Rp {{ props.row.purchasePrice }}
+                Rp {{ props.row.theGoods.purchasePrice }}
               </p>
               <q-card-actions align="right">
-                <base-button icon="remove" @click="removeGoods(props.row.id)" />
+                <base-button icon="delete" @click="removeGoods(props.row.id)" />
+                <base-button icon="edit">
+                  <q-popup-proxy :breakpoint="100" ref="popupRef">
+                    <base-card class="q-pa-sm">
+                      <base-input
+                        v-model="amount"
+                        class="col-12 q-my-sm"
+                        label="Jumlah Barang"
+                        type="number"
+                      />
+                      <base-input
+                        v-model="sellPrice"
+                        class="col-12 q-my-sm"
+                        label="Harga Jual"
+                        type="number"
+                      />
+                      <base-button
+                        label="Submit"
+                        @click="sendUpdateDetail(props.row.id)"
+                      />
+                    </base-card>
+                  </q-popup-proxy>
+                </base-button>
               </q-card-actions>
             </q-card-section>
           </q-card-section>
@@ -56,14 +80,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, ref, PropType } from 'vue';
 import { api } from 'boot/axios';
-import { transactionDetailColumns } from 'src/models/table-columns/transaction-detail-columns';
+import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
+import BaseDialog from 'components/ui/BaseDialog.vue';
+import BaseInput from'components/ui/BaseInput.vue'
+import { ITransactionHeader, ITransactionDetail } from 'src/models/interfaces/transaction.interface';
 import axios, { AxiosError } from 'axios';
-import { useQuasar } from 'quasar';
+import { QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({
   emits: ['deletedDetail'],
@@ -72,12 +98,18 @@ export default defineComponent({
   },
   components: {
     BaseButton,
-    BaseCard
+    BaseCard,
+    BaseInput
   },
   setup(props) {
     console.log(props.transactionHeader);
     const $q = useQuasar();
-    function notifyError(err: unknown | AxiosError) {
+    const popupRef = ref<InstanceType<typeof QPopupProxy>>();
+    const rows = ref<ITransactionDetail[]>([]);
+    const amount = ref(Number);
+    const sellPrice = ref(Number);
+
+    function notifyError(err: unknown | AxiosError): void {
       if (axios.isAxiosError(err)) {
         const { response } = err;
         // eslint-disable-next-line
@@ -89,18 +121,42 @@ export default defineComponent({
       }
     }
 
-    // TODO: Removes detail data after OK
-    async function removeDetail(id: number) {
+    function removeDetail(id: number) {
+      $q.dialog({
+        component: BaseDialog,
+        componentProps: {
+          title: 'Hapus barang',
+          body: 'Yakin ingin menghapus barang?'
+        }
+      }).onOk(async () => {
+        try {
+          await api.delete(`/transaction/detail/${id}`);
+
+        } catch (err) {
+          notifyError(err);
+        }
+      });
+    }
+
+    async function sendUpdateDetail(id: number) {
       try {
-        await api.delete(`/transaction/detail/${id}`);
+        await api.put(`/transaction/detail/${id}`);
+        // TODO: Update Function
       } catch (err) {
-        notifyError(err);
+        notifyError?.(err);
       }
     }
 
+    // TODO: "Lakukan Transaksi" Function
+
     return {
-      transactionDetailColumns,
-      removeGoods: removeDetail
+      goodsColumns,
+      popupRef,
+      rows,
+      amount,
+      sellPrice,
+      removeGoods: removeDetail,
+      sendUpdateDetail,
     };
   }
 });
