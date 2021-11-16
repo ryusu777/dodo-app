@@ -93,17 +93,17 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'pages/goods/goods.interface';
+import { IGoods } from 'src/models/interfaces/goods.interface';
 import { IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { goodsColumns } from 'pages/goods/goods-columns';
+import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseInput from 'components/ui/BaseInput.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
-import SellingGoodsBasketDialog from './SellingGoodsBasketDialog.vue';
-import { ITransactionHeader } from './selling-goods.interface';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
+import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketDialog.vue';
+import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import { QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({

@@ -27,9 +27,9 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
-import BaseCard from 'src/components/ui/BaseCard.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import { ITransactionHeader } from './selling-goods.interface';
+import BaseCard from 'components/ui/BaseCard.vue';
+import BaseButton from 'components/ui/BaseButton.vue';
+import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import SellingGoodsBasket from './SellingGoodsBasket.vue';
 
 export default {

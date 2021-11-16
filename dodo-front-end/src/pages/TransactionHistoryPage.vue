@@ -44,7 +44,7 @@
             <q-card-section horizontal class="row">
               <q-card-section class="col">
                 <p class="text-bold text-h5 q-pa-none q-ma-none">
-                  {{ props.row.transactionType === 'sell' ? 'Pemasukan' : 'Pengeluaran' }} 
+                  {{ props.row.transactionType === 'sell' ? 'Pemasukan' : 'Pengeluaran' }}
                 </p>
                 <div class="row">
                   <p class="q-pr-md"> Rp {{ props.row.totalPrice }} </p>
@@ -59,7 +59,7 @@
                   class="text-overline q-ma-none self-end"
                   style="line-height: 15px"
                 >
-                  Cash : Rp 
+                  Cash : Rp
                 </p>
                 <q-card-actions align="right">
                   <base-button
@@ -77,19 +77,19 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'pages/goods/goods.interface';
-import { ITransactionHeader } from './selling-goods.interface';
+import { IGoods } from 'src/models/interfaces/goods.interface';
+import { ITransactionHeader } from '../models/interfaces/transaction.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
-import { goodsColumns } from 'pages/goods/goods-columns';
-import GoodsFormDialog from 'pages/goods/GoodsFormDialog.vue';
-import BaseDialog from 'src/components/ui/BaseDialog.vue';
+import { goodsColumns } from 'src/models/table-columns/goods-columns';
+import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
+import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
 
 export default defineComponent({
   components: {

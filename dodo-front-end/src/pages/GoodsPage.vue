@@ -83,18 +83,18 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'pages/goods/goods.interface';
+import { IGoods } from 'src/models/interfaces/goods.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
-import { goodsColumns } from 'pages/goods/goods-columns';
-import GoodsFormDialog from 'pages/goods/GoodsFormDialog.vue';
-import BaseDialog from 'src/components/ui/BaseDialog.vue';
+import { goodsColumns } from 'src/models/table-columns/goods-columns';
+import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
+import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
 
 export default defineComponent({
   components: {

@@ -57,11 +57,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { api } from 'src/boot/axios';
-import { transactionDetailColumns } from './transaction-detail-columns';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
-import { ITransactionHeader } from './selling-goods.interface';
+import { api } from 'boot/axios';
+import { transactionDetailColumns } from 'src/models/table-columns/transaction-detail-columns';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
+import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import axios, { AxiosError } from 'axios';
 import { useQuasar } from 'quasar';
 
