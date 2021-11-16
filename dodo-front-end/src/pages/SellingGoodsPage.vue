@@ -105,6 +105,7 @@ import BaseCard from 'components/ui/BaseCard.vue';
 import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketDialog.vue';
 import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import { QPopupProxy, useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   props: {
@@ -117,6 +118,7 @@ export default defineComponent({
   },
   setup(props) {
     const $q = useQuasar();
+    const $router = useRouter();
     const filter = ref('');
     const amount = ref(0);
     const sellPrice = ref(0);
@@ -135,6 +137,20 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${props.id || 0}`
+        );
+
+        if (response.data.transactionType !== 'sell') {
+          await $router.push('/not-found');
+        }
+
+        transactionHeader.value = response.data;
+      } catch (err) {
+        await $router.push('/not-found');
+      }
+
+      try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
           {
@@ -143,21 +159,11 @@ export default defineComponent({
             }
           }
         );
-
         if (response.data.data) rows.value = response.data.data;
       } catch (err) {
         notifyError?.(err);
       }
 
-      try {
-        const response = await api.get<ITransactionHeader>(
-          `/transaction/header/${props.id || 0}`
-        );
-
-        transactionHeader.value = response.data;
-      } catch (err) {
-        notifyError?.(err);
-      }
     });
 
     function showCart() {
