@@ -214,6 +214,7 @@ export default defineComponent({
       goodsColumns,
       rows,
       filter,
+      transactionHeader,
       sendDeleteRequest,
       showUpdateDialog,
       showAddDialog
