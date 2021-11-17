@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Controllers.V1
 {
+    // TODO: Transaction Header date filter
     [Route("/api/v1/[controller]")]
     [ApiController]
     public class TransactionController : ControllerBase
@@ -45,11 +46,13 @@ namespace DodoApp.Controllers.V1
         }
 
         [HttpGet("header")]
-        public async Task<ActionResult<PageWrapper<List<GoodsTransactionHeader>>>> GetGoodsTransactionHeaders(
+        public async Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> GetGoodsTransactionHeaders(
             [FromQuery]PageFilter pageFilter)
         {
-            return Ok(await _transactionRepo
-                .GetGoodsTransactionHeadersAsync(pageFilter));
+            return Ok(_mapper.Map<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>(
+                await _transactionRepo
+                .GetGoodsTransactionHeadersAsync(pageFilter)));
+
         }
 
         [HttpGet("header/{id}")]

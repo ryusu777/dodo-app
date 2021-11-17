@@ -9,15 +9,17 @@ namespace DodoApp.Contracts.V1.Responses
         public DateTime PurchaseDate { get; set; }
         public DateTime ReceiveDate { get; set; }
         public DateTime CreatedDate { get; set; }
-        public int TotalPrice { get
-        {
-            int result = 0;
-            foreach (var detail in GoodsTransactionDetails)
+        public int TotalPrice { 
+            get
             {
-                result += detail.PricePerItem * detail.GoodsAmount;
+                int result = 0;
+                foreach (var detail in GoodsTransactionDetails)
+                {
+                    result += detail.PricePerItem * detail.GoodsAmount;
+                }
+                return result;
             }
-            return result;
-        }}
+        }
         public string Vendor { get; set; }
         public string TransactionType { get; set; }
         public List<ReadGoodsTransactionDetailDto> GoodsTransactionDetails { get; set; }

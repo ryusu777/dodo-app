@@ -50,7 +50,8 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail request)
+        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(
+            GoodsTransactionDetail request)
         {
             var transactionDetail = await _context.GoodsTransactionsDetails
                 .FirstOrDefaultAsync(g => g.Id == request.Id);
@@ -81,7 +82,8 @@ namespace DodoApp.Repository
             -1: internal server error
             >= 1: id of created header
         */
-        public async Task<int> CreateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
+        public async Task<int> CreateTransactionHeaderAsync(
+            GoodsTransactionHeader transactionHeader)
         {
             transactionHeader.CreatedDate = DateTime.Now;
             await _context.GoodsTransactionHeaders.AddAsync(transactionHeader);
@@ -136,7 +138,8 @@ namespace DodoApp.Repository
             return goods;
         }
 
-        public async Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(PageFilter pageFilter)
+        public async Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
+            PageFilter pageFilter)
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
 
@@ -148,7 +151,8 @@ namespace DodoApp.Repository
                           PurchaseDate = s.PurchaseDate,
                           ReceiveDate = s.ReceiveDate,
                           TransactionType = s.TransactionType,
-                          Vendor = s.Vendor
+                          Vendor = s.Vendor,
+                          GoodsTransactionDetails = s.GoodsTransactionDetails
                       };
 
             if (!String.IsNullOrEmpty(validPageFilter.SearchText))
@@ -158,7 +162,8 @@ namespace DodoApp.Repository
                 );
             }
 
-            return await Pagination<GoodsTransactionHeader>.LoadPageAsync(qry, validPageFilter);
+            return await Pagination<GoodsTransactionHeader>.LoadPageAsync(
+                qry, validPageFilter);
         }
 
         public async Task<HttpStatusCode> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)

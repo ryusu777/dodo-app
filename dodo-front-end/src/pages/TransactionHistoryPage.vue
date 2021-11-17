@@ -15,56 +15,56 @@
           dense
           debounce="300"
           label="Purchase Date dari "
+          v-model="purchaseDateFrom"
         />
         <base-input-date
           borderless
           dense
           debounce="300"
           label="Purchase Date sampai "
+          v-model="purchaseDateTo"
         />
         <base-input-date
           borderless
           dense
           debounce="300"
           label="Receive Date dari "
+          v-model="receiveDateFrom"
         />
         <base-input-date
           borderless
           dense
           debounce="300"
           label="Receive Date sampai "
+          v-model="receiveDateTo"
         />
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-12">
           <base-card
             :class="props.selected ? 'bg-grey-2' : ''"
-            style="height: 100px"
+            style="height: 90px"
           >
             <q-card-section horizontal class="row">
               <q-card-section class="col">
                 <p class="text-bold text-h5 q-pa-none q-ma-none">
-                  {{ props.row.transactionType === 'sell' ? 'Pemasukan' : 'Pengeluaran' }}
+                  {{
+                    props.row.transactionType === 'sell'
+                      ? 'Pemasukan'
+                      : 'Pengeluaran'
+                  }}
                 </p>
                 <div class="row">
-                  <p class="q-pr-md"> Rp {{ props.row.totalPrice }} </p>
+                  <p class="q-pr-md">Rp {{ props.row.totalPrice }}</p>
                 </div>
               </q-card-section>
 
               <q-card-section class="text-right">
                 <p class="text-overline q-ma-none" style="line-height: 15px">
-                  {{ props.row.createdDate }}
-                </p>
-                <p
-                  class="text-overline q-ma-none self-end"
-                  style="line-height: 15px"
-                >
-                  Cash : Rp
+                  {{ formattedDate(props.row.createdDate) }}
                 </p>
                 <q-card-actions align="right">
-                  <base-button
-                    label = "Detail"
-                  />
+                  <base-button label="Detail" />
                 </q-card-actions>
               </q-card-section>
             </q-card-section>
@@ -77,29 +77,24 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'src/models/interfaces/goods.interface';
 import { ITransactionHeader } from '../models/interfaces/transaction.interface';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
+import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuasar } from 'quasar';
 import { goodsColumns } from 'src/models/table-columns/goods-columns';
-import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
-import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
+import { date } from 'quasar';
 
 export default defineComponent({
   components: {
     BaseInputDate,
     BaseButton,
     BaseCard
-
   },
   setup() {
-    const $q = useQuasar();
     const filter = ref('');
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
@@ -109,20 +104,23 @@ export default defineComponent({
       rowsPerPage: 5
     });
 
+    const purchaseDateFrom = ref('');
+    const purchaseDateTo = ref('');
+    const receiveDateFrom = ref('');
+    const receiveDateTo = ref('');
+
     const transactionHeader = ref<ITransactionHeader>();
 
-    const rows = ref<IGoods[]>([]);
+    const rows = ref<ITransactionHeader[]>([]);
 
     onMounted(async () => {
       try {
-        const response: AxiosResponse<IPagination<IGoods>> = await api.get(
-          '/goods',
-          {
+        const response: AxiosResponse<IPagination<ITransactionHeader>> =
+          await api.get('/transaction/header', {
             params: {
               ...pagination.value
             }
-          }
-        );
+          });
 
         if (response.data.data) rows.value = response.data.data;
       } catch (err) {
@@ -130,84 +128,8 @@ export default defineComponent({
       }
     });
 
-    function sendDeleteRequest(id: number) {
-      $q.dialog({
-        component: BaseDialog,
-        componentProps: {
-          title: 'Hapus barang',
-          body: 'Yakin ingin menghapus barang?'
-        }
-      }).onOk(async () => {
-        try {
-          await api.delete(`/goods/${id}`);
-
-          rows.value.splice(
-            rows.value.findIndex((item) => item.id == id),
-            1
-          );
-        } catch (err) {
-          notifyError?.(err);
-        }
-      });
-    }
-
-    async function sendUpdateRequest(goods: IGoods) {
-      try {
-        await api.put(`/goods/${goods.id || -1}`, goods);
-
-        rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
-      } catch (err) {
-        notifyError?.(err);
-      }
-    }
-
-    async function sendCreateRequest(goods: IGoods): Promise<void> {
-      try {
-        const response = await api.post<ICreateResponse>('/goods', {
-          goodsName: goods.goodsName,
-          goodsCode: goods.goodsCode,
-          carType: goods.carType,
-          partNumber: goods.partNumber,
-          minimalAvailable: goods.minimalAvailable,
-          stockAvailable: goods.stockAvailable,
-          purchasePrice: goods.purchasePrice
-        });
-        rows.value.push({
-          id: response.data.id,
-          goodsName: goods.goodsName,
-          goodsCode: goods.goodsCode,
-          carType: goods.carType,
-          partNumber: goods.partNumber,
-          minimalAvailable: goods.minimalAvailable,
-          stockAvailable: goods.stockAvailable,
-          purchasePrice: goods.purchasePrice
-        });
-      } catch (err) {
-        notifyError?.(err);
-      }
-    }
-
-    function showUpdateDialog(goods: IGoods) {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          goods,
-          title: 'Ubah data barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendUpdateRequest(goods);
-      });
-    }
-
-    function showAddDialog() {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          title: 'Tambah Barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendCreateRequest(goods);
-      });
+    function formattedDate(value: Date | string) {
+      return date.formatDate(value, 'ddd D MMM, YYYY');
     }
 
     return {
@@ -215,9 +137,11 @@ export default defineComponent({
       rows,
       filter,
       transactionHeader,
-      sendDeleteRequest,
-      showUpdateDialog,
-      showAddDialog
+      formattedDate,
+      receiveDateFrom,
+      receiveDateTo,
+      purchaseDateFrom,
+      purchaseDateTo
     };
   }
 });
