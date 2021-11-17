@@ -1,11 +1,11 @@
 <template>
-  <!-- TODO: Grid display of item -->
   <q-table
     grid
     :rows="transactionHeader?.goodsTransactionDetails"
     :columns="goodsColumns"
     row-key="id"
     hide-header
+    hide-pagination
   >
     <template v-slot:item="props">
       <div class="q-pa-xs col-12">
@@ -30,7 +30,6 @@
               <p class="text-caption q-pa-none q-ma-none">
                 {{ props.row.theGoods.carType }}
               </p>
-              
             </q-card-section>
 
             <q-card-section class="text-right">
@@ -49,20 +48,20 @@
                   <q-popup-proxy :breakpoint="100" ref="popupRef">
                     <base-card class="q-pa-sm">
                       <base-input
-                        v-model="amount"
+                        v-model="props.row.goodsAmount"
                         class="col-12 q-my-sm"
                         label="Jumlah Barang"
                         type="number"
                       />
                       <base-input
-                        v-model="sellPrice"
+                        v-model="props.row.pricePerItem"
                         class="col-12 q-my-sm"
                         label="Harga Jual"
                         type="number"
                       />
                       <base-button
                         label="Submit"
-                        @click="sendUpdateDetail(props.row.id)"
+                        @click="sendUpdateDetail(props.row.id, props.row)"
                       />
                     </base-card>
                   </q-popup-proxy>
@@ -86,10 +85,13 @@ import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseDialog from 'components/ui/BaseDialog.vue';
-import BaseInput from'components/ui/BaseInput.vue'
-import { ITransactionHeader, ITransactionDetail } from 'src/models/interfaces/transaction.interface';
+import BaseInput from 'components/ui/BaseInput.vue';
+import {
+  ITransactionHeader,
+  ITransactionDetail
+} from 'src/models/interfaces/transaction.interface';
 import axios, { AxiosError } from 'axios';
-import { QPopupProxy, useQuasar } from 'quasar';
+import { LooseDictionary, QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({
   emits: ['deletedDetail'],
@@ -131,17 +133,21 @@ export default defineComponent({
       }).onOk(async () => {
         try {
           await api.delete(`/transaction/detail/${id}`);
-
         } catch (err) {
           notifyError(err);
         }
       });
     }
 
-    async function sendUpdateDetail(id: number) {
+    async function sendUpdateDetail(id: number, detail: LooseDictionary) {
       try {
-        await api.put(`/transaction/detail/${id}`);
-        // TODO: Update Function
+        await api.put(`/transaction/detail/${id}`, detail);
+
+        $q.notify({
+          message: 'Berhasil mengubah data'
+        });
+
+        popupRef.value?.hide();
       } catch (err) {
         notifyError?.(err);
       }
@@ -156,7 +162,7 @@ export default defineComponent({
       amount,
       sellPrice,
       removeGoods: removeDetail,
-      sendUpdateDetail,
+      sendUpdateDetail
     };
   }
 });
