@@ -7,7 +7,8 @@
       :rows="rows"
       :columns="goodsColumns"
       row-key="id"
-      :filter="filter"
+      v-model:filter="filter"
+      v-model:pagination="pagination"
       hide-header
     >
       <template v-slot:top-right>
@@ -82,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, inject } from 'vue';
+import { defineComponent, ref, inject, watch } from 'vue';
 import { IGoods } from 'src/models/interfaces/goods.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
@@ -115,13 +116,28 @@ export default defineComponent({
 
     const rows = ref<IGoods[]>([]);
 
-    onMounted(async () => {
+    watch(
+      () => pagination.value,
+      async () => {
+        await sendGetGoods();
+      }
+    );
+
+    watch(
+      () => filter.value,
+      async () => {
+        await sendGetGoods();
+      }
+    );
+
+    async function sendGetGoods() {
       try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
           {
             params: {
-              ...pagination.value
+              ...pagination.value,
+              searchText: filter.value
             }
           }
         );
@@ -130,7 +146,7 @@ export default defineComponent({
       } catch (err) {
         notifyError?.(err);
       }
-    });
+    }
 
     function sendDeleteRequest(id: number) {
       $q.dialog({
@@ -217,8 +233,10 @@ export default defineComponent({
       rows,
       filter,
       sendDeleteRequest,
+      sendGetGoods,
       showUpdateDialog,
-      showAddDialog
+      showAddDialog,
+      pagination
     };
   }
 });
