@@ -8,7 +8,6 @@
       <q-card-section>
         <selling-goods-basket
           :transaction-header="transactionHeader"
-          @deleted-detail="onDialogOK"
         ></selling-goods-basket>
       </q-card-section>
 
@@ -25,18 +24,21 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue';
+import { PropType, defineComponent } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import SellingGoodsBasket from './SellingGoodsBasket.vue';
 
-export default {
+export default defineComponent({
   props: {
-    transactionHeader: Object as PropType<ITransactionHeader>
+    transactionHeader: {
+      type: Object as PropType<ITransactionHeader>,
+      required: true
+    }
   },
-  emits: [...useDialogPluginComponent.emits],
+  emits: [...useDialogPluginComponent.emits, 'deletedDetail'],
   setup() {
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
@@ -51,5 +53,5 @@ export default {
     };
   },
   components: { BaseCard, BaseButton, SellingGoodsBasket }
-};
+});
 </script>

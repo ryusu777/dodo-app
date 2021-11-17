@@ -1,7 +1,7 @@
 <template>
   <q-table
     grid
-    :rows="transactionHeader?.goodsTransactionDetails"
+    :rows="modelHeader?.goodsTransactionDetails"
     :columns="goodsColumns"
     row-key="id"
     hide-header
@@ -74,7 +74,7 @@
     </template>
   </q-table>
   <div class="row justify-end q-mb-md">
-    <base-button label="Lakukan Transaksi" />
+    <base-button label="Lakukan Transaksi" @click="sendCompleteTransaction" />
   </div>
 </template>
 
@@ -94,9 +94,11 @@ import axios, { AxiosError } from 'axios';
 import { LooseDictionary, QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({
-  emits: ['deletedDetail'],
   props: {
-    transactionHeader: Object as PropType<ITransactionHeader>
+    transactionHeader: {
+      type: Object as PropType<ITransactionHeader>,
+      required: true
+    }
   },
   components: {
     BaseButton,
@@ -110,6 +112,7 @@ export default defineComponent({
     const rows = ref<ITransactionDetail[]>([]);
     const amount = ref(Number);
     const sellPrice = ref(Number);
+    const modelHeader = ref(props.transactionHeader);
 
     function notifyError(err: unknown | AxiosError): void {
       if (axios.isAxiosError(err)) {
@@ -133,6 +136,12 @@ export default defineComponent({
       }).onOk(async () => {
         try {
           await api.delete(`/transaction/detail/${id}`);
+          modelHeader.value.goodsTransactionDetails.splice(
+            modelHeader.value.goodsTransactionDetails.findIndex(
+              (item) => item.id === id
+            ),
+            1
+          );
         } catch (err) {
           notifyError(err);
         }
@@ -153,7 +162,22 @@ export default defineComponent({
       }
     }
 
-    // TODO: "Lakukan Transaksi" Function
+    async function sendCompleteTransaction() {
+      const transactionHeader = props.transactionHeader;
+      transactionHeader.purchaseDate = new Date();
+      transactionHeader.receiveDate = new Date();
+      try {
+        await api.put(
+          `/transaction/header/${props.transactionHeader.id || 0}`,
+          transactionHeader
+        );
+        $q.notify({
+          message: 'Berhasil menyelesaikan transaksi'
+        });
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
 
     return {
       goodsColumns,
@@ -162,7 +186,9 @@ export default defineComponent({
       amount,
       sellPrice,
       removeGoods: removeDetail,
-      sendUpdateDetail
+      sendUpdateDetail,
+      sendCompleteTransaction,
+      modelHeader
     };
   }
 });

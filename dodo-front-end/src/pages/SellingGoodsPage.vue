@@ -163,7 +163,6 @@ export default defineComponent({
       } catch (err) {
         notifyError?.(err);
       }
-
     });
 
     function showCart() {
@@ -190,6 +189,16 @@ export default defineComponent({
         amount.value = 0;
         sellPrice.value = 0;
         popupRef.value?.hide();
+      } catch (err) {
+        notifyError?.(err);
+      }
+
+      try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${transactionHeader.value?.id || 0}`
+        );
+
+        transactionHeader.value = response.data;
       } catch (err) {
         notifyError?.(err);
       }
