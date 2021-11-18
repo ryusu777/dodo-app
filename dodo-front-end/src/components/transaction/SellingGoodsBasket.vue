@@ -11,7 +11,7 @@
       <div class="q-pa-xs col-12">
         <base-card
           :class="props.selected ? 'bg-grey-2' : ''"
-          style="height: 100px"
+          :style="{ height: editable ? '100px' : '75px' }"
         >
           <q-card-section horizontal class="row">
             <q-card-section class="col">
@@ -21,30 +21,28 @@
               >
                 {{ props.row.theGoods.goodsCode }}
               </p>
-              <p class="text-bold text-h7 q-pa-none q-ma-none">
+              <p class="text-bold text-h5 q-pa-none q-ma-none">
                 {{ props.row.theGoods.goodsName }}
-              </p>
-              <p class="text-caption q-pa-none q-ma-none">
-                {{ props.row.theGoods.partNumber }}
-              </p>
-              <p class="text-caption q-pa-none q-ma-none">
-                {{ props.row.theGoods.carType }}
               </p>
             </q-card-section>
 
             <q-card-section class="text-right">
               <p class="text-overline q-ma-none" style="line-height: 15px">
-                Stok: {{ props.row.theGoods.stockAvailable }}
+                Jumlah: {{ props.row.goodsAmount }}
               </p>
               <p
                 class="text-overline q-ma-none self-end"
                 style="line-height: 15px"
               >
-                Rp {{ props.row.theGoods.purchasePrice }}
+                Rp {{ props.row.pricePerItem }}
               </p>
               <q-card-actions align="right">
-                <base-button icon="delete" @click="removeGoods(props.row.id)" />
-                <base-button icon="edit">
+                <base-button
+                  v-if="editable"
+                  icon="delete"
+                  @click="removeGoods(props.row.id)"
+                />
+                <base-button v-if="editable" icon="edit">
                   <q-popup-proxy :breakpoint="100" ref="popupRef">
                     <base-card class="q-pa-sm">
                       <base-input
@@ -73,9 +71,6 @@
       </div>
     </template>
   </q-table>
-  <div class="row justify-end q-mb-md">
-    <base-button label="Lakukan Transaksi" @click="sendCompleteTransaction" />
-  </div>
 </template>
 
 <script lang="ts">
@@ -98,7 +93,8 @@ export default defineComponent({
     transactionHeader: {
       type: Object as PropType<ITransactionHeader>,
       required: true
-    }
+    },
+    editable: Boolean
   },
   components: {
     BaseButton,
@@ -106,7 +102,6 @@ export default defineComponent({
     BaseInput
   },
   setup(props) {
-    console.log(props.transactionHeader);
     const $q = useQuasar();
     const popupRef = ref<InstanceType<typeof QPopupProxy>>();
     const rows = ref<ITransactionDetail[]>([]);
@@ -136,8 +131,8 @@ export default defineComponent({
       }).onOk(async () => {
         try {
           await api.delete(`/transaction/detail/${id}`);
-          modelHeader.value.goodsTransactionDetails.splice(
-            modelHeader.value.goodsTransactionDetails.findIndex(
+          modelHeader.value?.goodsTransactionDetails.splice(
+            modelHeader.value?.goodsTransactionDetails.findIndex(
               (item) => item.id === id
             ),
             1
@@ -162,23 +157,6 @@ export default defineComponent({
       }
     }
 
-    async function sendCompleteTransaction() {
-      const transactionHeader = props.transactionHeader;
-      transactionHeader.purchaseDate = new Date();
-      transactionHeader.receiveDate = new Date();
-      try {
-        await api.put(
-          `/transaction/header/${props.transactionHeader.id || 0}`,
-          transactionHeader
-        );
-        $q.notify({
-          message: 'Berhasil menyelesaikan transaksi'
-        });
-      } catch (err) {
-        notifyError?.(err);
-      }
-    }
-
     return {
       goodsColumns,
       popupRef,
@@ -187,7 +165,6 @@ export default defineComponent({
       sellPrice,
       removeGoods: removeDetail,
       sendUpdateDetail,
-      sendCompleteTransaction,
       modelHeader
     };
   }

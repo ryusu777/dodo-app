@@ -1,14 +1,7 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">History Transaction</h3>
-    <q-table
-      grid
-      :rows="rows"
-      :columns="goodsColumns"
-      row-key="id"
-      :filter="filter"
-      hide-header
-    >
+    <q-table grid :rows="rows" row-key="id" :filter="filter" hide-header>
       <template v-slot:top-right>
         <base-input-date
           borderless
@@ -64,7 +57,10 @@
                   {{ formattedDate(props.row.createdDate) }}
                 </p>
                 <q-card-actions align="right">
-                  <base-button label="Detail" />
+                  <base-button
+                    label="Detail"
+                    @click="showDetail(props.row.id)"
+                  />
                 </q-card-actions>
               </q-card-section>
             </q-card-section>
@@ -86,7 +82,8 @@ import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import { date } from 'quasar';
+import { date, useQuasar } from 'quasar';
+import TransactionHistoryDialog from 'src/components/transaction/TransactionHistoryDialog.vue';
 
 export default defineComponent({
   components: {
@@ -98,6 +95,7 @@ export default defineComponent({
     const filter = ref('');
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
+    const $q = useQuasar();
 
     const pagination = ref<IPageFilter>({
       page: 1,
@@ -132,6 +130,17 @@ export default defineComponent({
       return date.formatDate(value, 'ddd D MMM, YYYY');
     }
 
+    function showDetail(id: number) {
+      $q.dialog({
+        component: TransactionHistoryDialog,
+        componentProps: {
+          headerId: id
+        }
+      });
+    }
+
+    // TODO: Transaction History Date Filter
+
     return {
       goodsColumns,
       rows,
@@ -141,7 +150,8 @@ export default defineComponent({
       receiveDateFrom,
       receiveDateTo,
       purchaseDateFrom,
-      purchaseDateTo
+      purchaseDateTo,
+      showDetail
     };
   }
 });
