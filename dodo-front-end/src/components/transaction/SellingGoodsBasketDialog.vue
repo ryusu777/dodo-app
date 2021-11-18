@@ -1,12 +1,13 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <base-card style="width: 300px">
+    <base-card style="width: 325px">
       <q-card-section>
         <p class="text-center text-h6 text-bold">Keranjang</p>
       </q-card-section>
 
       <q-card-section>
         <selling-goods-basket
+          :editable="editable"
           :transaction-header="transactionHeader"
         ></selling-goods-basket>
         <div class="row justify-end q-mb-md">
@@ -45,7 +46,8 @@ export default defineComponent({
     transactionHeader: {
       type: Object as PropType<ITransactionHeader>,
       required: true
-    }
+    },
+    editable: Boolean
   },
   emits: [...useDialogPluginComponent.emits, 'deletedDetail'],
   setup(props) {

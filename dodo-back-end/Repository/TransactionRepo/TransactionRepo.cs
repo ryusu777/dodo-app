@@ -28,6 +28,7 @@ namespace DodoApp.Repository
             -3 -> Goods doesn't exists
             -4 -> TransactionDetail exists
         */
+        // TODO: Check if goods stock is enough or currency is enough
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
             var validity = await CheckTransferDetailValidity(transactionDetail);
@@ -166,6 +167,7 @@ namespace DodoApp.Repository
                 qry, validPageFilter);
         }
 
+        // TODO: Change goods stock and currency for done transaction
         public async Task<HttpStatusCode> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
         {
             _context.Entry(transactionHeader).State = EntityState.Modified;

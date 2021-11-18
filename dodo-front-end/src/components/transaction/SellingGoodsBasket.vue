@@ -21,7 +21,7 @@
               >
                 {{ props.row.theGoods.goodsCode }}
               </p>
-              <p class="text-bold text-h5 q-pa-none q-ma-none">
+              <p class="text-bold text-h7 q-pa-none q-ma-none">
                 {{ props.row.theGoods.goodsName }}
               </p>
             </q-card-section>

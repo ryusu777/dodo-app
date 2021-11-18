@@ -47,12 +47,7 @@ const menu = [
     text: 'Lihat Barang'
   },
   {
-    id: 2,
-    url: '/selling-goods',
-    text: 'Menjual Barang'
-  },
-  {
-    id: 3,
+    id: 4,
     url: '/transaction-history',
     text: 'Histori transaksi'
   }
