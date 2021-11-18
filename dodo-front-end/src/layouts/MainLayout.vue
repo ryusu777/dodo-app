@@ -50,6 +50,11 @@ const menu = [
     id: 2,
     url: '/selling-goods',
     text: 'Menjual Barang'
+  },
+  {
+    id: 3,
+    url: '/transaction-history',
+    text: 'Histori transaksi'
   }
 ];
 export default defineComponent({

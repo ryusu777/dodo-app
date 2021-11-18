@@ -1,7 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Menjual</h3>
-    <!-- TODO: Pagination -->
     <q-table
       grid
       :rows="rows"
