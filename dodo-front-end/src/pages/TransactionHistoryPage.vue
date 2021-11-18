@@ -86,7 +86,6 @@ import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
@@ -162,7 +161,6 @@ export default defineComponent({
     // TODO: Transaction History Date Filter
 
     return {
-      goodsColumns,
       rows,
       filter,
       transactionHeader,
