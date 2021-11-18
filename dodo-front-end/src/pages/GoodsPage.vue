@@ -1,15 +1,14 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
-    <!-- TODO: Pagination -->
+    <!-- TODO: Next - Previous page -->
     <q-table
       grid
       :rows="rows"
-      :columns="goodsColumns"
       row-key="id"
       v-model:filter="filter"
-      v-model:pagination="pagination"
-      hide-header
+      v-model:pagination="requestPagination"
+      @request="handleRequest"
     >
       <template v-slot:top-right>
         <base-button
@@ -83,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, watch } from 'vue';
+import { defineComponent, ref, inject, onMounted } from 'vue';
 import { IGoods } from 'src/models/interfaces/goods.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
@@ -109,26 +108,19 @@ export default defineComponent({
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
-    const pagination = ref<IPageFilter>({
+    const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
     });
 
     const rows = ref<IGoods[]>([]);
 
-    watch(
-      () => pagination.value,
-      async () => {
-        await sendGetGoods();
-      }
-    );
+    onMounted(async () => await sendGetGoods());
 
-    watch(
-      () => filter.value,
-      async () => {
-        await sendGetGoods();
-      }
-    );
+    async function handleRequest({ pagination }: { pagination: IPageFilter }) {
+      requestPagination.value = pagination;
+      await sendGetGoods();
+    }
 
     async function sendGetGoods() {
       try {
@@ -136,13 +128,19 @@ export default defineComponent({
           '/goods',
           {
             params: {
-              ...pagination.value,
+              ...requestPagination.value,
               searchText: filter.value
             }
           }
         );
 
-        if (response.data.data) rows.value = response.data.data;
+        if (response.data.data) {
+          rows.value = response.data.data;
+          requestPagination.value.rowsNumber = response.data.rowsNumber;
+          requestPagination.value.page = response.data.pageNumber;
+          requestPagination.value.searchText = response.data.searchText;
+          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+        }
       } catch (err) {
         notifyError?.(err);
       }
@@ -236,7 +234,8 @@ export default defineComponent({
       sendGetGoods,
       showUpdateDialog,
       showAddDialog,
-      pagination
+      requestPagination,
+      handleRequest
     };
   }
 });

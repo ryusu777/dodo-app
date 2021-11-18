@@ -1,7 +1,15 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">History Transaction</h3>
-    <q-table grid :rows="rows" row-key="id" :filter="filter" hide-header>
+    <q-table
+      grid
+      :rows="rows"
+      row-key="id"
+      :filter="filter"
+      hide-header
+      v-model:pagination="requestPagination"
+      @request="handleRequest"
+    >
       <template v-slot:top-right>
         <base-input-date
           borderless
@@ -97,7 +105,7 @@ export default defineComponent({
       inject('notifyError');
     const $q = useQuasar();
 
-    const pagination = ref<IPageFilter>({
+    const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
     });
@@ -111,20 +119,32 @@ export default defineComponent({
 
     const rows = ref<ITransactionHeader[]>([]);
 
-    onMounted(async () => {
+    async function sendGetHeaders() {
       try {
         const response: AxiosResponse<IPagination<ITransactionHeader>> =
           await api.get('/transaction/header', {
             params: {
-              ...pagination.value
+              ...requestPagination.value
             }
           });
 
-        if (response.data.data) rows.value = response.data.data;
+        if (response.data.data) {
+          rows.value = response.data.data;
+          requestPagination.value.rowsNumber = response.data.rowsNumber;
+          requestPagination.value.page = response.data.pageNumber;
+          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+        }
       } catch (err) {
         notifyError?.(err);
       }
-    });
+    }
+
+    async function handleRequest({ pagination }: { pagination: IPageFilter }) {
+      requestPagination.value = pagination;
+      await sendGetHeaders();
+    }
+
+    onMounted(async () => await sendGetHeaders());
 
     function formattedDate(value: Date | string) {
       return date.formatDate(value, 'ddd D MMM, YYYY');
@@ -151,7 +171,9 @@ export default defineComponent({
       receiveDateTo,
       purchaseDateFrom,
       purchaseDateTo,
-      showDetail
+      showDetail,
+      requestPagination,
+      handleRequest
     };
   }
 });
