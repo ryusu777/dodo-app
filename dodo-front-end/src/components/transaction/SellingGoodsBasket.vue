@@ -2,7 +2,6 @@
   <q-table
     grid
     :rows="modelHeader?.goodsTransactionDetails"
-    :columns="goodsColumns"
     row-key="id"
     hide-header
     hide-pagination
@@ -76,7 +75,6 @@
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue';
 import { api } from 'boot/axios';
-import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseDialog from 'components/ui/BaseDialog.vue';
@@ -158,7 +156,6 @@ export default defineComponent({
     }
 
     return {
-      goodsColumns,
       popupRef,
       rows,
       amount,

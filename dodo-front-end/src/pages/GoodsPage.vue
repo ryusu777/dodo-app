@@ -88,7 +88,6 @@ import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
-import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
 import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
@@ -226,7 +225,6 @@ export default defineComponent({
     }
 
     return {
-      goodsColumns,
       rows,
       filter,
       sendDeleteRequest,
