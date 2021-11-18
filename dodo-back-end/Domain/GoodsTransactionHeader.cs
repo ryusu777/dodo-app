@@ -9,6 +9,7 @@ namespace DodoApp.Domain
     {
         [Key]
         public int Id { get; set; }
+        // TODO: Purchase and Receive date can be null
         public DateTime PurchaseDate { get; set; }
         public DateTime ReceiveDate { get; set; }
         [Required]

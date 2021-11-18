@@ -1,7 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
-    <!-- TODO: Pagination -->
+    <h3 class="text-bold q-mx-lg q-mt-sm">Menjual</h3>
     <q-table
       grid
       :rows="rows"
@@ -11,11 +10,7 @@
       hide-header
     >
       <template v-slot:top-right>
-        <base-button
-          label="Tambah Barang"
-          @click="showAddDialog()"
-          class="q-mr-md"
-        />
+        <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
           borderless
           dense
@@ -63,14 +58,28 @@
                   Rp {{ props.row.purchasePrice }}
                 </p>
                 <q-card-actions align="right">
-                  <base-button
-                    @click="sendDeleteRequest(props.row.id)"
-                    icon="delete"
-                  />
-                  <base-button
-                    icon="edit"
-                    @click="showUpdateDialog(props.row)"
-                  />
+                  <base-button icon="add">
+                    <q-popup-proxy :breakpoint="100" ref="popupRef">
+                      <base-card class="q-pa-sm">
+                        <base-input
+                          v-model="amount"
+                          class="col-12 q-my-sm"
+                          label="Jumlah Barang"
+                          type="number"
+                        />
+                        <base-input
+                          v-model="sellPrice"
+                          class="col-12 q-my-sm"
+                          label="Harga Jual"
+                          type="number"
+                        />
+                        <base-button
+                          label="Submit"
+                          @click="sendAddDetail(props.row.id)"
+                        />
+                      </base-card>
+                    </q-popup-proxy>
+                  </base-button>
                 </q-card-actions>
               </q-card-section>
             </q-card-section>
@@ -83,28 +92,36 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'pages/goods/goods.interface';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { IGoods } from 'src/models/interfaces/goods.interface';
+import { IPagination } from 'src/models/responses.interface';
+import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { useQuasar } from 'quasar';
-import { goodsColumns } from 'pages/goods/goods-columns';
-import GoodsFormDialog from 'pages/goods/GoodsFormDialog.vue';
-import BaseDialog from 'src/components/ui/BaseDialog.vue';
+import { goodsColumns } from 'src/models/table-columns/goods-columns';
 import BaseInput from 'components/ui/BaseInput.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
+import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketDialog.vue';
+import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
+import { QPopupProxy, useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
+  props: {
+    id: String
+  },
   components: {
     BaseInput,
     BaseButton,
     BaseCard
   },
-  setup() {
+  setup(props) {
     const $q = useQuasar();
+    const $router = useRouter();
     const filter = ref('');
+    const amount = ref(0);
+    const sellPrice = ref(0);
+    const popupRef = ref<InstanceType<typeof QPopupProxy>>();
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
@@ -113,9 +130,25 @@ export default defineComponent({
       rowsPerPage: 5
     });
 
+    const transactionHeader = ref<ITransactionHeader>();
+
     const rows = ref<IGoods[]>([]);
 
     onMounted(async () => {
+      try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${props.id || 0}`
+        );
+
+        if (response.data.transactionType !== 'sell') {
+          await $router.push('/not-found');
+        }
+
+        transactionHeader.value = response.data;
+      } catch (err) {
+        await $router.push('/not-found');
+      }
+
       try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
@@ -125,100 +158,60 @@ export default defineComponent({
             }
           }
         );
-
         if (response.data.data) rows.value = response.data.data;
       } catch (err) {
         notifyError?.(err);
       }
     });
 
-    function sendDeleteRequest(id: number) {
+    function showCart() {
       $q.dialog({
-        component: BaseDialog,
+        component: SellingGoodsBasketDialog,
         componentProps: {
-          title: 'Hapus barang',
-          body: 'Yakin ingin menghapus barang?'
-        }
-      }).onOk(async () => {
-        try {
-          await api.delete(`/goods/${id}`);
-
-          rows.value.splice(
-            rows.value.findIndex((item) => item.id == id),
-            1
-          );
-        } catch (err) {
-          notifyError?.(err);
+          transactionHeader: transactionHeader.value
         }
       });
     }
 
-    async function sendUpdateRequest(goods: IGoods) {
+    async function sendAddDetail(goodsId: number) {
       try {
-        await api.put(`/goods/${goods.id || -1}`, goods);
+        await api.post('/transaction/detail', {
+          goodsId,
+          goodsTransactionHeaderId: transactionHeader.value?.id || 0,
+          goodsAmount: amount.value,
+          pricePerItem: sellPrice.value
+        });
 
-        rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
+        $q.notify({
+          message: 'Berhasil menambahkan barang'
+        });
+        amount.value = 0;
+        sellPrice.value = 0;
+        popupRef.value?.hide();
       } catch (err) {
         notifyError?.(err);
       }
-    }
 
-    async function sendCreateRequest(goods: IGoods): Promise<void> {
       try {
-        const response = await api.post<ICreateResponse>('/goods', {
-          goodsName: goods.goodsName,
-          goodsCode: goods.goodsCode,
-          carType: goods.carType,
-          partNumber: goods.partNumber,
-          minimalAvailable: goods.minimalAvailable,
-          stockAvailable: goods.stockAvailable,
-          purchasePrice: goods.purchasePrice
-        });
-        rows.value.push({
-          id: response.data.id,
-          goodsName: goods.goodsName,
-          goodsCode: goods.goodsCode,
-          carType: goods.carType,
-          partNumber: goods.partNumber,
-          minimalAvailable: goods.minimalAvailable,
-          stockAvailable: goods.stockAvailable,
-          purchasePrice: goods.purchasePrice
-        });
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${transactionHeader.value?.id || 0}`
+        );
+
+        transactionHeader.value = response.data;
       } catch (err) {
         notifyError?.(err);
       }
-    }
-
-    function showUpdateDialog(goods: IGoods) {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          goods,
-          title: 'Ubah data barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendUpdateRequest(goods);
-      });
-    }
-
-    function showAddDialog() {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          title: 'Tambah Barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendCreateRequest(goods);
-      });
     }
 
     return {
       goodsColumns,
       rows,
       filter,
-      sendDeleteRequest,
-      showUpdateDialog,
-      showAddDialog
+      amount,
+      sellPrice,
+      showCart,
+      sendAddDetail,
+      popupRef
     };
   }
 });

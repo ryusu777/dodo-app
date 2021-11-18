@@ -1,7 +1,7 @@
 export interface IPageFilter {
   page?: number;
   rowsPerPage?: number;
+  rowsNumber?: number;
   sortBy?: string;
-  descending?: string;
   searchText?: string;
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoMapper;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
@@ -15,6 +16,7 @@ namespace DodoApp.Profiles
             CreateMap<CreateGoodsTransactionDetailDto, GoodsTransactionDetail>();
             CreateMap<UpdateGoodsTransactionDetailDto, GoodsTransactionDetail>();
             CreateMap<GoodsTransactionDetail, ReadGoodsTransactionDetailDto>();
+            CreateMap<PageWrapper<List<GoodsTransactionHeader>>, PageWrapper<List<ReadGoodsTransactionHeaderDto>>>();
         }
     }
 }

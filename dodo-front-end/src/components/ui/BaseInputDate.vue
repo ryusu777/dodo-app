@@ -18,21 +18,19 @@
 import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
-  inheritAttrs: false,
   emits: ['modelValue:update'],
   props: {
     modelValue: {
-      type: Date,
-      required: false,
-      default: new Date()
+      type: String,
+      required: true
     }
   },
   setup(props, { emit }) {
     const model = computed({
-      get(): Date {
+      get(): string {
         return props.modelValue;
       },
-      set(val: Date) {
+      set(val: string) {
         emit('modelValue:update', val);
       }
     });

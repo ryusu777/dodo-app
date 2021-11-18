@@ -1,15 +1,9 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <h3 class="text-bold q-mx-lg q-mt-sm">Menjual</h3>
-    <!-- TODO: Pagination -->
-    <q-table
-      grid
-      :rows="rows"
-      :columns="goodsColumns"
-      row-key="id"
-      :filter="filter"
-      hide-header
-    >
+    <h3 class="text-bold q-mx-lg q-mt-sm">
+      {{ transactionType == 'sell' ? 'Menjual' : 'Membeli' }}
+    </h3>
+    <q-table grid :rows="rows" row-key="id" :filter="filter" hide-header>
       <template v-slot:top-right>
         <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
@@ -69,6 +63,7 @@
                           type="number"
                         />
                         <base-input
+                          v-if="transactionType == 'sell'"
                           v-model="sellPrice"
                           class="col-12 q-my-sm"
                           label="Harga Jual"
@@ -92,23 +87,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, inject } from 'vue';
-import { IGoods } from 'pages/goods/goods.interface';
+import { defineComponent, ref, onMounted, inject, PropType } from 'vue';
+import { IGoods } from 'src/models/interfaces/goods.interface';
 import { IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { goodsColumns } from 'pages/goods/goods-columns';
 import BaseInput from 'components/ui/BaseInput.vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
-import SellingGoodsBasketDialog from './SellingGoodsBasketDialog.vue';
-import { ITransactionHeader } from './selling-goods.interface';
+import BaseButton from 'components/ui/BaseButton.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
+import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketDialog.vue';
+import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import { QPopupProxy, useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   props: {
-    id: String
+    id: {
+      type: String,
+      required: true
+    },
+    transactionType: {
+      type: String as PropType<'sell' | 'purchase'>,
+      required: true
+    }
   },
   components: {
     BaseInput,
@@ -117,6 +119,7 @@ export default defineComponent({
   },
   setup(props) {
     const $q = useQuasar();
+    const $router = useRouter();
     const filter = ref('');
     const amount = ref(0);
     const sellPrice = ref(0);
@@ -135,6 +138,20 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${props.id || 0}`
+        );
+
+        if (response.data.transactionType !== props.transactionType) {
+          await $router.push('/not-found');
+        }
+
+        transactionHeader.value = response.data;
+      } catch (err) {
+        await $router.push('/not-found');
+      }
+
+      try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
           {
@@ -143,18 +160,7 @@ export default defineComponent({
             }
           }
         );
-
         if (response.data.data) rows.value = response.data.data;
-      } catch (err) {
-        notifyError?.(err);
-      }
-
-      try {
-        const response = await api.get<ITransactionHeader>(
-          `/transaction/header/${props.id || 0}`
-        );
-
-        transactionHeader.value = response.data;
       } catch (err) {
         notifyError?.(err);
       }
@@ -164,7 +170,8 @@ export default defineComponent({
       $q.dialog({
         component: SellingGoodsBasketDialog,
         componentProps: {
-          transactionHeader: transactionHeader.value
+          transactionHeader: transactionHeader.value,
+          editable: true
         }
       });
     }
@@ -175,7 +182,10 @@ export default defineComponent({
           goodsId,
           goodsTransactionHeaderId: transactionHeader.value?.id || 0,
           goodsAmount: amount.value,
-          pricePerItem: sellPrice.value
+          pricePerItem:
+            props.transactionType == 'sell'
+              ? sellPrice.value
+              : rows.value.find((item) => item.id == goodsId)?.purchasePrice
         });
 
         $q.notify({
@@ -187,10 +197,19 @@ export default defineComponent({
       } catch (err) {
         notifyError?.(err);
       }
+
+      try {
+        const response = await api.get<ITransactionHeader>(
+          `/transaction/header/${transactionHeader.value?.id || 0}`
+        );
+
+        transactionHeader.value = response.data;
+      } catch (err) {
+        notifyError?.(err);
+      }
     }
 
     return {
-      goodsColumns,
       rows,
       filter,
       amount,

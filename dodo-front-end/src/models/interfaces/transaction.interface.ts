@@ -1,9 +1,10 @@
-import { IGoods } from '../goods/goods.interface';
+import { IGoods } from './goods.interface';
 
 export interface ITransactionHeader {
   id?: number;
   purchaseDate: Date;
   receiveDate: Date;
+  createdDate: Date;
   vendor: string;
   totalPrice: number;
   transactionType: 'sell' | 'purchase';

@@ -9,13 +9,18 @@ namespace DodoApp.Repository
 {
     public interface ITransactionRepo
     {
-        Task<int> CreateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader);
-        Task<HttpStatusCode> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader);
+        Task<int> CreateTransactionHeaderAsync(
+            GoodsTransactionHeader transactionHeader);
+        Task<HttpStatusCode> UpdateTransactionHeaderAsync(
+            GoodsTransactionHeader transactionHeader);
         Task<HttpStatusCode> DeleteTransactionHeaderAsync(int id);
         Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id);
-        Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(PageFilter pageFilter);
-        Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail);
-        Task<HttpStatusCode> UpdateTransactionDetailAsync(GoodsTransactionDetail transactionDetail);
+        Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
+            PageFilter pageFilter);
+        Task<int> CreateTransactionDetailAsync(
+            GoodsTransactionDetail transactionDetail);
+        Task<HttpStatusCode> UpdateTransactionDetailAsync(
+            GoodsTransactionDetail transactionDetail);
         Task<HttpStatusCode> DeleteTransactionDetail(int id);
     }
 }
