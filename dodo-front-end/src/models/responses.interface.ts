@@ -8,7 +8,7 @@ export interface IPagination<T> {
   pageNumber?: number;
   totalPage?: number;
   itemPerPage?: number;
-  totalItem?: number;
+  rowsNumber?: number;
   sortBy?: string;
   descending?: string;
   searchText?: string;
