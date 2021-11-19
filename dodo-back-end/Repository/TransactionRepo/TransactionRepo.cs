@@ -140,7 +140,7 @@ namespace DodoApp.Repository
         }
 
         public async Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
-            PageFilter pageFilter)
+            PageFilter pageFilter, FilterGoodsTransactionHeader filter)
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
 
@@ -155,6 +155,26 @@ namespace DodoApp.Repository
                           Vendor = s.Vendor,
                           GoodsTransactionDetails = s.GoodsTransactionDetails
                       };
+
+            if (filter != null)
+            {
+                var predicate = PredicateBuilder.True<GoodsTransactionHeader>();
+
+                if (filter.PurchaseDateFrom != null)
+                    predicate = predicate.And(h 
+                        => h.PurchaseDate >= filter.PurchaseDateFrom);
+                if (filter.PurchaseDateTo != null)
+                    predicate = predicate.And(h 
+                        => h.PurchaseDate <= filter.PurchaseDateTo);
+                if (filter.ReceiveDateFrom != null)
+                    predicate = predicate.And(h 
+                        => h.ReceiveDate >= filter.ReceiveDateFrom);
+                if (filter.ReceiveDateTo != null)
+                    predicate = predicate.And(h 
+                        => h.ReceiveDate <= filter.ReceiveDateTo);
+                
+                qry = qry.Where(predicate);
+            }
 
             if (!String.IsNullOrEmpty(validPageFilter.SearchText))
             {
