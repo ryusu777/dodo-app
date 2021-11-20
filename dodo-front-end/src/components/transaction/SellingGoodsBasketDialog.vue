@@ -69,6 +69,12 @@ export default defineComponent({
     }
     async function sendCompleteTransaction() {
       const transactionHeader = props.transactionHeader;
+      if (!transactionHeader.goodsTransactionDetails.length) {
+        $q.notify({
+          message: 'Tidak dapat menyelesaikan transaksi kosong'
+        });
+        return;
+      }
       if (transactionHeader) {
         transactionHeader.purchaseDate = new Date();
         transactionHeader.receiveDate = new Date();
