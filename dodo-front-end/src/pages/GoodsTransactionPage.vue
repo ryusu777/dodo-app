@@ -137,7 +137,7 @@ export default defineComponent({
 
     const rows = ref<IGoods[]>([]);
 
-    onMounted(async () => {
+    async function sendGetHeaders() {
       try {
         const response = await api.get<ITransactionHeader>(
           `/transaction/header/${props.id || 0}`
@@ -181,6 +181,10 @@ export default defineComponent({
       } catch (err) {
         notifyError?.(err);
       }
+    }
+
+    onMounted(async () => {
+      await sendGetHeaders();
     });
 
     function showCart() {
