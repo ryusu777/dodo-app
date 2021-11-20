@@ -69,7 +69,13 @@
                 <q-card-actions align="right">
                   <base-button
                     label="Detail"
-                    @click="showDetail(props.row.id, props.row.transactionType)"
+                    @click="
+                      showDetail(
+                        props.row.id,
+                        props.row.transactionType,
+                        !!props.row.purchaseDate && !!props.row.purchaseDate
+                      )
+                    "
                   />
                 </q-card-actions>
               </q-card-section>
@@ -188,12 +194,17 @@ export default defineComponent({
       return date.formatDate(value, 'ddd D MMM, YYYY');
     }
 
-    function showDetail(id: number, transactionType: string) {
+    function showDetail(
+      id: number,
+      transactionType: string,
+      transactionIsDone: boolean
+    ) {
       $q.dialog({
         component: TransactionHistoryDialog,
         componentProps: {
           headerId: id,
-          transactionType: transactionType
+          transactionType,
+          transactionIsDone
         }
       });
     }

@@ -12,7 +12,11 @@
           />
         </q-card-actions>
         <transaction-header :header-id="headerId" />
-        <base-button label="Lakukan transaksi" @click="doTransaction" />
+        <base-button
+          label="Lakukan transaksi"
+          @click="doTransaction"
+          :disable="transactionIsDone"
+        />
       </q-card-section>
     </base-card>
   </q-dialog>
@@ -35,7 +39,8 @@ export default defineComponent({
     transactionType: {
       type: String as PropType<'sell' | 'purchase'>,
       required: true
-    }
+    },
+    transactionIsDone: Boolean
   },
   emits: [...useDialogPluginComponent.emits],
   setup(props) {
