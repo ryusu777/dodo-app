@@ -11,14 +11,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/GoodsPage.vue')
       },
       {
-        path: 'selling-goods/:id',
-        component: () => import('pages/SellingGoodsPage.vue'),
+        path: 'transaction/:transactionType/:id',
+        component: () => import('src/pages/GoodsTransactionPage.vue'),
         props: true
       },
       {
         path: 'transaction-history',
         component: () => import('pages/TransactionHistoryPage.vue')
-      },
+      }
     ]
   },
 

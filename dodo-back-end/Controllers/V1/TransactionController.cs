@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Controllers.V1
 {
-    // TODO: Transaction Header date filter
     // TODO: More efficient at getting transaction data
     [Route("/api/v1/[controller]")]
     [ApiController]
@@ -46,13 +45,23 @@ namespace DodoApp.Controllers.V1
             return StatusCode((int)HttpStatusCode.Created, new { id = result });
         }
 
+        [HttpPost("header-filter")]
+        public async Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> FilterGoodsHeader(
+            [FromQuery] PageFilter pageFilter, 
+            [FromBody] FilterGoodsTransactionHeader filter)
+        {
+            return Ok(_mapper.Map<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>(
+                await _transactionRepo
+                .GetGoodsTransactionHeadersAsync(pageFilter, filter)));
+        }
+
         [HttpGet("header")]
         public async Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> GetGoodsTransactionHeaders(
             [FromQuery]PageFilter pageFilter)
         {
             return Ok(_mapper.Map<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>(
                 await _transactionRepo
-                .GetGoodsTransactionHeadersAsync(pageFilter)));
+                .GetGoodsTransactionHeadersAsync(pageFilter, null)));
 
         }
 
@@ -124,6 +133,11 @@ namespace DodoApp.Controllers.V1
             {
                 return BadRequest(new { errors = new string[] 
                     { "Transaction Detail already exists" }});
+            }
+            else if (result == -5)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Goods available stock is not enough" }});
             }
 
             return StatusCode((int)HttpStatusCode.Created, new { id = result });

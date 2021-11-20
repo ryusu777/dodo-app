@@ -8,12 +8,18 @@
 
       <q-card-actions align="right">
         <base-button
+          v-if="cancelLabel"
           color="primary"
-          label="Close"
+          :label="cancelLabel"
           @click="onCancelClick"
           flat
         />
-        <base-button color="primary" label="OK" @click="onOKClick" />
+        <base-button
+          v-if="okLabel"
+          color="primary"
+          :label="okLabel"
+          @click="onOKClick"
+        />
       </q-card-actions>
     </base-card>
   </q-dialog>
@@ -33,7 +39,9 @@ export default {
     body: {
       type: String,
       required: true
-    }
+    },
+    okLabel: String,
+    cancelLabel: String
   },
   emits: [...useDialogPluginComponent.emits],
   setup() {

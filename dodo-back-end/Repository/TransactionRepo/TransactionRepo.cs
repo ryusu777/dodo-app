@@ -27,6 +27,7 @@ namespace DodoApp.Repository
             -2 -> TransactionHeader doesn't exists
             -3 -> Goods doesn't exists
             -4 -> TransactionDetail exists
+            -5 -> Goods amount is not enough for selling
         */
         // TODO: Check if goods stock is enough or currency is enough
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
@@ -140,7 +141,7 @@ namespace DodoApp.Repository
         }
 
         public async Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
-            PageFilter pageFilter)
+            PageFilter pageFilter, FilterGoodsTransactionHeader filter)
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
 
@@ -155,6 +156,26 @@ namespace DodoApp.Repository
                           Vendor = s.Vendor,
                           GoodsTransactionDetails = s.GoodsTransactionDetails
                       };
+
+            if (filter != null)
+            {
+                var predicate = PredicateBuilder.True<GoodsTransactionHeader>();
+
+                if (filter.PurchaseDateFrom != null)
+                    predicate = predicate.And(h 
+                        => h.PurchaseDate >= filter.PurchaseDateFrom);
+                if (filter.PurchaseDateTo != null)
+                    predicate = predicate.And(h 
+                        => h.PurchaseDate <= filter.PurchaseDateTo);
+                if (filter.ReceiveDateFrom != null)
+                    predicate = predicate.And(h 
+                        => h.ReceiveDate >= filter.ReceiveDateFrom);
+                if (filter.ReceiveDateTo != null)
+                    predicate = predicate.And(h 
+                        => h.ReceiveDate <= filter.ReceiveDateTo);
+                
+                qry = qry.Where(predicate);
+            }
 
             if (!String.IsNullOrEmpty(validPageFilter.SearchText))
             {
@@ -194,14 +215,19 @@ namespace DodoApp.Repository
         private async Task<int> CheckTransferDetailValidity(
             GoodsTransactionDetail transactionDetail)
         {
-            if (await _context.GoodsTransactionHeaders.AnyAsync(q => 
-                q.Id == transactionDetail.GoodsTransactionHeaderId) == false)
+            var header = await _context.GoodsTransactionHeaders
+                .FirstOrDefaultAsync(h => 
+                    h.Id == transactionDetail.GoodsTransactionHeaderId);
+
+            if (header == null)
             {
                 return -2;
             }
 
-            if (await _context.Goods.AnyAsync(q => 
-                q.Id == transactionDetail.GoodsId) == false)
+            var goods = await _context.Goods
+                .FirstOrDefaultAsync(g => g.Id == transactionDetail.GoodsId);
+
+            if (goods == null)
             {
                 return -3;
             }
@@ -214,6 +240,12 @@ namespace DodoApp.Repository
                 return -4;
             }
 
+
+            if (goods.StockAvailable < transactionDetail.GoodsAmount 
+                && header.TransactionType == "sell")
+            {
+                return -5;
+            }
             return 0;
         }
     }
