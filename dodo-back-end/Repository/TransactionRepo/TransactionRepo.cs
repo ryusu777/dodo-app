@@ -27,6 +27,7 @@ namespace DodoApp.Repository
             -2 -> TransactionHeader doesn't exists
             -3 -> Goods doesn't exists
             -4 -> TransactionDetail exists
+            -5 -> Goods amount is not enough for selling
         */
         // TODO: Check if goods stock is enough or currency is enough
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
@@ -214,14 +215,19 @@ namespace DodoApp.Repository
         private async Task<int> CheckTransferDetailValidity(
             GoodsTransactionDetail transactionDetail)
         {
-            if (await _context.GoodsTransactionHeaders.AnyAsync(q => 
-                q.Id == transactionDetail.GoodsTransactionHeaderId) == false)
+            var header = await _context.GoodsTransactionHeaders
+                .FirstOrDefaultAsync(h => 
+                    h.Id == transactionDetail.GoodsTransactionHeaderId);
+
+            if (header == null)
             {
                 return -2;
             }
 
-            if (await _context.Goods.AnyAsync(q => 
-                q.Id == transactionDetail.GoodsId) == false)
+            var goods = await _context.Goods
+                .FirstOrDefaultAsync(g => g.Id == transactionDetail.GoodsId);
+
+            if (goods == null)
             {
                 return -3;
             }
@@ -234,6 +240,12 @@ namespace DodoApp.Repository
                 return -4;
             }
 
+
+            if (goods.StockAvailable < transactionDetail.GoodsAmount 
+                && header.TransactionType == "sell")
+            {
+                return -5;
+            }
             return 0;
         }
     }

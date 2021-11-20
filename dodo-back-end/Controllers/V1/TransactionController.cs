@@ -134,6 +134,11 @@ namespace DodoApp.Controllers.V1
                 return BadRequest(new { errors = new string[] 
                     { "Transaction Detail already exists" }});
             }
+            else if (result == -5)
+            {
+                return BadRequest(new { errors = new string[] 
+                    { "Goods available stock is not enough" }});
+            }
 
             return StatusCode((int)HttpStatusCode.Created, new { id = result });
         }
