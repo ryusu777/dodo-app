@@ -100,6 +100,7 @@ import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketD
 import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
 import { QPopupProxy, useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import BaseDialog from 'src/components/ui/BaseDialog.vue';
 
 export default defineComponent({
   props: {
@@ -144,6 +145,22 @@ export default defineComponent({
 
         if (response.data.transactionType !== props.transactionType) {
           await $router.push('/not-found');
+        }
+
+        if (
+          response.data.purchaseDate !== null ||
+          response.data.receiveDate !== null
+        ) {
+          $q.dialog({
+            component: BaseDialog,
+            componentProps: {
+              title: 'Pemberitahuan',
+              body: 'Transaksi ini telah selesai dilakukan',
+              okLabel: 'Kembali'
+            }
+          }).onDismiss(async () => {
+            await $router.push('/');
+          });
         }
 
         transactionHeader.value = response.data;
