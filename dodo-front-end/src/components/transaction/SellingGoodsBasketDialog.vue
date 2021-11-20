@@ -40,6 +40,7 @@ import SellingGoodsBasket from './SellingGoodsBasket.vue';
 import { api } from 'src/boot/axios';
 import axios, { AxiosError } from 'axios';
 import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   props: {
@@ -52,6 +53,7 @@ export default defineComponent({
   emits: [...useDialogPluginComponent.emits, 'deletedDetail'],
   setup(props) {
     const $q = useQuasar();
+    const $router = useRouter();
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
     function notifyError(err: unknown | AxiosError) {
@@ -78,6 +80,7 @@ export default defineComponent({
           $q.notify({
             message: 'Berhasil menyelesaikan transaksi'
           });
+          await $router.push('/');
         } catch (err) {
           notifyError?.(err);
         }
