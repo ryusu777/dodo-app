@@ -39,6 +39,8 @@
           label="Receive Date sampai "
           v-model="receiveDateTo"
         />
+        <base-button label="Submit" @click="sendHeaderFilter" />
+        <base-button label="Clear" @click="clearFilter" />
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-12">
@@ -67,7 +69,13 @@
                 <q-card-actions align="right">
                   <base-button
                     label="Detail"
-                    @click="showDetail(props.row.id)"
+                    @click="
+                      showDetail(
+                        props.row.id,
+                        props.row.transactionType,
+                        !!props.row.purchaseDate && !!props.row.purchaseDate
+                      )
+                    "
                   />
                 </q-card-actions>
               </q-card-section>
@@ -85,7 +93,7 @@ import { ITransactionHeader } from '../models/interfaces/transaction.interface';
 import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
@@ -120,12 +128,49 @@ export default defineComponent({
 
     async function sendGetHeaders() {
       try {
-        const response: AxiosResponse<IPagination<ITransactionHeader>> =
-          await api.get('/transaction/header', {
+        const response = await api.get<IPagination<ITransactionHeader>>(
+          '/transaction/header',
+          {
             params: {
               ...requestPagination.value
             }
-          });
+          }
+        );
+
+        if (response.data.data) {
+          rows.value = response.data.data;
+          requestPagination.value.rowsNumber = response.data.rowsNumber;
+          requestPagination.value.page = response.data.pageNumber;
+          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+        }
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
+
+    async function clearFilter() {
+      purchaseDateFrom.value = '';
+      purchaseDateTo.value = '';
+      receiveDateFrom.value = '';
+      receiveDateTo.value = '';
+      await sendGetHeaders();
+    }
+    async function sendHeaderFilter() {
+      try {
+        const response = await api.post<IPagination<ITransactionHeader>>(
+          '/transaction/header-filter',
+          {
+            purchaseDateFrom: purchaseDateFrom.value || null,
+            purchaseDateTo: purchaseDateTo.value || null,
+            receiveDateFrom: receiveDateFrom.value || null,
+            receiveDateTo: receiveDateTo.value || null
+          },
+          {
+            params: {
+              ...requestPagination.value
+            }
+          }
+        );
 
         if (response.data.data) {
           rows.value = response.data.data;
@@ -149,16 +194,20 @@ export default defineComponent({
       return date.formatDate(value, 'ddd D MMM, YYYY');
     }
 
-    function showDetail(id: number) {
+    function showDetail(
+      id: number,
+      transactionType: string,
+      transactionIsDone: boolean
+    ) {
       $q.dialog({
         component: TransactionHistoryDialog,
         componentProps: {
-          headerId: id
+          headerId: id,
+          transactionType,
+          transactionIsDone
         }
       });
     }
-
-    // TODO: Transaction History Date Filter
 
     return {
       rows,
@@ -171,7 +220,9 @@ export default defineComponent({
       purchaseDateTo,
       showDetail,
       requestPagination,
-      handleRequest
+      handleRequest,
+      sendHeaderFilter,
+      clearFilter
     };
   }
 });

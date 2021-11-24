@@ -12,35 +12,56 @@
           />
         </q-card-actions>
         <transaction-header :header-id="headerId" />
+        <base-button
+          label="Lakukan transaksi"
+          @click="doTransaction"
+          :disable="transactionIsDone"
+        />
       </q-card-section>
     </base-card>
   </q-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import TransactionHeader from './TransactionHeader.vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   props: {
     headerId: {
       type: [Number, String],
       required: true
-    }
+    },
+    transactionType: {
+      type: String as PropType<'sell' | 'purchase'>,
+      required: true
+    },
+    transactionIsDone: Boolean
   },
   emits: [...useDialogPluginComponent.emits],
-  setup() {
+  setup(props) {
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
+
+    const $router = useRouter();
+
+    async function doTransaction() {
+      console.log(props.transactionType);
+      await $router.push(
+        `/transaction/${props.transactionType}/${props.headerId}`
+      );
+    }
 
     return {
       dialogRef,
       onDialogHide,
       onDialogOK,
-      onCancelClick: onDialogCancel
+      onCancelClick: onDialogCancel,
+      doTransaction
     };
   },
   components: { BaseCard, BaseButton, TransactionHeader }

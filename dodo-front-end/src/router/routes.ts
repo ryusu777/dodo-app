@@ -11,8 +11,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/GoodsPage.vue')
       },
       {
-        path: 'selling-goods/:id',
-        component: () => import('pages/SellingGoodsPage.vue'),
+        path: 'transaction/:transactionType/:id',
+        component: () => import('src/pages/GoodsTransactionPage.vue'),
         props: true
       },
       {
@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'daily-expenses',
         component: () => import('pages/DailyExpensesPage.vue')
-      },
+      }
     ]
   },
 

@@ -9,9 +9,10 @@ namespace DodoApp.Domain
     {
         [Key]
         public int Id { get; set; }
-        // TODO: Purchase and Receive date can be null
-        public DateTime PurchaseDate { get; set; }
-        public DateTime ReceiveDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? PurchaseDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? ReceiveDate { get; set; }
         [Required]
         public DateTime CreatedDate { get; set; }
         [StringLength(255)]

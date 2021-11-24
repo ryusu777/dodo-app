@@ -18,7 +18,7 @@
 import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
-  emits: ['modelValue:update'],
+  emits: ['update:modelValue'],
   props: {
     modelValue: {
       type: String,
@@ -31,7 +31,7 @@ export default defineComponent({
         return props.modelValue;
       },
       set(val: string) {
-        emit('modelValue:update', val);
+        emit('update:modelValue', val);
       }
     });
     return {
