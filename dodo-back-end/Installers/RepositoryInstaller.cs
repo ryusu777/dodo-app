@@ -10,6 +10,7 @@ namespace DodoApp.Installers
         {
             services.AddScoped<IGoodsRepo, GoodsRepo>();
             services.AddScoped<ITransactionRepo, TransactionRepo>();
+            services.AddScoped<ICurrencyRepo, CurrencyRepo>();
         }
     }
 }
