@@ -11,7 +11,14 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Dodo App </q-toolbar-title>
+        <q-toolbar-title> 
+          <router-link
+            to="/"
+            style="text-decoration: none"
+          >
+            <q-btn flat class="text-white" label="Dodo App" />
+          </router-link>
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -47,7 +54,7 @@ const menu = [
     text: 'Lihat Barang'
   },
   {
-    id: 4,
+    id: 2,
     url: '/transaction-history',
     text: 'Histori transaksi'
   }
