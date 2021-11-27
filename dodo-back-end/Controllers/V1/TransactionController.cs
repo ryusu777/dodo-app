@@ -178,7 +178,26 @@ namespace DodoApp.Controllers.V1
                 _mapper.Map<GoodsTransactionDetail>(request)
             );
 
-            return StatusCode((int)result);
+            if (result == -1)
+            {
+                return NotFound(new { errors = new string[] {
+                    "Transaction detail doesn't exists"
+                }});
+            }
+
+            if (result == -2)
+            {
+                return BadRequest(new { errors = new string[] {
+                    "Goods available stock is not enough"
+                }});
+            }
+
+            if (result == -3)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return NoContent();
         }
 
         [HttpDelete("detail/{id}")]

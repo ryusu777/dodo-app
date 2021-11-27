@@ -52,16 +52,30 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(
+        /*
+            Returns:
+            1 -> Successfully update data
+            -1 -> Transaction detail not found
+            -2 -> Goods amount is not enough
+            -3 -> Internal server error
+        */
+        public async Task<int> UpdateTransactionDetailAsync(
             GoodsTransactionDetail request)
         {
             var transactionDetail = await _context.GoodsTransactionsDetails
+                .Include(d => d.TheGoods)
+                .Include(d => d.TheGoodsTransactionHeader)
                 .FirstOrDefaultAsync(g => g.Id == request.Id);
 
             if (transactionDetail == null)
             {
-                return HttpStatusCode.NotFound;
+                return -1;
             }
+
+            if (request.GoodsAmount > transactionDetail.TheGoods.StockAvailable
+                && transactionDetail
+                    .TheGoodsTransactionHeader.TransactionType == "Sell")
+                return -2;
 
             _context.Entry(transactionDetail).State = EntityState.Modified;
             transactionDetail.PricePerItem = request.PricePerItem;
