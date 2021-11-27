@@ -188,9 +188,21 @@ namespace DodoApp.Repository
                 qry, validPageFilter);
         }
 
-        // TODO: Change goods stock and currency for done transaction
-        public async Task<HttpStatusCode> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
+        // TODO: Change currency for done transaction
+        /*
+            Returns:
+            1 -> Successfully edited data
+            -1 -> Header Not found
+            -2 -> One of the goods stock is not enough
+            -3 -> Internal server error
+        */
+        public async Task<int> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
         {
+            var result = await ModifyGoodsAndCurrencyData(transactionHeader.Id);
+
+            if (result < 0)
+                return result;
+
             _context.Entry(transactionHeader).State = EntityState.Modified;
 
             try
@@ -199,19 +211,19 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                if ((await _context.GoodsTransactionHeaders.FirstOrDefaultAsync(g => g.Id == transactionHeader.Id)) == null)
-                {
-                    return HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
+                return -3;
             }
 
-            return HttpStatusCode.NoContent;
+            return 1;
         }
 
+        /*
+            Returns:
+            -2 -> Transaction header not found
+            -3 -> Goods not found
+            -4 -> Transaction detail exists
+            -5 -> Goods amount is not enough
+        */
         private async Task<int> CheckTransferDetailValidity(
             GoodsTransactionDetail transactionDetail)
         {
@@ -247,6 +259,52 @@ namespace DodoApp.Repository
                 return -5;
             }
             return 0;
+        }
+
+        /*
+            Returns:
+            -1 -> Header not found
+            -2 -> One of goods stock is not enough
+            -3 -> Internal server error
+        */
+        private async Task<int> ModifyGoodsAndCurrencyData(int headerId)
+        {
+            var header = await _context.GoodsTransactionHeaders
+                .Include(h => h.GoodsTransactionDetails)
+                .ThenInclude(d => d.TheGoods)
+                .FirstOrDefaultAsync(h => h.Id == headerId);
+            
+            if (header == null)
+            {
+                return -1;
+            }
+
+            foreach(var detail in header.GoodsTransactionDetails)
+            {
+                if (header.TransactionType == "sell")
+                {
+                    if (detail.TheGoods.StockAvailable < detail.GoodsAmount)
+                        return -2;
+                    detail.TheGoods.StockAvailable -= detail.GoodsAmount;
+                }
+                else
+                {
+                    detail.TheGoods.StockAvailable += detail.GoodsAmount;
+                }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return -3;
+            }
+
+            _context.Entry(header).State = EntityState.Detached;
+
+            return 1;
         }
     }
 }

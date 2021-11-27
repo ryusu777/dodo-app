@@ -95,7 +95,26 @@ namespace DodoApp.Controllers.V1
                 _mapper.Map<GoodsTransactionHeader>(request)
             );
 
-            return StatusCode((int)result);
+            if (result == -1)
+            {
+                return NotFound(new { errors = new string[] {
+                    "Transaction header not found"
+                }});
+            }
+
+            if (result == -2)
+            {
+                return BadRequest(new { errors = new string[] {
+                    "One of the goods stock is not enough"
+                }});
+            }
+
+            if (result == -3 )
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return NoContent();
         }
 
         [HttpDelete("header/{id}")]
