@@ -84,13 +84,34 @@ namespace DodoApp.Repository
 
         public async Task<HttpStatusCode> UpdateGoodsAsync(int id, Goods request)
         {
+            var goods = await _context.Goods
+                .Include(g => g.GoodsTransactionDetails)
+                .ThenInclude(d => d.TheGoodsTransactionHeader)
+                .FirstOrDefaultAsync(g => g.Id == request.Id);
 
-            if (await _context.Goods.FirstOrDefaultAsync(g => 
-                g.GoodsCode == request.GoodsCode && g.Id != request.Id) != null)
+            if (await _context.Goods.AnyAsync(g => 
+                g.GoodsCode == request.GoodsCode && g.Id != request.Id) == true)
             {
                 return HttpStatusCode.Conflict;
             }
-            _context.Entry(request).State = EntityState.Modified;
+            goods.GoodsName = request.GoodsName;
+            goods.GoodsCode = request.GoodsCode;
+            goods.StockAvailable = request.StockAvailable;
+            goods.PartNumber = request.PartNumber;
+            goods.PurchasePrice = request.PurchasePrice;
+            goods.CarType = request.CarType;
+            goods.MinimalAvailable = request.MinimalAvailable;
+
+            foreach(var detail in goods.GoodsTransactionDetails)
+            {
+                if (detail.TheGoodsTransactionHeader.TransactionType == "purchase" 
+                    && detail.TheGoodsTransactionHeader.PurchaseDate == null)
+                {
+                    detail.PricePerItem = request.PurchasePrice;
+                }
+            }
+
+            _context.Entry(goods).State = EntityState.Modified;
 
             try
             {
