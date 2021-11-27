@@ -1,3 +1,4 @@
+// TODO: Cannot delete goods if there are transaction details for that goods
 using System;
 using System.Collections.Generic;
 using System.Linq;

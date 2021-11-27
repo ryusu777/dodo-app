@@ -87,10 +87,10 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return HttpStatusCode.InternalServerError;
+                return -3;
             }
 
-            return HttpStatusCode.NoContent;
+            return 1;
         }
 
         /*
