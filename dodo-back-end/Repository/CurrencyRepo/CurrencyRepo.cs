@@ -28,7 +28,7 @@ namespace DodoApp.Repository
         */
         public async Task<int> CreateCurrencyReportAsync(Currency request)
         {
-            if (await _context.Currencies
+            if (request.TransactionHeaderId != null && await _context.Currencies
                 .FirstOrDefaultAsync(c => 
                     c.TransactionHeaderId == request.TransactionHeaderId) != null)
             {
@@ -42,6 +42,13 @@ namespace DodoApp.Repository
                 return -2;
             }
 
+            var latestCurrency = await _context.Currencies
+                .OrderBy(c => c.Id)
+                .LastOrDefaultAsync();
+            var latestCurrencyAmount = (int?)latestCurrency.CurrencyAmount ?? 0;
+
+            request.CurrencyAmount = 
+                latestCurrencyAmount + request.ChangingAmount;
             await _context.Currencies.AddAsync(request);
 
             try

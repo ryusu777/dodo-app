@@ -12,6 +12,7 @@ namespace DodoApp.Profiles
         public CurrencyProfile()
         {
             CreateMap<CreateCurrencyDto, Currency>();
+            CreateMap<Currency, ReadCurrencyDto>();
             CreateMap<PageWrapper<List<Currency>>, PageWrapper<List<ReadCurrencyDto>>>();
         }
     }
