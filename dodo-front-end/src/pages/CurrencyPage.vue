@@ -23,12 +23,17 @@
             style="height: 100px"
           >
             <q-card-section horizontal class="row">
-              <q-card-section class="col">
-                <p class="text-bold text-h5 q-pa-none q-ma-none">
-                  {{ props.row.type }}
+              <q-card-section class="col q-pt-sm">
+                <p class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10" v-if="props.row.changingAmount < 0">
+                  Pengeluaran
+                </p>
+                <p class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8" v-if="props.row.changingAmount > 0">
+                  Pemasukkan
                 </p>
                 <div class="row">
-                  <p class="q-pr-md">Deskripsi: {{ props.row.changeDescription }}</p>
+                  <p class="q-mb-none q-mt-none" v-if="props.row.changingAmount < 0"><b>Changing: </b>Rp{{ (-1 * props.row.changingAmount) }}</p>
+                  <p class="q-mb-none q-mt-none" v-if="props.row.changingAmount > 0"><b>Changing: </b>Rp{{ props.row.changingAmount}}</p>
+                  <p class="q-mt-none"><b>Deskripsi: </b>{{ props.row.changeDescription }}</p>
                 </div>
               </q-card-section>
 
@@ -36,8 +41,14 @@
                 <p class="text-overline q-ma-none" style="line-height: 15px">
                   {{ formattedDate(props.row.dateOfChange) }}
                 </p>
-                <p class="q-pr-md">Changing: Rp{{ props.row.changingAmount}}</p>
-                <p class="q-pr-md">Currency: Rp{{ props.row.currencyAmount}}</p>
+                <p class="q-mb-none"><b>Currency: </b>Rp{{ props.row.currencyAmount}}</p>
+                <base-button 
+                  label="Detail"
+                  v-if="props.row.transactionHeaderId !== null"
+                  @click="showDetail(
+                    props.row.id,
+                  )"
+                />
               </q-card-section>
 
             </q-card-section>
@@ -59,6 +70,7 @@ import { date, useQuasar } from 'quasar';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
+import TransactionHistoryDialog from 'src/components/transaction/TransactionHistoryDialog.vue';
 
 export default defineComponent({
   components: {
@@ -141,6 +153,17 @@ export default defineComponent({
       return undefined;
     }
 
+    function showDetail(
+      id: number,
+    ) {
+      $q.dialog({
+        component: TransactionHistoryDialog,
+        componentProps: {
+          headerId: id,
+        }
+      });
+    }
+
     return {
       rows,
       filter,
@@ -149,6 +172,7 @@ export default defineComponent({
       requestPagination,
       handleRequest,
       formattedDate,
+      showDetail
     };
   },
 });
