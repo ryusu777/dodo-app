@@ -149,7 +149,9 @@ export default defineComponent({
         component: BaseDialog,
         componentProps: {
           title: 'Hapus barang',
-          body: 'Yakin ingin menghapus barang?'
+          body: 'Yakin ingin menghapus barang?',
+          okLabel: 'Hapus',
+          cancelLabel: 'Tidak'
         }
       }).onOk(async () => {
         try {
