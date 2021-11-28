@@ -4,14 +4,16 @@ using DodoApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DodoApp.Migrations
 {
     [DbContext(typeof(DodoAppContext))]
-    partial class DodoAppContextModelSnapshot : ModelSnapshot
+    [Migration("20211128111442_CurrencyNullableTransactionHeaderid")]
+    partial class CurrencyNullableTransactionHeaderid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

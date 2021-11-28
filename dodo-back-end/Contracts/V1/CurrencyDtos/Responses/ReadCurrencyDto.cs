@@ -10,6 +10,6 @@ namespace DodoApp.Contracts.V1.Responses
         public int ChangingAmount { get; set; }
         public DateTime? DateOfChange { get; set; }
         public string ChangeDescription { get; set; }
-        public ReadGoodsTransactionHeaderDto? TheGoodsTransactionHeader { get; set; }
+        public ReadGoodsTransactionHeaderDto TheGoodsTransactionHeader { get; set; }
     }
 }

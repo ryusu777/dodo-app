@@ -35,7 +35,7 @@ namespace DodoApp.Repository
                 return -3;
             }
 
-            if (await _context.GoodsTransactionHeaders
+            if (request.TransactionHeaderId != null && await _context.GoodsTransactionHeaders
                 .FirstOrDefaultAsync(h => 
                     h.Id == request.TransactionHeaderId) == null)
             {
