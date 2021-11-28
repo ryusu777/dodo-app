@@ -204,7 +204,6 @@ namespace DodoApp.Repository
                 qry, validPageFilter);
         }
 
-        // TODO: Change currency for done transaction
         /*
             Returns:
             1 -> Successfully edited data
