@@ -8,16 +8,21 @@ using DodoApp.Data;
 using DodoApp.Domain;
 using DodoApp.Helpers;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace DodoApp.Repository
 {
     public class CurrencyRepo : ICurrencyRepo
     {
         private readonly DodoAppContext _context;
+        private readonly IMapper _mapper;
 
-        public CurrencyRepo(DodoAppContext context)
+        public CurrencyRepo(
+            DodoAppContext context, 
+            IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         /*
@@ -35,11 +40,22 @@ namespace DodoApp.Repository
                 return -3;
             }
 
-            if (request.TransactionHeaderId != null && await _context.GoodsTransactionHeaders
-                .FirstOrDefaultAsync(h => 
-                    h.Id == request.TransactionHeaderId) == null)
+            GoodsTransactionHeader header;
+            if (request.TransactionHeaderId != null)
             {
-                return -2;
+                header = await _context.GoodsTransactionHeaders
+                    .Include(h => h.GoodsTransactionDetails)
+                    .FirstOrDefaultAsync(h => 
+                        h.Id == request.TransactionHeaderId);
+
+                if (header == null)
+                    return -2;
+                
+                request.ChangingAmount = _mapper
+                    .Map<ReadGoodsTransactionHeaderDto>(header).TotalPrice;
+                
+                if (header.TransactionType == "purchase")
+                    request.ChangingAmount *= -1;
             }
 
             var latestCurrency = await _context.Currencies
