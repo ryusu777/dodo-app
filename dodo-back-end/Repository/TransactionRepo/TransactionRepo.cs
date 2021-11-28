@@ -15,10 +15,12 @@ namespace DodoApp.Repository
     public class TransactionRepo : ITransactionRepo
     {
         private readonly DodoAppContext _context;
+        private readonly ICurrencyRepo _currencyRepo;
 
-        public TransactionRepo(DodoAppContext context)
+        public TransactionRepo(DodoAppContext context, ICurrencyRepo currencyRepo)
         {
             _context = context;
+            _currencyRepo = currencyRepo;
         }
 
         /*
@@ -74,7 +76,7 @@ namespace DodoApp.Repository
 
             if (request.GoodsAmount > transactionDetail.TheGoods.StockAvailable
                 && transactionDetail
-                    .TheGoodsTransactionHeader.TransactionType == "Sell")
+                    .TheGoodsTransactionHeader.TransactionType == "sell")
                 return -2;
 
             _context.Entry(transactionDetail).State = EntityState.Modified;
