@@ -1,7 +1,10 @@
 <template>
   <q-form class="row justify-start q-gutter-y-lg" @submit.prevent="submitData">
+    <q-radio v-model="type" val="income" label="Pemasukkan" />
+    <q-radio v-model="type" val="expenses" label="Pengeluaran" />
+
     <BaseInput
-      v-model="expenses"
+      v-model="changingAmount"
       class="col-12 q-my-sm"
       label="Nilai"
       type="number"
@@ -10,7 +13,7 @@
     />
 
     <BaseInput
-      v-model="description"
+      v-model="changeDescription"
       class="col-12 q-my-sm"
       label="Deskripsi"
       lazy-rules
@@ -27,7 +30,7 @@
 import { defineComponent, ref, PropType } from 'vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import { IExpenses } from 'src/models/interfaces/dailyexpenses.interface';
+import { ICurrency } from 'src/models/interfaces/currency.interface';
 
 export default defineComponent({
   emits: ['submit'],
@@ -36,34 +39,35 @@ export default defineComponent({
     BaseInput
   },
   props: {
-    dailyexpenses: {
-      type: Object as PropType<IExpenses>,
+    currency: {
+      type: Object as PropType<ICurrency>,
       required: false
     }
   },
   setup(props, { emit }) {
-    const expensesId = ref(props.dailyexpenses?.id || null);
-    const expenses = ref(props.dailyexpenses?.expenses || 0);
-    const description = ref(props.dailyexpenses?.description || '');
-
+    const currencyId = ref(props.currency?.id || null);
+    const changingAmount = ref(props.currency?.changingAmount || 0);
+    const changeDescription = ref(props.currency?.changeDescription || '');
+    const type = ref('income');
 
     function submitData() {
       emit('submit', {
-        id: expensesId.value,
-        expenses: expenses.value,
-        description: description.value,
+        id: currencyId.value,
+        changingAmount: type.value === 'expenses' ? (-1 * changingAmount.value) : changingAmount.value,
+        changeDescription: changeDescription.value,
       });
     }
 
     function reset() {
-      expenses.value = 0;
-      description.value = '';
+      changingAmount.value = 0;
+      changeDescription.value = '';
     }
 
     return {
-      expensesId,
-      expenses,
-      description,
+      type,
+      currencyId,
+      changingAmount,
+      changeDescription,
       submitData,
       reset,
       requiredRule: (val: string) => (val && val.length > 0) || 'Mohon diisi',

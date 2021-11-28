@@ -11,7 +11,7 @@
             class="q-mb-sm"
           />
         </q-card-actions>
-        <daily-expenses-form :dailyexpenses="dailyexpenses" @submit="onDialogOK"></daily-expenses-form>
+        <daily-expenses-form :currency="currency" @submit="onDialogOK"></daily-expenses-form>
       </q-card-section>
     </base-card>
   </q-dialog>
@@ -22,12 +22,12 @@ import { defineComponent, PropType } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
-import DailyExpensesForm from './DailyExpensesForm.vue';
-import { IExpenses } from 'src/models/interfaces/dailyexpenses.interface';
+import DailyExpensesForm from './CurrencyForm.vue';
+import { ICurrency } from 'src/models/interfaces/currency.interface';
 
 export default defineComponent({
   props: {
-    dailyexpenses: Object as PropType<IExpenses>,
+    currency: Object as PropType<ICurrency>,
     title: String
   },
   emits: [...useDialogPluginComponent.emits],
