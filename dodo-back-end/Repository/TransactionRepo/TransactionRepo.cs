@@ -318,6 +318,16 @@ namespace DodoApp.Repository
                 return -3;
             }
 
+            Currency request = new Currency 
+            {
+                TransactionHeaderId = headerId,
+                DateOfChange = DateTime.Now,
+                ChangeDescription = header.TransactionType == "sell" ? 
+                    "Transaksi penjualan barang" : "Transaksi restok barang"
+            };
+
+            await _currencyRepo.CreateCurrencyReportAsync(request);
+
             _context.Entry(header).State = EntityState.Detached;
 
             return 1;
