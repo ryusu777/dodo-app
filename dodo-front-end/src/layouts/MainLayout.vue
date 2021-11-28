@@ -56,7 +56,12 @@ const menu = [
   {
     id: 2,
     url: '/transaction-history',
-    text: 'Histori transaksi'
+    text: 'Histori Transaksi'
+  },
+  {
+    id: 3,
+    url: '/currency',
+    text: 'Daily Expenses'
   }
 ];
 export default defineComponent({
