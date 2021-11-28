@@ -1,4 +1,3 @@
-// TODO: Cannot delete goods if there are transaction details for that goods
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,10 +50,17 @@ namespace DodoApp.Repository
 
         public async Task<HttpStatusCode> DeleteGoodsAsync(int id)
         {
-            var goods = await _context.Goods.FindAsync(id);
+            var goods = await _context.Goods
+                .FirstOrDefaultAsync(g => g.Id == id);
             if (goods == null)
             {
                 return HttpStatusCode.NotFound;
+            }
+
+            if (await _context.GoodsTransactionsDetails
+                .AnyAsync(d => d.GoodsId == id))
+            {
+                return HttpStatusCode.BadRequest;
             }
 
             _context.Goods.Remove(goods);

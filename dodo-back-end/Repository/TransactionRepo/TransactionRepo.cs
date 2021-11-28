@@ -31,7 +31,6 @@ namespace DodoApp.Repository
             -4 -> TransactionDetail exists
             -5 -> Goods amount is not enough for selling
         */
-        // TODO: Check if goods stock is enough or currency is enough
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
             var validity = await CheckTransferDetailValidity(transactionDetail);
