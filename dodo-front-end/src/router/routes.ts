@@ -20,8 +20,8 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/TransactionHistoryPage.vue')
       },
       {
-        path: 'daily-expenses',
-        component: () => import('pages/DailyExpensesPage.vue')
+        path: 'currency',
+        component: () => import('pages/CurrencyPage.vue')
       }
     ]
   },

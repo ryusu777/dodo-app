@@ -87,6 +87,7 @@
 </template>
 
 <script lang="ts">
+// TODO: Changing goods in cart should be changed after request complete
 import { defineComponent, ref, onMounted, inject, PropType } from 'vue';
 import { IGoods } from 'src/models/interfaces/goods.interface';
 import { IPagination } from 'src/models/responses.interface';

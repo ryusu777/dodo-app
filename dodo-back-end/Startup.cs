@@ -1,4 +1,3 @@
-// TODO: Goods price is not updating in purchasing goods
 using System;
 using System.Collections.Generic;
 using System.Linq;

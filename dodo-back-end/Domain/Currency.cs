@@ -8,7 +8,7 @@ namespace DodoApp.Domain
     {
         [Key]
         public int Id { get; set; }
-        public int TransactionHeaderId { get; set; }
+        public int? TransactionHeaderId { get; set; }
         [Required]
         public int CurrencyAmount { get; set; }
         [Required]

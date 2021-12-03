@@ -89,6 +89,14 @@ namespace DodoApp.Controllers.V1
         {
             var result = await _goodsRepo.DeleteGoodsAsync(id);
 
+            if (result == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(new { errors = new string[] 
+                {
+                    "Cannot delete goods that has transaction detail"
+                }});
+            }
+
             return StatusCode((int)result);
         }
     }

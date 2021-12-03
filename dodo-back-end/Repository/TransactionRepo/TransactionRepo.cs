@@ -15,10 +15,12 @@ namespace DodoApp.Repository
     public class TransactionRepo : ITransactionRepo
     {
         private readonly DodoAppContext _context;
+        private readonly ICurrencyRepo _currencyRepo;
 
-        public TransactionRepo(DodoAppContext context)
+        public TransactionRepo(DodoAppContext context, ICurrencyRepo currencyRepo)
         {
             _context = context;
+            _currencyRepo = currencyRepo;
         }
 
         /*
@@ -29,7 +31,6 @@ namespace DodoApp.Repository
             -4 -> TransactionDetail exists
             -5 -> Goods amount is not enough for selling
         */
-        // TODO: Check if goods stock is enough or currency is enough
         public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
         {
             var validity = await CheckTransferDetailValidity(transactionDetail);
@@ -52,16 +53,30 @@ namespace DodoApp.Repository
             return transactionDetail.Id;
         }
 
-        public async Task<HttpStatusCode> UpdateTransactionDetailAsync(
+        /*
+            Returns:
+            1 -> Successfully update data
+            -1 -> Transaction detail not found
+            -2 -> Goods amount is not enough
+            -3 -> Internal server error
+        */
+        public async Task<int> UpdateTransactionDetailAsync(
             GoodsTransactionDetail request)
         {
             var transactionDetail = await _context.GoodsTransactionsDetails
+                .Include(d => d.TheGoods)
+                .Include(d => d.TheGoodsTransactionHeader)
                 .FirstOrDefaultAsync(g => g.Id == request.Id);
 
             if (transactionDetail == null)
             {
-                return HttpStatusCode.NotFound;
+                return -1;
             }
+
+            if (request.GoodsAmount > transactionDetail.TheGoods.StockAvailable
+                && transactionDetail
+                    .TheGoodsTransactionHeader.TransactionType == "sell")
+                return -2;
 
             _context.Entry(transactionDetail).State = EntityState.Modified;
             transactionDetail.PricePerItem = request.PricePerItem;
@@ -73,10 +88,10 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return HttpStatusCode.InternalServerError;
+                return -3;
             }
 
-            return HttpStatusCode.NoContent;
+            return 1;
         }
 
         /*
@@ -188,9 +203,20 @@ namespace DodoApp.Repository
                 qry, validPageFilter);
         }
 
-        // TODO: Change goods stock and currency for done transaction
-        public async Task<HttpStatusCode> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
+        /*
+            Returns:
+            1 -> Successfully edited data
+            -1 -> Header Not found
+            -2 -> One of the goods stock is not enough
+            -3 -> Internal server error
+        */
+        public async Task<int> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
         {
+            var result = await ModifyGoodsAndCurrencyData(transactionHeader.Id);
+
+            if (result < 0)
+                return result;
+
             _context.Entry(transactionHeader).State = EntityState.Modified;
 
             try
@@ -199,19 +225,19 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                if ((await _context.GoodsTransactionHeaders.FirstOrDefaultAsync(g => g.Id == transactionHeader.Id)) == null)
-                {
-                    return HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    return HttpStatusCode.InternalServerError;
-                }
+                return -3;
             }
 
-            return HttpStatusCode.NoContent;
+            return 1;
         }
 
+        /*
+            Returns:
+            -2 -> Transaction header not found
+            -3 -> Goods not found
+            -4 -> Transaction detail exists
+            -5 -> Goods amount is not enough
+        */
         private async Task<int> CheckTransferDetailValidity(
             GoodsTransactionDetail transactionDetail)
         {
@@ -247,6 +273,62 @@ namespace DodoApp.Repository
                 return -5;
             }
             return 0;
+        }
+
+        /*
+            Returns:
+            -1 -> Header not found
+            -2 -> One of goods stock is not enough
+            -3 -> Internal server error
+        */
+        private async Task<int> ModifyGoodsAndCurrencyData(int headerId)
+        {
+            var header = await _context.GoodsTransactionHeaders
+                .Include(h => h.GoodsTransactionDetails)
+                .ThenInclude(d => d.TheGoods)
+                .FirstOrDefaultAsync(h => h.Id == headerId);
+            
+            if (header == null)
+            {
+                return -1;
+            }
+
+            foreach(var detail in header.GoodsTransactionDetails)
+            {
+                if (header.TransactionType == "sell")
+                {
+                    if (detail.TheGoods.StockAvailable < detail.GoodsAmount)
+                        return -2;
+                    detail.TheGoods.StockAvailable -= detail.GoodsAmount;
+                }
+                else
+                {
+                    detail.TheGoods.StockAvailable += detail.GoodsAmount;
+                }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return -3;
+            }
+
+            Currency request = new Currency 
+            {
+                TransactionHeaderId = headerId,
+                DateOfChange = DateTime.Now,
+                ChangeDescription = header.TransactionType == "sell" ? 
+                    "Transaksi penjualan barang" : "Transaksi restok barang"
+            };
+
+            await _currencyRepo.CreateCurrencyReportAsync(request);
+
+            _context.Entry(header).State = EntityState.Detached;
+
+            return 1;
         }
     }
 }

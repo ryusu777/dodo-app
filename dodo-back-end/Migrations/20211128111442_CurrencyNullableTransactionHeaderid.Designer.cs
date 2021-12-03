@@ -4,14 +4,16 @@ using DodoApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DodoApp.Migrations
 {
     [DbContext(typeof(DodoAppContext))]
-    partial class DodoAppContextModelSnapshot : ModelSnapshot
+    [Migration("20211128111442_CurrencyNullableTransactionHeaderid")]
+    partial class CurrencyNullableTransactionHeaderid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,34 +48,6 @@ namespace DodoApp.Migrations
                     b.HasIndex("TransactionHeaderId");
 
                     b.ToTable("Currencies");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ChangeDescription = "Menjual Barang",
-                            ChangingAmount = 220000,
-                            CurrencyAmount = 500000,
-                            DateOfChange = new DateTime(2021, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            TransactionHeaderId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ChangeDescription = "Membeli Barang",
-                            ChangingAmount = -60000,
-                            CurrencyAmount = 440000,
-                            DateOfChange = new DateTime(2021, 11, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            TransactionHeaderId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ChangeDescription = "Bayar Listrik",
-                            ChangingAmount = -250000,
-                            CurrencyAmount = 190000,
-                            DateOfChange = new DateTime(2021, 11, 25, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("DodoApp.Domain.Goods", b =>
@@ -250,7 +224,7 @@ namespace DodoApp.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2021, 12, 3, 10, 36, 21, 216, DateTimeKind.Local).AddTicks(4838),
+                            CreatedDate = new DateTime(2021, 11, 28, 18, 14, 41, 947, DateTimeKind.Local).AddTicks(5252),
                             PurchaseDate = new DateTime(2021, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReceiveDate = new DateTime(2021, 11, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TransactionType = "sell"
@@ -258,7 +232,7 @@ namespace DodoApp.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2021, 12, 3, 10, 36, 21, 217, DateTimeKind.Local).AddTicks(3571),
+                            CreatedDate = new DateTime(2021, 11, 28, 18, 14, 41, 948, DateTimeKind.Local).AddTicks(2838),
                             PurchaseDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReceiveDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TransactionType = "purchase"

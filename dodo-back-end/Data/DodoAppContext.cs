@@ -16,6 +16,7 @@ namespace DodoApp.Data
             GoodsSeeder.Seed(builder);
             GoodsTransactionDetailSeeder.Seed(builder);
             GoodsTransactionHeaderSeeder.Seed(builder);
+            CurrencySeeder.Seed(builder);
         }
         public DbSet<Goods> Goods { get; set; }
         public DbSet<Currency> Currencies { get; set; }

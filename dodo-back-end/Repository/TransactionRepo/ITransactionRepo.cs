@@ -11,7 +11,7 @@ namespace DodoApp.Repository
     {
         Task<int> CreateTransactionHeaderAsync(
             GoodsTransactionHeader transactionHeader);
-        Task<HttpStatusCode> UpdateTransactionHeaderAsync(
+        Task<int> UpdateTransactionHeaderAsync(
             GoodsTransactionHeader transactionHeader);
         Task<HttpStatusCode> DeleteTransactionHeaderAsync(int id);
         Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id);
@@ -19,7 +19,7 @@ namespace DodoApp.Repository
             PageFilter pageFilter, FilterGoodsTransactionHeader filter);
         Task<int> CreateTransactionDetailAsync(
             GoodsTransactionDetail transactionDetail);
-        Task<HttpStatusCode> UpdateTransactionDetailAsync(
+        Task<int> UpdateTransactionDetailAsync(
             GoodsTransactionDetail transactionDetail);
         Task<HttpStatusCode> DeleteTransactionDetail(int id);
     }
