@@ -1,6 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <h3 class="text-bold q-mx-lg q-mt-sm">Daily Expenses</h3>
+    <h3 class="text-bold q-mx-lg q-mt-sm">Currency History</h3>
     <q-table
       grid
       :rows="rows"
