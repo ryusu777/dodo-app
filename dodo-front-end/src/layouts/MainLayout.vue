@@ -61,7 +61,7 @@ const menu = [
   {
     id: 3,
     url: '/currency',
-    text: 'Daily Expenses'
+    text: 'Currency History'
   }
 ];
 export default defineComponent({
