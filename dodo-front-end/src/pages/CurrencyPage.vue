@@ -14,10 +14,7 @@
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-12">
-          <base-card
-            :class="props.selected ? 'bg-grey-2' : ''"
-            style="height: 100px"
-          >
+          <base-card :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section horizontal class="row">
               <q-card-section class="col q-pt-sm">
                 <p
@@ -45,7 +42,7 @@
                   >
                     <b>Changing: </b>Rp{{ props.row.changingAmount }}
                   </p>
-                  <p class="q-mt-none">
+                  <p class="q-my-none">
                     <b>Deskripsi: </b>{{ props.row.changeDescription }}
                   </p>
                 </div>
@@ -73,7 +70,6 @@
 </template>
 
 <script lang="ts">
-// TODO: After adding currency, add to list with all of its data
 import { defineComponent, ref, inject, onMounted } from 'vue';
 import { ICurrency } from 'src/models/interfaces/currency.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
@@ -141,10 +137,13 @@ export default defineComponent({
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription
         });
-        rows.value.push({
+        rows.value.unshift({
           id: response.data.id,
           changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription
+          changeDescription: currency.changeDescription,
+          currencyAmount:
+            rows.value[0].currencyAmount || 0 + (currency?.changingAmount || 0),
+          dateOfChange: new Date()
         });
       } catch (err) {
         notifyError?.(err);
