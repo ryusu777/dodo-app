@@ -18,7 +18,7 @@ import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'PageIndex',
   components: {
-    BaseButton,
+    BaseButton
   },
   setup() {
     const $router = useRouter();
@@ -57,7 +57,7 @@ export default defineComponent({
 
     return {
       sendSellTransactionHeader,
-      sendPurchaseTransactionHeader,
+      sendPurchaseTransactionHeader
       // options: ['pilihan1', 'pilihan2', 'pilihan3']
     };
   }
