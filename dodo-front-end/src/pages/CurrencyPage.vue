@@ -10,11 +10,7 @@
       @request="handleRequest"
     >
       <template v-slot:top-right>
-        <base-button
-          label="Tambah"
-          @click="showAddDialog()"
-          class="q-mr-md"
-        />
+        <base-button label="Tambah" @click="showAddDialog()" class="q-mr-md" />
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-12">
@@ -24,16 +20,34 @@
           >
             <q-card-section horizontal class="row">
               <q-card-section class="col q-pt-sm">
-                <p class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10" v-if="props.row.changingAmount < 0">
+                <p
+                  class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                  v-if="props.row.changingAmount < 0"
+                >
                   Pengeluaran
                 </p>
-                <p class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8" v-if="props.row.changingAmount > 0">
+                <p
+                  class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                  v-if="props.row.changingAmount > 0"
+                >
                   Pemasukkan
                 </p>
                 <div class="row">
-                  <p class="q-mb-none q-mt-none" v-if="props.row.changingAmount < 0"><b>Changing: </b>Rp{{ (-1 * props.row.changingAmount) }}</p>
-                  <p class="q-mb-none q-mt-none" v-if="props.row.changingAmount > 0"><b>Changing: </b>Rp{{ props.row.changingAmount}}</p>
-                  <p class="q-mt-none"><b>Deskripsi: </b>{{ props.row.changeDescription }}</p>
+                  <p
+                    class="q-mb-none q-mt-none"
+                    v-if="props.row.changingAmount < 0"
+                  >
+                    <b>Changing: </b>Rp{{ -1 * props.row.changingAmount }}
+                  </p>
+                  <p
+                    class="q-mb-none q-mt-none"
+                    v-if="props.row.changingAmount > 0"
+                  >
+                    <b>Changing: </b>Rp{{ props.row.changingAmount }}
+                  </p>
+                  <p class="q-mt-none">
+                    <b>Deskripsi: </b>{{ props.row.changeDescription }}
+                  </p>
                 </div>
               </q-card-section>
 
@@ -41,16 +55,15 @@
                 <p class="text-overline q-ma-none" style="line-height: 15px">
                   {{ formattedDate(props.row.dateOfChange) }}
                 </p>
-                <p class="q-mb-none"><b>Currency: </b>Rp{{ props.row.currencyAmount}}</p>
-                <base-button 
+                <p class="q-mb-none">
+                  <b>Currency: </b>Rp{{ props.row.currencyAmount }}
+                </p>
+                <base-button
                   label="Detail"
                   v-if="props.row.transactionHeaderId !== null"
-                  @click="showDetail(
-                    props.row.id,
-                  )"
+                  @click="showDetail(props.row.id)"
                 />
               </q-card-section>
-
             </q-card-section>
           </base-card>
         </div>
@@ -60,6 +73,7 @@
 </template>
 
 <script lang="ts">
+// TODO: After adding currency, add to list with all of its data
 import { defineComponent, ref, inject, onMounted } from 'vue';
 import { ICurrency } from 'src/models/interfaces/currency.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
@@ -125,12 +139,12 @@ export default defineComponent({
       try {
         const response = await api.post<ICreateResponse>('/currency', {
           changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription,
+          changeDescription: currency.changeDescription
         });
         rows.value.push({
           id: response.data.id,
           changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription,
+          changeDescription: currency.changeDescription
         });
       } catch (err) {
         notifyError?.(err);
@@ -153,13 +167,11 @@ export default defineComponent({
       return undefined;
     }
 
-    function showDetail(
-      id: number,
-    ) {
+    function showDetail(id: number) {
       $q.dialog({
         component: TransactionHistoryDialog,
         componentProps: {
-          headerId: id,
+          headerId: id
         }
       });
     }
@@ -174,6 +186,6 @@ export default defineComponent({
       formattedDate,
       showDetail
     };
-  },
+  }
 });
 </script>
