@@ -1,26 +1,66 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <div>
-      <base-button label="Penjualan" @click="sendSellTransactionHeader()" />
-      <base-button label="Pembelian" @click="sendPurchaseTransactionHeader()" />
+  <q-page>
+    <base-card class="q-ma-lg q-py-lg q-px-md">
+      <div class="row justify-evenly">
+        <p class="col-10 text-center text-bold text-h4 q-ma-md">
+          Data Keuangan
+        </p>
+        <p class="col-5 text-left text-h6">Keuangan sekarang:</p>
+        <p class="col-5 text-right text-h6">Rp50000</p>
+      </div>
+      <div class="row justify-end q-my-md">
+        <base-button class="col-5 text-h6 self-end" label="Tambah" />
+      </div>
+    </base-card>
+    <div class="row items-center justify-between q-ma-lg">
+      <q-btn
+        class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
+        label="Daftar Barang"
+        style="height: 90px"
+      />
+      <q-btn
+        class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
+        label="Histori Transaksi"
+        style="height: 90px"
+      />
+      <q-btn
+        class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
+        label="Data Keuangan"
+        style="height: 90px"
+      />
+      <q-btn
+        class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
+        label="Penjualan"
+        style="height: 90px"
+        @click="sendSellTransactionHeader()"
+      />
+      <q-btn
+        class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
+        label="Pembelian"
+        style="height: 90px"
+        @click="sendPurchaseTransactionHeader()"
+      />
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
 import { defineComponent, inject } from 'vue';
-import BaseButton from 'src/components/ui/BaseButton.vue';
+import BaseCard from 'src/components/ui/BaseCard.vue';
 import { ICreateResponse } from 'src/models/responses.interface';
 import { api } from 'src/boot/axios';
 import { AxiosError } from 'axios';
 import { useRouter } from 'vue-router';
+import BaseButton from 'src/components/ui/BaseButton.vue';
 
 export default defineComponent({
   name: 'PageIndex',
   components: {
+    BaseCard,
     BaseButton
   },
   setup() {
+    BaseButton;
     const $router = useRouter();
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
