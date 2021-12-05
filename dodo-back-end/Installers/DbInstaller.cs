@@ -11,7 +11,9 @@ namespace DodoApp.Installers
         {
             services.AddDbContext<DodoAppContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseMySql(
+                    configuration.GetConnectionString("MySqlConnection"), 
+                    ServerVersion.AutoDetect(configuration.GetConnectionString("MySqlConnection")));
             });
         }
     }
