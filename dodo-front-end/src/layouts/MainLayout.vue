@@ -11,11 +11,8 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> 
-          <router-link
-            to="/"
-            style="text-decoration: none"
-          >
+        <q-toolbar-title>
+          <router-link to="/" style="text-decoration: none">
             <q-btn flat class="text-white" label="Dodo App" />
           </router-link>
         </q-toolbar-title>
@@ -61,7 +58,7 @@ const menu = [
   {
     id: 3,
     url: '/currency',
-    text: 'Currency History'
+    text: 'Data Keuangan'
   }
 ];
 export default defineComponent({
