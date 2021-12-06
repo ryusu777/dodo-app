@@ -6,6 +6,7 @@
           Data Keuangan
         </p>
         <p class="col-5 text-left text-h6">Keuangan sekarang:</p>
+        <!-- TODO: currencyAmount -->
         <p class="col-5 text-right text-h6">Rp {{ currencyAmount }}</p>
       </div>
       <div class="row justify-end q-my-md">
