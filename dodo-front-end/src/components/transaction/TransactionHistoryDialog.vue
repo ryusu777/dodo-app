@@ -13,9 +13,9 @@
         </q-card-actions>
         <transaction-header :header-id="headerId" />
         <base-button
+          v-if="!transactionIsDone"
           label="Lakukan transaksi"
           @click="doTransaction"
-          :disable="transactionIsDone"
         />
       </q-card-section>
     </base-card>
