@@ -93,7 +93,6 @@
 </template>
 
 <script lang="ts">
-// TODO: Pemasukan or Pengeluaran text color
 import { defineComponent, ref, onMounted, inject } from 'vue';
 import { ITransactionHeader } from '../models/interfaces/transaction.interface';
 import { IPagination } from 'src/models/responses.interface';
