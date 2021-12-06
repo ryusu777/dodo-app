@@ -42,16 +42,23 @@
                   @click="removeGoods(props.row.id)"
                 />
                 <base-button v-if="editable" icon="edit">
-                  <q-popup-proxy :breakpoint="100" ref="popupRef">
+                  <q-popup-proxy
+                    :breakpoint="100"
+                    ref="popupRef"
+                    @hide="clearInput"
+                    @show="
+                      setInput(props.row.goodsAmount, props.row.pricePerItem)
+                    "
+                  >
                     <base-card class="q-pa-sm">
                       <base-input
-                        v-model="props.row.goodsAmount"
+                        v-model="goodsAmountRequest"
                         class="col-12 q-my-sm"
                         label="Jumlah Barang"
                         type="number"
                       />
                       <base-input
-                        v-model="props.row.pricePerItem"
+                        v-model="pricePerItemRequest"
                         class="col-12 q-my-sm"
                         label="Harga Jual"
                         type="number"
@@ -103,8 +110,8 @@ export default defineComponent({
     const $q = useQuasar();
     const popupRef = ref<InstanceType<typeof QPopupProxy>>();
     const rows = ref<ITransactionDetail[]>([]);
-    const amount = ref(Number);
-    const sellPrice = ref(Number);
+    const goodsAmountRequest = ref<number>();
+    const pricePerItemRequest = ref<number>();
     const modelHeader = ref(props.transactionHeader);
 
     function notifyError(err: unknown | AxiosError): void {
@@ -148,11 +155,19 @@ export default defineComponent({
 
     async function sendUpdateDetail(id: number, detail: LooseDictionary) {
       try {
-        await api.put(`/transaction/detail/${id}`, detail);
+        await api.put(`/transaction/detail/${id}`, {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          id: detail.id || 0,
+          goodsAmount: goodsAmountRequest.value,
+          pricePerItem: pricePerItemRequest.value
+        });
 
         $q.notify({
           message: 'Berhasil mengubah data'
         });
+
+        detail.goodsAmount = goodsAmountRequest.value;
+        detail.pricePerItem = pricePerItemRequest.value;
 
         popupRef.value?.hide();
       } catch (err) {
@@ -160,13 +175,25 @@ export default defineComponent({
       }
     }
 
+    function clearInput() {
+      goodsAmountRequest.value = 0;
+      pricePerItemRequest.value = 0;
+    }
+
+    function setInput(goodsAmount: number, pricePerItem: number) {
+      goodsAmountRequest.value = goodsAmount;
+      pricePerItemRequest.value = pricePerItem;
+    }
+
     return {
       popupRef,
       rows,
-      amount,
-      sellPrice,
+      goodsAmountRequest,
+      pricePerItemRequest,
       removeGoods: removeDetail,
       sendUpdateDetail,
+      clearInput,
+      setInput,
       modelHeader
     };
   }

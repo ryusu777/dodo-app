@@ -3,7 +3,6 @@ using System;
 using DodoApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DodoApp.Migrations
@@ -15,19 +14,17 @@ namespace DodoApp.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.11")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64)
+                .HasAnnotation("ProductVersion", "5.0.11");
 
             modelBuilder.Entity("DodoApp.Domain.Currency", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("ChangeDescription")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("ChangingAmount")
                         .HasColumnType("int");
@@ -36,7 +33,7 @@ namespace DodoApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateOfChange")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("TransactionHeaderId")
                         .HasColumnType("int");
@@ -80,23 +77,22 @@ namespace DodoApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("CarType")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("GoodsCode")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("GoodsName")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<int>("MinimalAvailable")
                         .HasColumnType("int");
@@ -104,7 +100,7 @@ namespace DodoApp.Migrations
                     b.Property<string>("PartNumber")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<int>("PurchasePrice")
                         .HasColumnType("int");
@@ -159,8 +155,7 @@ namespace DodoApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<int>("GoodsAmount")
                         .HasColumnType("int");
@@ -221,26 +216,25 @@ namespace DodoApp.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("PurchaseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("ReceiveDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("TransactionType")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("Vendor")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -250,7 +244,7 @@ namespace DodoApp.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2021, 12, 3, 10, 36, 21, 216, DateTimeKind.Local).AddTicks(4838),
+                            CreatedDate = new DateTime(2021, 12, 5, 19, 25, 35, 647, DateTimeKind.Local).AddTicks(5972),
                             PurchaseDate = new DateTime(2021, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReceiveDate = new DateTime(2021, 11, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TransactionType = "sell"
@@ -258,7 +252,7 @@ namespace DodoApp.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2021, 12, 3, 10, 36, 21, 217, DateTimeKind.Local).AddTicks(3571),
+                            CreatedDate = new DateTime(2021, 12, 5, 19, 25, 35, 648, DateTimeKind.Local).AddTicks(3512),
                             PurchaseDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReceiveDate = new DateTime(2021, 11, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             TransactionType = "purchase"

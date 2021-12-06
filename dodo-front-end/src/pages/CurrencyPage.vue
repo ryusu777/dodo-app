@@ -1,6 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <h3 class="text-bold q-mx-lg q-mt-sm">Currency History</h3>
+    <h3 class="text-bold q-mx-lg q-mt-sm">Data Keuangan</h3>
     <q-table
       grid
       :rows="rows"
@@ -14,15 +14,12 @@
       </template>
       <template v-slot:item="props">
         <div class="q-pa-xs col-12">
-          <base-card
-            :class="props.selected ? 'bg-grey-2' : ''"
-            style="height: 100px"
-          >
+          <base-card :class="props.selected ? 'bg-grey-2' : ''">
             <q-card-section horizontal class="row">
               <q-card-section class="col q-pt-sm">
                 <p
                   class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
-                  v-if="props.row.changingAmount < 0"
+                  v-if="props.row.changingAmount <= 0"
                 >
                   Pengeluaran
                 </p>
@@ -32,7 +29,7 @@
                 >
                   Pemasukkan
                 </p>
-                <div class="row">
+                <div class="column">
                   <p
                     class="q-mb-none q-mt-none"
                     v-if="props.row.changingAmount < 0"
@@ -45,7 +42,7 @@
                   >
                     <b>Changing: </b>Rp{{ props.row.changingAmount }}
                   </p>
-                  <p class="q-mt-none">
+                  <p class="q-my-none">
                     <b>Deskripsi: </b>{{ props.row.changeDescription }}
                   </p>
                 </div>
@@ -73,7 +70,6 @@
 </template>
 
 <script lang="ts">
-// TODO: After adding currency, add to list with all of its data
 import { defineComponent, ref, inject, onMounted } from 'vue';
 import { ICurrency } from 'src/models/interfaces/currency.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
@@ -141,10 +137,13 @@ export default defineComponent({
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription
         });
-        rows.value.push({
+        rows.value.unshift({
           id: response.data.id,
           changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription
+          changeDescription: currency.changeDescription,
+          currencyAmount:
+            rows.value[0].currencyAmount || 0 + (currency?.changingAmount || 0),
+          dateOfChange: new Date()
         });
       } catch (err) {
         notifyError?.(err);
@@ -171,7 +170,8 @@ export default defineComponent({
       $q.dialog({
         component: TransactionHistoryDialog,
         componentProps: {
-          headerId: id
+          headerId: id,
+          transactionIsDone: true
         }
       });
     }
