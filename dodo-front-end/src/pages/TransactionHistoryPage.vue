@@ -1,6 +1,6 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
-    <h3 class="text-bold q-mx-lg q-mt-sm">History Transaction</h3>
+    <h3 class="text-bold q-mx-lg q-mt-sm">Histori Transaksi</h3>
     <q-table
       grid
       :rows="rows"
@@ -50,12 +50,17 @@
           >
             <q-card-section horizontal class="row">
               <q-card-section class="col">
-                <p class="text-bold text-h5 q-pa-none q-ma-none">
-                  {{
-                    props.row.transactionType === 'sell'
-                      ? 'Pemasukan'
-                      : 'Pengeluaran'
-                  }}
+                <p
+                  class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                  v-if="props.row.transactionType === 'sell'"
+                >
+                  Penjualan
+                </p>
+                <p
+                  class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                  v-else
+                >
+                  Pembelian
                 </p>
                 <div class="row">
                   <p class="q-pr-md">Rp {{ props.row.totalPrice }}</p>
