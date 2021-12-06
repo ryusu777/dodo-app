@@ -16,16 +16,19 @@
       <q-btn
         class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
         label="Daftar Barang"
+        @click="$router.push('/goods')"
         style="height: 90px"
       />
       <q-btn
         class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
         label="Histori Transaksi"
+        @click="$router.push('/transaction-history')"
         style="height: 90px"
       />
       <q-btn
         class="col-4 q-my-md q-pa-md text-subtitle1 text-weight-bold"
         label="Data Keuangan"
+        @click="$router.push('/currency')"
         style="height: 90px"
       />
       <q-btn
@@ -97,8 +100,8 @@ export default defineComponent({
 
     return {
       sendSellTransactionHeader,
-      sendPurchaseTransactionHeader
-      // options: ['pilihan1', 'pilihan2', 'pilihan3']
+      sendPurchaseTransactionHeader,
+      $router
     };
   }
 });
