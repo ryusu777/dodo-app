@@ -19,7 +19,7 @@
               <q-card-section class="col q-pt-sm">
                 <p
                   class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
-                  v-if="props.row.changingAmount < 0"
+                  v-if="props.row.changingAmount <= 0"
                 >
                   Pengeluaran
                 </p>
@@ -29,7 +29,7 @@
                 >
                   Pemasukkan
                 </p>
-                <div class="row">
+                <div class="column">
                   <p
                     class="q-mb-none q-mt-none"
                     v-if="props.row.changingAmount < 0"
@@ -170,7 +170,8 @@ export default defineComponent({
       $q.dialog({
         component: TransactionHistoryDialog,
         componentProps: {
-          headerId: id
+          headerId: id,
+          transactionIsDone: true
         }
       });
     }
