@@ -6,10 +6,14 @@
           Data Keuangan
         </p>
         <p class="col-5 text-left text-h6">Keuangan sekarang:</p>
-        <p class="col-5 text-right text-h6">Rp50000</p>
+        <p class="col-5 text-right text-h6">Rp {{ currencyAmount }}</p>
       </div>
       <div class="row justify-end q-my-md">
-        <base-button class="col-5 text-h6 self-end" label="Tambah" />
+        <base-button
+          class="col-5 text-h6 self-end"
+          @click="showAddDialog()"
+          label="Tambah"
+        />
       </div>
     </base-card>
     <div class="row items-center justify-between q-ma-lg">
@@ -48,13 +52,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
+import { defineComponent, ref, inject } from 'vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
 import { ICreateResponse } from 'src/models/responses.interface';
 import { api } from 'src/boot/axios';
 import { AxiosError } from 'axios';
 import { useRouter } from 'vue-router';
 import BaseButton from 'src/components/ui/BaseButton.vue';
+import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
+import { ICurrency } from 'src/models/interfaces/currency.interface';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'PageIndex',
@@ -63,8 +70,10 @@ export default defineComponent({
     BaseButton
   },
   setup() {
-    BaseButton;
+    const $q = useQuasar();
     const $router = useRouter();
+    const rows = ref<ICurrency[]>([]);
+
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
@@ -78,6 +87,36 @@ export default defineComponent({
         );
 
         await $router.push(`/transaction/sell/${response.data.id || 0}`);
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
+
+    function showAddDialog() {
+      $q.dialog({
+        component: CurrencyFormDialog,
+        componentProps: {
+          title: 'Tambah Daftar'
+        }
+      }).onOk(async (currency: ICurrency) => {
+        await sendCreateRequest(currency);
+      });
+    }
+
+    async function sendCreateRequest(currency: ICurrency): Promise<void> {
+      try {
+        const response = await api.post<ICreateResponse>('/currency', {
+          changingAmount: currency.changingAmount,
+          changeDescription: currency.changeDescription
+        });
+        rows.value.unshift({
+          id: response.data.id,
+          changingAmount: currency.changingAmount,
+          changeDescription: currency.changeDescription,
+          currencyAmount:
+            rows.value[0].currencyAmount || 0 + (currency?.changingAmount || 0),
+          dateOfChange: new Date()
+        });
       } catch (err) {
         notifyError?.(err);
       }
@@ -99,6 +138,7 @@ export default defineComponent({
     }
 
     return {
+      showAddDialog,
       sendSellTransactionHeader,
       sendPurchaseTransactionHeader,
       $router
