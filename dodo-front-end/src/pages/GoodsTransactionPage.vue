@@ -11,6 +11,7 @@
         <base-button
           :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
           @click="sortByStok = !sortByStok"
+          v-if="transactionType == 'purchase'"
         />
         <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
