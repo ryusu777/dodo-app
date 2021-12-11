@@ -11,6 +11,10 @@
     >
       <template v-slot:top-right>
         <base-button
+          :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
+          @click="sortByStok = !sortByStok"
+        />
+        <base-button
           label="Tambah Barang"
           @click="showAddDialog()"
           class="q-mr-md"
@@ -41,7 +45,13 @@
                 >
                   {{ props.row.goodsCode }}
                 </p>
-                <p class="text-bold text-h5 q-pa-none q-ma-none">
+                <p
+                  class="text-bold text-h5 q-pa-none q-ma-none"
+                  :class="{
+                    'text-yellow-10':
+                      props.row.minimalAvailable > props.row.stockAvailable
+                  }"
+                >
                   {{ props.row.goodsName }}
                 </p>
                 <div class="row">
@@ -81,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, onMounted } from 'vue';
+import { defineComponent, ref, inject, onMounted, watch } from 'vue';
 import { IGoods } from 'src/models/interfaces/goods.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
@@ -113,12 +123,19 @@ export default defineComponent({
 
     const rows = ref<IGoods[]>([]);
 
+    const sortByStok = ref(false);
+
     onMounted(async () => await sendGetGoods());
 
     async function handleRequest({ pagination }: { pagination: IPageFilter }) {
       requestPagination.value = pagination;
       await sendGetGoods();
     }
+
+    watch(
+      () => sortByStok.value,
+      async () => await sendGetGoods()
+    );
 
     async function sendGetGoods() {
       try {
@@ -127,7 +144,9 @@ export default defineComponent({
           {
             params: {
               ...requestPagination.value,
-              searchText: filter.value
+              searchText: filter.value,
+              sortBy: sortByStok.value ? 'StockAvailable' : null,
+              descending: sortByStok.value ? 'ASC' : null
             }
           }
         );
@@ -230,6 +249,7 @@ export default defineComponent({
       rows,
       filter,
       sendDeleteRequest,
+      sortByStok,
       sendGetGoods,
       showUpdateDialog,
       showAddDialog,
