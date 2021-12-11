@@ -53,11 +53,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject } from 'vue';
+import { defineComponent, ref, inject, onMounted } from 'vue';
 import BaseCard from 'src/components/ui/BaseCard.vue';
-import { ICreateResponse } from 'src/models/responses.interface';
+import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'src/boot/axios';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
 import BaseButton from 'src/components/ui/BaseButton.vue';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
@@ -73,7 +73,6 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const $router = useRouter();
-    const rows = ref<ICurrency[]>([]);
 
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
@@ -106,21 +105,15 @@ export default defineComponent({
 
     async function sendCreateRequest(currency: ICurrency): Promise<void> {
       try {
-        const response = await api.post<ICreateResponse>('/currency', {
+        await api.post<ICreateResponse>('/currency', {
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription
-        });
-        rows.value.unshift({
-          id: response.data.id,
-          changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription,
-          currencyAmount:
-            rows.value[0].currencyAmount || 0 + (currency?.changingAmount || 0),
-          dateOfChange: new Date()
         });
       } catch (err) {
         notifyError?.(err);
       }
+
+      await sendGetLastCurrency();
     }
 
     async function sendPurchaseTransactionHeader(): Promise<void> {
@@ -138,10 +131,33 @@ export default defineComponent({
       }
     }
 
+    const currencyAmount = ref<number>();
+    async function sendGetLastCurrency() {
+      try {
+        const response: AxiosResponse<IPagination<ICurrency>> = await api.get(
+          '/currency',
+          {
+            params: {
+              rowsPerPage: 1
+            }
+          }
+        );
+
+        if (response.data.data) {
+          currencyAmount.value = response.data.data[0].currencyAmount;
+        }
+      } catch (err) {
+        notifyError?.(err);
+      }
+    }
+
+    onMounted(async () => await sendGetLastCurrency());
+
     return {
       showAddDialog,
       sendSellTransactionHeader,
       sendPurchaseTransactionHeader,
+      currencyAmount,
       $router
     };
   }
