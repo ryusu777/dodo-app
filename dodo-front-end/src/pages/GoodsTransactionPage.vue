@@ -3,8 +3,15 @@
     <h3 class="text-bold q-mx-lg q-mt-sm">
       {{ transactionType == 'sell' ? 'Menjual' : 'Membeli' }}
     </h3>
-    <q-table grid :rows="rows" row-key="id" :filter="filter" hide-header>
+    <q-table grid :rows="rows" row-key="id" 
+      v-model:filter="filter"
+      v-model:pagination="requestPagination"
+      @request="handleRequest" hide-header>
       <template v-slot:top-right>
+        <base-button
+          :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
+          @click="sortByStok = !sortByStok"
+        />
         <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
           borderless
@@ -32,7 +39,10 @@
                 >
                   {{ props.row.goodsCode }}
                 </p>
-                <p class="text-bold text-h5 q-pa-none q-ma-none">
+                <p 
+                  class="text-bold text-h5 q-pa-none q-ma-none"
+                  :class="{'text-yellow-10': props.row.minimalAvailable > props.row.stockAvailable}"
+                >
                   {{ props.row.goodsName }}
                 </p>
                 <div class="row">
@@ -87,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, inject, PropType } from 'vue';
+import { defineComponent, ref, onMounted, inject, PropType, watch } from 'vue';
 import { IGoods } from 'src/models/interfaces/goods.interface';
 import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
@@ -128,14 +138,26 @@ export default defineComponent({
     const notifyError: ((err: unknown | AxiosError) => void) | undefined =
       inject('notifyError');
 
-    const pagination = ref<IPageFilter>({
+    const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
     });
+    
+    async function handleRequest({ pagination }: { pagination: IPageFilter }) {
+      requestPagination.value = pagination;
+      await sendGetHeaders();
+    }
 
     const transactionHeader = ref<ITransactionHeader>();
 
     const rows = ref<IGoods[]>([]);
+
+    const sortByStok = ref(false);
+
+    watch(
+      () => sortByStok.value,
+      async () => await sendGetHeaders()
+    );
 
     async function sendGetHeaders() {
       try {
@@ -173,11 +195,20 @@ export default defineComponent({
           '/goods',
           {
             params: {
-              ...pagination.value
+              ...requestPagination.value,
+              searchText: filter.value,
+              sortBy: sortByStok.value ? 'StockAvailable' : null,
+              descending: sortByStok.value ? 'ASC' : null
             }
           }
         );
-        if (response.data.data) rows.value = response.data.data;
+        if (response.data.data) {
+          rows.value = response.data.data;
+          requestPagination.value.rowsNumber = response.data.rowsNumber;
+          requestPagination.value.page = response.data.pageNumber;
+          requestPagination.value.searchText = response.data.searchText;
+          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+        }
       } catch (err) {
         notifyError?.(err);
       }
@@ -234,10 +265,13 @@ export default defineComponent({
       rows,
       filter,
       amount,
+      sortByStok,
       sellPrice,
       showCart,
       sendAddDetail,
-      popupRef
+      popupRef,
+      requestPagination,
+      handleRequest,
     };
   }
 });
