@@ -6,6 +6,7 @@ namespace DodoApp.Domain
 {
     public class Currency
     {
+        // TODO: Profit and funding property
         [Key]
         public int Id { get; set; }
         public int? TransactionHeaderId { get; set; }

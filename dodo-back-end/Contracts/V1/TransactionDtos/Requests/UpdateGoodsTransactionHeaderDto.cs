@@ -5,6 +5,7 @@ namespace DodoApp.Contracts.V1.Requests
 {
     public class UpdateGoodsTransactionHeaderDto
     {
+        // TODO: Transaction Title
 
         [Required]
         public int Id { get; set; }

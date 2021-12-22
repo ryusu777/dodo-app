@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DodoApp.Controllers.V1
 {
     // TODO: More efficient at getting transaction data
+    // TODO: Deleting empty transaction endpoint
     [Route("/api/v1/[controller]")]
     [ApiController]
     public class TransactionController : ControllerBase

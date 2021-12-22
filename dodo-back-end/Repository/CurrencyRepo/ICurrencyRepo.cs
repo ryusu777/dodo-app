@@ -9,6 +9,7 @@ namespace DodoApp.Repository
 {
     public interface ICurrencyRepo
     {
+        // TODO: Convert profit to fund
         Task<int> CreateCurrencyReportAsync(Currency request);
         Task<PageWrapper<List<Currency>>> GetCurrenciesAsync(
             PageFilter pageFilter);

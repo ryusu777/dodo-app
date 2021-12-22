@@ -9,6 +9,8 @@ namespace DodoApp.Repository
 {
     public interface ITransactionRepo
     {
+        // TODO: Deleting empty transaction interface & implementation
+        // TODO: Purchasing goods should check if fund is available
         Task<int> CreateTransactionHeaderAsync(
             GoodsTransactionHeader transactionHeader);
         Task<int> UpdateTransactionHeaderAsync(

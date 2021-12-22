@@ -7,6 +7,7 @@ namespace DodoApp.Domain
 {
     public class GoodsTransactionHeader
     {
+        // TODO: Transaction title
         [Key]
         public int Id { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
