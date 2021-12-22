@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-// REFACTOR: Notify error outside of vue file
+// REFACTOR: Notify error uses axios interceptors
 // REFACTOR: Page, forms, and component folder structure
 // REFACTOR: Separate table with page component
 // REFACTOR: CRUD function as module
