@@ -3,6 +3,10 @@
 </template>
 
 <script lang="ts">
+// REFACTOR: Notify error outside of vue file
+// REFACTOR: Page, forms, and component folder structure
+// REFACTOR: Separate table with page component
+// REFACTOR: CRUD function as module
 import { useQuasar } from 'quasar';
 import axios, { AxiosError } from 'axios';
 import { defineComponent, provide } from 'vue';

@@ -50,6 +50,7 @@
           >
             <q-card-section horizontal class="row">
               <q-card-section class="col">
+                <!-- TODO: Transaction title -->
                 <p
                   class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
                   v-if="props.row.transactionType === 'sell'"
@@ -72,6 +73,7 @@
                   {{ formattedDate(props.row.createdDate) }}
                 </p>
                 <q-card-actions align="right">
+                  <!-- TODO: Delete transaction -->
                   <base-button
                     label="Detail"
                     @click="
@@ -93,6 +95,7 @@
 </template>
 
 <script lang="ts">
+// TODO: Set purchase date or receive date on calendar
 import { defineComponent, ref, onMounted, inject } from 'vue';
 import { ITransactionHeader } from '../models/interfaces/transaction.interface';
 import { IPagination } from 'src/models/responses.interface';

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
+// REFACTOR: All repositories should return action result
 namespace DodoApp
 {
     public class Startup

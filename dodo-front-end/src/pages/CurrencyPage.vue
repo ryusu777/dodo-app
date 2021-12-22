@@ -10,6 +10,7 @@
       @request="handleRequest"
     >
       <template v-slot:top-right>
+        <!-- TODO: Convert profit to fund -->
         <base-button label="Tambah" @click="showAddDialog()" class="q-mr-md" />
       </template>
       <template v-slot:item="props">

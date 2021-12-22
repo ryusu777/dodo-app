@@ -88,7 +88,6 @@ namespace DodoApp.Repository
             return await Pagination<Goods>.LoadPageAsync(qry, validPageFilter);
         }
 
-        // TODO: Change goods price in undone transaction details.
         public async Task<HttpStatusCode> UpdateGoodsAsync(int id, Goods request)
         {
             var goods = await _context.Goods
