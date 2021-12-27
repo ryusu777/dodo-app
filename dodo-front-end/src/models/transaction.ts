@@ -1,4 +1,4 @@
-import { IGoods } from './goods.interface';
+import { IGoods } from './goods';
 
 export interface ITransactionHeader {
   id?: number;

@@ -6,10 +6,10 @@
       </q-card-section>
 
       <q-card-section>
-        <selling-goods-basket
+        <transaction-detail-form
           :editable="editable"
           :transaction-header="transactionHeader"
-        ></selling-goods-basket>
+        ></transaction-detail-form>
         <div class="row justify-end q-mb-md">
           <base-button
             label="Lakukan Transaksi"
@@ -35,8 +35,8 @@ import { PropType, defineComponent } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
-import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
-import SellingGoodsBasket from './SellingGoodsBasket.vue';
+import { ITransactionHeader } from 'src/models/transaction';
+import TransactionDetailForm from './TransactionDetailForm.vue';
 import { api } from 'src/boot/axios';
 import axios, { AxiosError } from 'axios';
 import { useQuasar } from 'quasar';
@@ -104,6 +104,6 @@ export default defineComponent({
       sendCompleteTransaction
     };
   },
-  components: { BaseCard, BaseButton, SellingGoodsBasket }
+  components: { BaseCard, BaseButton, TransactionDetailForm }
 });
 </script>

@@ -11,7 +11,7 @@
             class="q-mb-sm"
           />
         </q-card-actions>
-        <transaction-header :header-id="headerId" />
+        <transaction-detail :header-id="headerId" />
         <base-button
           v-if="!transactionIsDone"
           label="Lakukan transaksi"
@@ -27,7 +27,7 @@ import { defineComponent, PropType } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
-import TransactionHeader from './TransactionHeader.vue';
+import TransactionDetail from './TransactionDetail.vue';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
@@ -64,6 +64,6 @@ export default defineComponent({
       doTransaction
     };
   },
-  components: { BaseCard, BaseButton, TransactionHeader }
+  components: { BaseCard, BaseButton, TransactionDetail }
 });
 </script>

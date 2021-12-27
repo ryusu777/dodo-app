@@ -90,7 +90,7 @@ import BaseInput from 'components/ui/BaseInput.vue';
 import {
   ITransactionHeader,
   ITransactionDetail
-} from 'src/models/interfaces/transaction.interface';
+} from 'src/models/transaction';
 import axios, { AxiosError } from 'axios';
 import { LooseDictionary, QPopupProxy, useQuasar } from 'quasar';
 

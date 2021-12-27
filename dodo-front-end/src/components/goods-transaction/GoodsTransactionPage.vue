@@ -1,9 +1,9 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">
-      {{ transactionType == 'sell' ? 'Menjual' : 'Membeli' }}
+      {{ transactionType === 'sell' ? 'Menjual' : 'Membeli' }}
     </h3>
-    <q-table grid :rows="rows" row-key="id" 
+    <q-table grid :rows="rows" row-key="id"
       v-model:filter="filter"
       v-model:pagination="requestPagination"
       @request="handleRequest" hide-header>
@@ -11,7 +11,7 @@
         <base-button
           :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
           @click="sortByStok = !sortByStok"
-          v-if="transactionType == 'purchase'"
+          v-if="transactionType === 'purchase'"
         />
         <base-button icon="shopping_cart" @click="showCart" class="q-mr-md" />
         <base-input
@@ -40,7 +40,7 @@
                 >
                   {{ props.row.goodsCode }}
                 </p>
-                <p 
+                <p
                   class="text-bold text-h5 q-pa-none q-ma-none"
                   :class="{'text-yellow-10': props.row.minimalAvailable > props.row.stockAvailable}"
                 >
@@ -74,7 +74,7 @@
                           type="number"
                         />
                         <base-input
-                          v-if="transactionType == 'sell'"
+                          v-if="transactionType === 'sell'"
                           v-model="sellPrice"
                           class="col-12 q-my-sm"
                           label="Harga Jual"
@@ -99,7 +99,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject, PropType, watch } from 'vue';
-import { IGoods } from 'src/models/interfaces/goods.interface';
+import { IGoods } from 'src/models/goods';
 import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
@@ -107,11 +107,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import SellingGoodsBasketDialog from 'components/transaction/SellingGoodsBasketDialog.vue';
-import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
+import TransactionDetailFormDialog from 'components/goods-transaction/TransactionDetailFormDialog.vue';
+import { ITransactionHeader } from 'src/models/transaction';
 import { QPopupProxy, useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import BaseDialog from 'src/components/ui/BaseDialog.vue';
+import BaseDialog from 'components/ui/BaseDialog.vue';
 
 export default defineComponent({
   props: {
@@ -143,7 +143,7 @@ export default defineComponent({
       page: 1,
       rowsPerPage: 5
     });
-    
+
     async function handleRequest({ pagination }: { pagination: IPageFilter }) {
       requestPagination.value = pagination;
       await sendGetHeaders();
@@ -221,7 +221,7 @@ export default defineComponent({
 
     function showCart() {
       $q.dialog({
-        component: SellingGoodsBasketDialog,
+        component: TransactionDetailFormDialog,
         componentProps: {
           transactionHeader: transactionHeader.value,
           editable: true

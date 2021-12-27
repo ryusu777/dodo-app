@@ -72,7 +72,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, inject, onMounted } from 'vue';
-import { ICurrency } from 'src/models/interfaces/currency.interface';
+import { ICurrency } from 'src/models/currency';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
@@ -81,7 +81,7 @@ import { date, useQuasar } from 'quasar';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import TransactionHistoryDialog from 'src/components/transaction/TransactionHistoryDialog.vue';
+import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 
 export default defineComponent({
   components: {
@@ -143,7 +143,7 @@ export default defineComponent({
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription,
           currencyAmount:
-            rows.value[0].currencyAmount || 0 + (currency?.changingAmount || 0),
+            rows.value[0].currencyAmount || (currency?.changingAmount || 0),
           dateOfChange: new Date()
         });
       } catch (err) {
@@ -169,7 +169,7 @@ export default defineComponent({
 
     function showDetail(id: number) {
       $q.dialog({
-        component: TransactionHistoryDialog,
+        component: TransactionDetailDialog,
         componentProps: {
           headerId: id,
           transactionIsDone: true
@@ -180,7 +180,6 @@ export default defineComponent({
     return {
       rows,
       filter,
-      sendGetCurrency,
       showAddDialog,
       requestPagination,
       handleRequest,

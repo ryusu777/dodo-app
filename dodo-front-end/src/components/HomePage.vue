@@ -55,18 +55,17 @@
 
 <script lang="ts">
 import { defineComponent, ref, inject, onMounted } from 'vue';
-import BaseCard from 'src/components/ui/BaseCard.vue';
+import BaseCard from 'components/ui/BaseCard.vue';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
-import BaseButton from 'src/components/ui/BaseButton.vue';
+import BaseButton from 'components/ui/BaseButton.vue';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
-import { ICurrency } from 'src/models/interfaces/currency.interface';
+import { ICurrency } from 'src/models/currency';
 import { useQuasar } from 'quasar';
 
 export default defineComponent({
-  name: 'PageIndex',
   components: {
     BaseCard,
     BaseButton

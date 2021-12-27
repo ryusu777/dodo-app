@@ -64,7 +64,7 @@
 import { defineComponent, ref, PropType } from 'vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import { IGoods } from 'src/models/interfaces/goods.interface';
+import { IGoods } from 'src/models/goods';
 
 export default defineComponent({
   emits: ['submit'],

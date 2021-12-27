@@ -24,25 +24,25 @@
 
     <q-card-section>
       <p class="text-h5 text-bold">Transaction Detail</p>
-      <selling-goods-basket
+      <transaction-detail-form
         v-if="transactionHeader"
         :transaction-header="transactionHeader"
-      ></selling-goods-basket>
+      ></transaction-detail-form>
     </q-card-section>
   </base-card>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
-import { ITransactionHeader } from 'src/models/interfaces/transaction.interface';
+import { ITransactionHeader } from 'src/models/transaction';
 import BaseCard from '../ui/BaseCard.vue';
-import { api } from 'src/boot/axios';
+import { api } from 'boot/axios';
 import axios, { AxiosError } from 'axios';
 import { date, useQuasar } from 'quasar';
-import SellingGoodsBasket from './SellingGoodsBasket.vue';
+import TransactionDetailForm from '../goods-transaction/TransactionDetailForm.vue';
 
 export default defineComponent({
-  components: { BaseCard, SellingGoodsBasket },
+  components: { BaseCard, TransactionDetailForm },
   props: {
     headerId: {
       type: [Number, String],

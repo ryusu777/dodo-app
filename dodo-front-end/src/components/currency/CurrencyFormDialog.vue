@@ -11,7 +11,7 @@
             class="q-mb-sm"
           />
         </q-card-actions>
-        <daily-expenses-form :currency="currency" @submit="onDialogOK"></daily-expenses-form>
+        <currency-form :currency="currency" @submit="onDialogOK"></currency-form>
       </q-card-section>
     </base-card>
   </q-dialog>
@@ -22,8 +22,8 @@ import { defineComponent, PropType } from 'vue';
 import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
-import DailyExpensesForm from './CurrencyForm.vue';
-import { ICurrency } from 'src/models/interfaces/currency.interface';
+import CurrencyForm from './CurrencyForm.vue';
+import { ICurrency } from 'src/models/currency';
 
 export default defineComponent({
   props: {
@@ -42,6 +42,6 @@ export default defineComponent({
       onCancelClick: onDialogCancel
     };
   },
-  components: { BaseCard, BaseButton, DailyExpensesForm }
+  components: { BaseCard, BaseButton, CurrencyForm }
 });
 </script>

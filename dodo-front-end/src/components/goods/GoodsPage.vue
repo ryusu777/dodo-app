@@ -11,8 +11,8 @@
     >
       <template v-slot:top-right>
         <base-button
-          :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
-          @click="sortByStok = !sortByStok"
+          :label="sortByStock ? 'Kembalikan ke semula' : 'Urutkan stok'"
+          @click="sortByStock = !sortByStock"
         />
         <base-button
           label="Tambah Barang"
@@ -92,7 +92,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, inject, onMounted, watch } from 'vue';
-import { IGoods } from 'src/models/interfaces/goods.interface';
+import { IGoods } from 'src/models/goods';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
@@ -123,7 +123,7 @@ export default defineComponent({
 
     const rows = ref<IGoods[]>([]);
 
-    const sortByStok = ref(false);
+    const sortByStock = ref(false);
 
     onMounted(async () => await sendGetGoods());
 
@@ -133,7 +133,7 @@ export default defineComponent({
     }
 
     watch(
-      () => sortByStok.value,
+      () => sortByStock.value,
       async () => await sendGetGoods()
     );
 
@@ -145,8 +145,8 @@ export default defineComponent({
             params: {
               ...requestPagination.value,
               searchText: filter.value,
-              sortBy: sortByStok.value ? 'StockAvailable' : null,
-              descending: sortByStok.value ? 'ASC' : null
+              sortBy: sortByStock.value ? 'StockAvailable' : null,
+              descending: sortByStock.value ? 'ASC' : null
             }
           }
         );
@@ -249,8 +249,7 @@ export default defineComponent({
       rows,
       filter,
       sendDeleteRequest,
-      sortByStok,
-      sendGetGoods,
+      sortByStock,
       showUpdateDialog,
       showAddDialog,
       requestPagination,

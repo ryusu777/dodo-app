@@ -97,7 +97,7 @@
 <script lang="ts">
 // TODO: Set purchase date or receive date on calendar
 import { defineComponent, ref, onMounted, inject } from 'vue';
-import { ITransactionHeader } from '../models/interfaces/transaction.interface';
+import { ITransactionHeader } from 'src/models/transaction';
 import { IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
@@ -106,7 +106,7 @@ import BaseInputDate from 'components/ui/BaseInputDate.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import { date, useQuasar } from 'quasar';
-import TransactionHistoryDialog from 'src/components/transaction/TransactionHistoryDialog.vue';
+import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 
 export default defineComponent({
   components: {
@@ -208,7 +208,7 @@ export default defineComponent({
       transactionIsDone: boolean
     ) {
       $q.dialog({
-        component: TransactionHistoryDialog,
+        component: TransactionDetailDialog,
         componentProps: {
           headerId: id,
           transactionType,
