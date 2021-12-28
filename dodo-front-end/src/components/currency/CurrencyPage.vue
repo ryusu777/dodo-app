@@ -1,120 +1,52 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Data Keuangan</h3>
-    <q-table
-      grid
+    <currency-table
       :rows="rows"
       row-key="id"
-      v-model:filter="filter"
-      v-model:pagination="requestPagination"
-      @request="handleRequest"
-    >
-      <template v-slot:top-right>
-        <!-- TODO: Convert profit to fund -->
-        <base-button label="Tambah" @click="showAddDialog()" class="q-mr-md" />
-      </template>
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-12">
-          <base-card :class="props.selected ? 'bg-grey-2' : ''">
-            <q-card-section horizontal class="row">
-              <q-card-section class="col q-pt-sm">
-                <p
-                  class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
-                  v-if="props.row.changingAmount <= 0"
-                >
-                  Pengeluaran
-                </p>
-                <p
-                  class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
-                  v-if="props.row.changingAmount > 0"
-                >
-                  Pemasukkan
-                </p>
-                <div class="column">
-                  <p
-                    class="q-mb-none q-mt-none"
-                    v-if="props.row.changingAmount < 0"
-                  >
-                    <b>Changing: </b>Rp{{ -1 * props.row.changingAmount }}
-                  </p>
-                  <p
-                    class="q-mb-none q-mt-none"
-                    v-if="props.row.changingAmount > 0"
-                  >
-                    <b>Changing: </b>Rp{{ props.row.changingAmount }}
-                  </p>
-                  <p class="q-my-none">
-                    <b>Deskripsi: </b>{{ props.row.changeDescription }}
-                  </p>
-                </div>
-              </q-card-section>
-
-              <q-card-section class="text-right">
-                <p class="text-overline q-ma-none" style="line-height: 15px">
-                  {{ formattedDate(props.row.dateOfChange) }}
-                </p>
-                <p class="q-mb-none">
-                  <b>Currency: </b>Rp{{ props.row.currencyAmount }}
-                </p>
-                <base-button
-                  label="Detail"
-                  v-if="props.row.transactionHeaderId !== null"
-                  @click="showDetail(props.row.id)"
-                />
-              </q-card-section>
-            </q-card-section>
-          </base-card>
-        </div>
-      </template>
-    </q-table>
+      @create="sendCreateRequest"
+      @get-all="sendGetCurrency"
+      @get="showDetail"
+    />
   </q-page>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, inject, onMounted } from 'vue';
+import CurrencyTable from 'components/currency/CurrencyTable.vue';
 import { ICurrency } from 'src/models/currency';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
+import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { AxiosError, AxiosResponse } from 'axios';
-import { date, useQuasar } from 'quasar';
-import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
-import BaseButton from 'components/ui/BaseButton.vue';
-import BaseCard from 'components/ui/BaseCard.vue';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
-
+import { useQuasar } from 'quasar';
 export default defineComponent({
   components: {
-    BaseButton,
-    BaseCard
+    CurrencyTable
   },
   setup() {
     const $q = useQuasar();
     const filter = ref('');
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
-
     const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
     });
 
+    onMounted(async () => await sendGetCurrency({ page: 1, rowsPerPage: 5 }));
+
+    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
+      inject('notifyError');
+
     const rows = ref<ICurrency[]>([]);
 
-    onMounted(async () => await sendGetCurrency());
-
-    async function handleRequest({ pagination }: { pagination: IPageFilter }) {
-      requestPagination.value = pagination;
-      await sendGetCurrency();
-    }
-
-    async function sendGetCurrency() {
+    async function sendGetCurrency(requestPagination: IPageFilter) {
       try {
         const response: AxiosResponse<IPagination<ICurrency>> = await api.get(
           '/currency',
           {
             params: {
-              ...requestPagination.value,
+              ...requestPagination,
               searchText: filter.value
             }
           }
@@ -122,10 +54,10 @@ export default defineComponent({
 
         if (response.data.data) {
           rows.value = response.data.data;
-          requestPagination.value.rowsNumber = response.data.rowsNumber;
-          requestPagination.value.page = response.data.pageNumber;
-          requestPagination.value.searchText = response.data.searchText;
-          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+          requestPagination.rowsNumber = response.data.rowsNumber;
+          requestPagination.page = response.data.pageNumber;
+          requestPagination.searchText = response.data.searchText;
+          requestPagination.rowsPerPage = response.data.itemPerPage;
         }
       } catch (err) {
         notifyError?.(err);
@@ -138,33 +70,18 @@ export default defineComponent({
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription
         });
+        // TODO: Create Currency should return created result
         rows.value.unshift({
           id: response.data.id,
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription,
           currencyAmount:
-            rows.value[0].currencyAmount || (currency?.changingAmount || 0),
+            rows.value[0].currencyAmount || currency?.changingAmount || 0,
           dateOfChange: new Date()
         });
       } catch (err) {
         notifyError?.(err);
       }
-    }
-
-    function showAddDialog() {
-      $q.dialog({
-        component: CurrencyFormDialog,
-        componentProps: {
-          title: 'Tambah Daftar'
-        }
-      }).onOk(async (currency: ICurrency) => {
-        await sendCreateRequest(currency);
-      });
-    }
-
-    function formattedDate(value: Date | undefined) {
-      if (value) return date.formatDate(value, 'dddd, D MMMM YYYY');
-      return undefined;
     }
 
     function showDetail(id: number) {
@@ -180,10 +97,9 @@ export default defineComponent({
     return {
       rows,
       filter,
-      showAddDialog,
       requestPagination,
-      handleRequest,
-      formattedDate,
+      sendCreateRequest,
+      sendGetCurrency,
       showDetail
     };
   }

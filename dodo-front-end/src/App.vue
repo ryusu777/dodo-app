@@ -7,6 +7,7 @@
 // REFACTOR: Page, forms, and component folder structure
 // REFACTOR: Separate table with page component
 // REFACTOR: CRUD function as module
+// REFACTOR: Pagination on pages
 import { useQuasar } from 'quasar';
 import axios, { AxiosError } from 'axios';
 import { defineComponent, provide } from 'vue';

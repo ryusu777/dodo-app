@@ -11,7 +11,10 @@
             class="q-mb-sm"
           />
         </q-card-actions>
-        <currency-form :currency="currency" @submit="onDialogOK"></currency-form>
+        <currency-form
+          :currency="currency"
+          @submit="onDialogOK"
+        ></currency-form>
       </q-card-section>
     </base-card>
   </q-dialog>
