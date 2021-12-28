@@ -1,149 +1,57 @@
 <template>
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Daftar Barang</h3>
-    <q-table
-      grid
+    <goods-table
       :rows="rows"
       row-key="id"
-      v-model:filter="filter"
-      v-model:pagination="requestPagination"
-      @request="handleRequest"
-    >
-      <template v-slot:top-right>
-        <base-button
-          :label="sortByStock ? 'Kembalikan ke semula' : 'Urutkan stok'"
-          @click="sortByStock = !sortByStock"
-        />
-        <base-button
-          label="Tambah Barang"
-          @click="showAddDialog()"
-          class="q-mr-md"
-        />
-        <base-input
-          borderless
-          dense
-          debounce="300"
-          v-model="filter"
-          placeholder="Search"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </base-input>
-      </template>
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-12">
-          <base-card
-            :class="props.selected ? 'bg-grey-2' : ''"
-            style="height: 100px"
-          >
-            <q-card-section horizontal class="row">
-              <q-card-section class="col">
-                <p
-                  class="text-overline q-pa-none q-ma-none"
-                  style="line-height: 15px"
-                >
-                  {{ props.row.goodsCode }}
-                </p>
-                <p
-                  class="text-bold text-h5 q-pa-none q-ma-none"
-                  :class="{
-                    'text-yellow-10':
-                      props.row.minimalAvailable > props.row.stockAvailable
-                  }"
-                >
-                  {{ props.row.goodsName }}
-                </p>
-                <div class="row">
-                  <p class="q-pr-md">{{ props.row.partNumber }}</p>
-                  |
-                  <p class="q-pl-md">{{ props.row.carType }}</p>
-                </div>
-              </q-card-section>
-
-              <q-card-section class="text-right">
-                <p class="text-overline q-ma-none" style="line-height: 15px">
-                  Stok: {{ props.row.stockAvailable }}
-                </p>
-                <p
-                  class="text-overline q-ma-none self-end"
-                  style="line-height: 15px"
-                >
-                  Rp {{ props.row.purchasePrice }}
-                </p>
-                <q-card-actions align="right">
-                  <base-button
-                    @click="sendDeleteRequest(props.row.id)"
-                    icon="delete"
-                  />
-                  <base-button
-                    icon="edit"
-                    @click="showUpdateDialog(props.row)"
-                  />
-                </q-card-actions>
-              </q-card-section>
-            </q-card-section>
-          </base-card>
-        </div>
-      </template>
-    </q-table>
+      @get-all="sendGetGoods"
+      @create="sendCreateRequest"
+      @update="sendUpdateRequest"
+      @delete="sendDeleteRequest"
+    />
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, onMounted, watch } from 'vue';
+import { defineComponent, inject, ref, onMounted, watch } from 'vue';
+import GoodsTable from 'components/goods/GoodsTable.vue';
 import { IGoods } from 'src/models/goods';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'boot/axios';
-import { IPageFilter } from 'src/models/requests.interface';
 import { AxiosError, AxiosResponse } from 'axios';
+import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
-import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
+import { IPagination, ICreateResponse } from 'src/models/responses.interface';
+import { IPageFilter } from 'src/models/requests.interface';
 import BaseDialog from 'components/ui/BaseDialog.vue';
-import BaseInput from 'components/ui/BaseInput.vue';
-import BaseButton from 'components/ui/BaseButton.vue';
-import BaseCard from 'components/ui/BaseCard.vue';
-
 export default defineComponent({
   components: {
-    BaseInput,
-    BaseButton,
-    BaseCard
+    GoodsTable
   },
   setup() {
     const $q = useQuasar();
+    const rows = ref<IGoods[]>([]);
     const filter = ref('');
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
-
+    const sortByStock = ref(false);
     const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
     });
+    // watch(
+    //   () => sortByStock.value,
+    //   () => sendGetGoods(requestPagination)
+    // );
 
-    const rows = ref<IGoods[]>([]);
+    onMounted(async () => await sendGetGoods({ page: 1, rowsPerPage: 5 }));
 
-    const sortByStock = ref(false);
+    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
+      inject('notifyError');
 
-    onMounted(async () => await sendGetGoods());
-
-    async function handleRequest({ pagination }: { pagination: IPageFilter }) {
-      requestPagination.value = pagination;
-      await sendGetGoods();
-    }
-
-    watch(
-      () => sortByStock.value,
-      async () => await sendGetGoods()
-    );
-
-    async function sendGetGoods() {
+    async function sendGetGoods(requestPagination: IPageFilter) {
       try {
         const response: AxiosResponse<IPagination<IGoods>> = await api.get(
           '/goods',
           {
             params: {
-              ...requestPagination.value,
+              ...requestPagination,
               searchText: filter.value,
               sortBy: sortByStock.value ? 'StockAvailable' : null,
               descending: sortByStock.value ? 'ASC' : null
@@ -153,10 +61,10 @@ export default defineComponent({
 
         if (response.data.data) {
           rows.value = response.data.data;
-          requestPagination.value.rowsNumber = response.data.rowsNumber;
-          requestPagination.value.page = response.data.pageNumber;
-          requestPagination.value.searchText = response.data.searchText;
-          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+          requestPagination.rowsNumber = response.data.rowsNumber;
+          requestPagination.page = response.data.pageNumber;
+          requestPagination.searchText = response.data.searchText;
+          requestPagination.rowsPerPage = response.data.itemPerPage;
         }
       } catch (err) {
         notifyError?.(err);
@@ -189,7 +97,6 @@ export default defineComponent({
     async function sendUpdateRequest(goods: IGoods) {
       try {
         await api.put(`/goods/${goods.id || -1}`, goods);
-
         rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
       } catch (err) {
         notifyError?.(err);
@@ -222,38 +129,12 @@ export default defineComponent({
       }
     }
 
-    function showUpdateDialog(goods: IGoods) {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          goods,
-          title: 'Ubah data barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendUpdateRequest(goods);
-      });
-    }
-
-    function showAddDialog() {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          title: 'Tambah Barang'
-        }
-      }).onOk(async (goods: IGoods) => {
-        await sendCreateRequest(goods);
-      });
-    }
-
     return {
       rows,
-      filter,
-      sendDeleteRequest,
-      sortByStock,
-      showUpdateDialog,
-      showAddDialog,
       requestPagination,
-      handleRequest
+      sendDeleteRequest,
+      sendCreateRequest,
+      sendUpdateRequest
     };
   }
 });
