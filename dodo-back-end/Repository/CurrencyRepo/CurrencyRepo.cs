@@ -9,6 +9,7 @@ using DodoApp.Domain;
 using DodoApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Repository
 {
@@ -25,37 +26,36 @@ namespace DodoApp.Repository
             _mapper = mapper;
         }
 
-        /*
-            Returns:
-            -1 -> Internal server error
-            -2 -> Transaction Header Not Found
-            -3 -> Transaction Header Already Exists
-        */
-        public async Task<int> CreateCurrencyReportAsync(Currency request)
+        public async Task<IActionResult> CreateCurrencyReportAsync(CreateCurrencyDto request)
         {
             if (request.TransactionHeaderId != null && await _context.Currencies
                 .FirstOrDefaultAsync(c => 
                     c.TransactionHeaderId == request.TransactionHeaderId) != null)
             {
-                return -3;
+                return new BadRequestObjectResult(new { errors = new string[] 
+                    { "Record keuangan sudah ada" }});
             }
 
             GoodsTransactionHeader header;
-            if (request.TransactionHeaderId != null)
+            var currency = _mapper.Map<Currency>(request);
+            if (currency.TransactionHeaderId != null)
             {
                 header = await _context.GoodsTransactionHeaders
                     .Include(h => h.GoodsTransactionDetails)
                     .FirstOrDefaultAsync(h => 
-                        h.Id == request.TransactionHeaderId);
+                        h.Id == currency.TransactionHeaderId);
 
                 if (header == null)
-                    return -2;
+                    return new BadRequestObjectResult(new 
+                    { 
+                        errors = new string[] { "Transaksi barang tidak ditemukan" }
+                    });
                 
-                request.ChangingAmount = _mapper
+                currency.ChangingAmount = _mapper
                     .Map<ReadGoodsTransactionHeaderDto>(header).TotalPrice;
                 
                 if (header.TransactionType == "purchase")
-                    request.ChangingAmount *= -1;
+                    currency.ChangingAmount *= -1;
             }
 
             var latestCurrency = await _context.Currencies
@@ -63,9 +63,9 @@ namespace DodoApp.Repository
                 .LastOrDefaultAsync();
             var latestCurrencyAmount = (int?)latestCurrency.CurrencyAmount ?? 0;
 
-            request.CurrencyAmount = 
-                latestCurrencyAmount + request.ChangingAmount;
-            await _context.Currencies.AddAsync(request);
+            currency.CurrencyAmount = 
+                latestCurrencyAmount + currency.ChangingAmount;
+            await _context.Currencies.AddAsync(currency);
 
             try
             {
@@ -73,13 +73,13 @@ namespace DodoApp.Repository
             }
             catch
             {
-                return -1;
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
 
-            return request.Id;
+            return new OkObjectResult(new { id = currency.Id });
         }
 
-        public async Task<PageWrapper<List<Currency>>> GetCurrenciesAsync(PageFilter pageFilter)
+        public async Task<ActionResult<PageWrapper<List<ReadCurrencyDto>>>> GetCurrenciesAsync(PageFilter pageFilter)
         {
             var validPageFilter = new PageFilter(
                 pageFilter.Page,
@@ -88,8 +88,8 @@ namespace DodoApp.Repository
                 pageFilter.Descending, 
                 pageFilter.SearchText);
 
-            var qry = _context.Currencies.AsQueryable();
-            qry = qry.Select(s => new Currency {
+            var qry = _context.Currencies.AsQueryable().Select(s => new ReadCurrencyDto
+            {
                 Id = s.Id,
                 ChangeDescription = s.ChangeDescription,
                 ChangingAmount = s.ChangingAmount,
@@ -98,7 +98,7 @@ namespace DodoApp.Repository
                 TransactionHeaderId = s.TransactionHeaderId
             });
 
-            return await Pagination<Currency>.LoadPageAsync(qry, validPageFilter);
+            return new OkObjectResult(await Pagination<ReadCurrencyDto>.LoadPageAsync(qry, validPageFilter));
         }
     }
 }

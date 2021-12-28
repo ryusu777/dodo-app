@@ -27,27 +27,8 @@ namespace DodoApp.Controllers.V1
         public async Task<IActionResult> CreateCurrencyReport(
             CreateCurrencyDto request)
         {
-            var result = await _repo
-                .CreateCurrencyReportAsync(_mapper.Map<Currency>(request));
-            
-            if (result == -1)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-
-            if (result == -2)
-            {
-                return NotFound(new { errors = new string[] 
-                    { "Transaction header not found"}});
-            }
-
-            if (result == -3)
-            {
-                return Conflict(new { errors = new string[]
-                    { "Currency report already exists"}});
-            }
-
-            return Ok(new { id = result });
+            return await _repo
+                .CreateCurrencyReportAsync(request);
         }
 
         [HttpGet]
@@ -55,9 +36,7 @@ namespace DodoApp.Controllers.V1
             [FromQuery] PageFilter pageFilter
         )
         {
-            var result = await _repo.GetCurrenciesAsync(pageFilter);
-
-            return Ok(_mapper.Map<PageWrapper<List<ReadCurrencyDto>>>(result));
+            return await _repo.GetCurrenciesAsync(pageFilter);
         }
     }
 }
