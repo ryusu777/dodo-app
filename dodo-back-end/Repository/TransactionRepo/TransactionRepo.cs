@@ -316,7 +316,7 @@ namespace DodoApp.Repository
                 return -3;
             }
 
-            Currency request = new Currency 
+            CreateCurrencyDto request = new CreateCurrencyDto 
             {
                 TransactionHeaderId = headerId,
                 DateOfChange = DateTime.Now,

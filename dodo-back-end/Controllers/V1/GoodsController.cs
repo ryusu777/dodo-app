@@ -34,70 +34,33 @@ namespace DodoApp.Controllers.V1
         [HttpGet("{id}")]
         public async Task<ActionResult<ReadGoodsDto>> GetGoods(int id)
         {
-            var goods = await _goodsRepo.GetGoodsByIdAsync(id);
-
-            if (goods == null)
-            {
-                return NotFound();
-            }
-
-            return _mapper.Map<ReadGoodsDto>(goods);
+            return await _goodsRepo.GetGoodsByIdAsync(id);
         }
 
         // PUT: api/Goods/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGoods(int id, UpdateGoodsDto goods)
         {
             if (id != goods.Id)
             {
-                return BadRequest(new { errors = new string[] { "Id doesn't match" }});
+                return BadRequest(new { errors = new string[] { "Permintaan bermasalah" }});
             }
 
-            var result = await _goodsRepo.UpdateGoodsAsync(id, _mapper.Map<Goods>(goods));
-
-            if (result == HttpStatusCode.Conflict)
-            {
-                return BadRequest(new { errors = new string[] {"Code already exists"} });
-            }
-
-            return StatusCode((int)result);
+            return await _goodsRepo.UpdateGoodsAsync(id, goods);
         }
 
         // POST: api/Goods
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<IActionResult> PostGoods(CreateGoodsDto goods)
         {
-            var result = await _goodsRepo.CreateGoodsAsync(_mapper.Map<Goods>(goods));
-
-            if (result == -2)
-            {
-                return Conflict(new { errors = new string[] { "Code already exists" }});
-            }
-            else if (result == -1)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-
-            return CreatedAtAction("GetGoods", new { id = result });
+            return await _goodsRepo.CreateGoodsAsync(goods);
         }
 
         // DELETE: api/Goods/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGoods(int id)
         {
-            var result = await _goodsRepo.DeleteGoodsAsync(id);
-
-            if (result == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(new { errors = new string[] 
-                {
-                    "Cannot delete goods that has transaction detail"
-                }});
-            }
-
-            return StatusCode((int)result);
+            return await _goodsRepo.DeleteGoodsAsync(id);
         }
     }
 }
