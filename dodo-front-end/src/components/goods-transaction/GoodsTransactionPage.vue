@@ -3,10 +3,15 @@
     <h3 class="text-bold q-mx-lg q-mt-sm">
       {{ transactionType === 'sell' ? 'Menjual' : 'Membeli' }}
     </h3>
-    <q-table grid :rows="rows" row-key="id"
+    <q-table
+      grid
+      :rows="rows"
+      row-key="id"
       v-model:filter="filter"
       v-model:pagination="requestPagination"
-      @request="handleRequest" hide-header>
+      @request="handleRequest"
+      hide-header
+    >
       <template v-slot:top-right>
         <base-button
           :label="sortByStok ? 'Kembalikan ke semula' : 'Urutkan stok'"
@@ -42,7 +47,10 @@
                 </p>
                 <p
                   class="text-bold text-h5 q-pa-none q-ma-none"
-                  :class="{'text-yellow-10': props.row.minimalAvailable > props.row.stockAvailable}"
+                  :class="{
+                    'text-yellow-10':
+                      props.row.minimalAvailable > props.row.stockAvailable
+                  }"
                 >
                   {{ props.row.goodsName }}
                 </p>
@@ -98,6 +106,7 @@
 </template>
 
 <script lang="ts">
+// TODO: Cannot send TransactionDetail request with empty amount or price
 import { defineComponent, ref, onMounted, inject, PropType, watch } from 'vue';
 import { IGoods } from 'src/models/goods';
 import { IPagination } from 'src/models/responses.interface';
@@ -272,7 +281,7 @@ export default defineComponent({
       sendAddDetail,
       popupRef,
       requestPagination,
-      handleRequest,
+      handleRequest
     };
   }
 });
