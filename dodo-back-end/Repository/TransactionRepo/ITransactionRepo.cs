@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
 using DodoApp.Domain;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DodoApp.Repository
 {
@@ -12,18 +13,18 @@ namespace DodoApp.Repository
         // TODO: Deleting empty transaction interface & implementation
         // TODO: Purchasing goods should check if fund is available
         // TODO: Implement receive date and purchase date
-        Task<int> CreateTransactionHeaderAsync(
-            GoodsTransactionHeader transactionHeader);
-        Task<int> UpdateTransactionHeaderAsync(
-            GoodsTransactionHeader transactionHeader);
-        Task<HttpStatusCode> DeleteTransactionHeaderAsync(int id);
-        Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id);
-        Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
+        Task<IActionResult> CreateTransactionHeaderAsync(
+            CreateGoodsTransactionHeaderDto request);
+        Task<IActionResult> UpdateTransactionHeaderAsync(
+            UpdateGoodsTransactionHeaderDto request);
+        Task<IActionResult> DeleteTransactionHeaderAsync(int id);
+        Task<ActionResult<ReadGoodsTransactionHeaderDto>> GetGoodsTransactionHeaderByIdAsync(int id);
+        Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> GetGoodsTransactionHeadersAsync(
             PageFilter pageFilter, FilterGoodsTransactionHeader filter);
-        Task<int> CreateTransactionDetailAsync(
-            GoodsTransactionDetail transactionDetail);
-        Task<int> UpdateTransactionDetailAsync(
-            GoodsTransactionDetail transactionDetail);
-        Task<HttpStatusCode> DeleteTransactionDetail(int id);
+        Task<IActionResult> CreateTransactionDetailAsync(
+            CreateGoodsTransactionDetailDto request);
+        Task<IActionResult> UpdateTransactionDetailAsync(
+            UpdateGoodsTransactionDetailDto request);
+        Task<IActionResult> DeleteTransactionDetail(int id);
     }
 }
