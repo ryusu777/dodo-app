@@ -2,7 +2,7 @@
   <q-table grid @request="$emit('getAll', requestPagination)" :rows="rows">
     <template v-slot:top-right>
       <base-button
-        :label="sortByStock ? 'Kembalikan ke semula' : 'Urutkan stok'"
+        :label="sortByStock ? 'Kembalikan ke semula' : 'Stok terkecil'"
         @click="sortByStock = !sortByStock"
       />
       <base-button
@@ -67,7 +67,7 @@
                   @click="$emit('delete', props.row.id)"
                   icon="delete"
                 />
-                <base-button icon="edit" @click="showUpdateDialog" />
+                <base-button icon="edit" @click="showUpdateDialog(props.row)" />
               </q-card-actions>
             </q-card-section>
           </q-card-section>
@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, ref, PropType, watch } from 'vue';
 import { IGoods } from 'src/models/goods';
 import { IPageFilter } from 'src/models/requests.interface';
 import { useQuasar } from 'quasar';
@@ -109,12 +109,25 @@ export default defineComponent({
       rowsPerPage: 5
     });
 
-    // const sortByStock = ref(false);
+    const sortByStock = ref(false);
 
-    // watch(
-    //   () => sortByStock.value,
-    //   async () => await sendGetGoods()
-    // );
+    watch(
+      () => sortByStock.value,
+      (newVal: boolean) => {
+        if (newVal) {
+          requestPagination.value = {
+            page: 1,
+            rowsPerPage: 5,
+            sortBy: 'StockAvailable',
+            descending: 'ASC'
+          };
+        } else {
+          requestPagination.value.sortBy = undefined;
+          requestPagination.value.descending = undefined;
+        }
+        emit('getAll', requestPagination.value);
+      }
+    );
 
     function showAddDialog() {
       $q.dialog({
@@ -141,7 +154,7 @@ export default defineComponent({
 
     return {
       filter,
-      // sortByStock,
+      sortByStock,
       requestPagination,
       showAddDialog,
       showUpdateDialog

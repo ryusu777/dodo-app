@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, onMounted, watch } from 'vue';
+import { defineComponent, inject, ref, onMounted } from 'vue';
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import { IGoods } from 'src/models/goods';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -30,15 +30,6 @@ export default defineComponent({
     const $q = useQuasar();
     const rows = ref<IGoods[]>([]);
     const filter = ref('');
-    const sortByStock = ref(false);
-    const requestPagination = ref<IPageFilter>({
-      page: 1,
-      rowsPerPage: 5
-    });
-    // watch(
-    //   () => sortByStock.value,
-    //   () => sendGetGoods(requestPagination)
-    // );
 
     onMounted(async () => await sendGetGoods({ page: 1, rowsPerPage: 5 }));
 
@@ -52,9 +43,7 @@ export default defineComponent({
           {
             params: {
               ...requestPagination,
-              searchText: filter.value,
-              sortBy: sortByStock.value ? 'StockAvailable' : null,
-              descending: sortByStock.value ? 'ASC' : null
+              searchText: filter.value
             }
           }
         );
@@ -131,7 +120,7 @@ export default defineComponent({
 
     return {
       rows,
-      requestPagination,
+      sendGetGoods,
       sendDeleteRequest,
       sendCreateRequest,
       sendUpdateRequest
