@@ -84,13 +84,6 @@
 </template>
 
 
-                                // showDetail(
-                                //     props.row.id,
-                                //     props.row.transactionType,
-                                //     !!props.row.purchaseDate && !!props.row.purchaseDate
-                                // )
-                                
-
 <script lang="ts">
 // TODO: Set purchase date or receive date on calendar
 import { defineComponent, ref, onMounted, inject, PropType } from 'vue';
