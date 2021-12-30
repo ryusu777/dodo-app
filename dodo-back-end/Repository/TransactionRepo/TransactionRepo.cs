@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using DodoApp.Contracts.V1.Requests;
 using DodoApp.Contracts.V1.Responses;
 using DodoApp.Data;
 using DodoApp.Domain;
 using DodoApp.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DodoApp.Repository
@@ -16,11 +18,16 @@ namespace DodoApp.Repository
     {
         private readonly DodoAppContext _context;
         private readonly ICurrencyRepo _currencyRepo;
+        private readonly IMapper _mapper;
 
-        public TransactionRepo(DodoAppContext context, ICurrencyRepo currencyRepo)
+        public TransactionRepo(
+            DodoAppContext context, 
+            ICurrencyRepo currencyRepo,
+            IMapper mapper)
         {
             _context = context;
             _currencyRepo = currencyRepo;
+            _mapper = mapper;
         }
 
         /*
@@ -31,13 +38,13 @@ namespace DodoApp.Repository
             -4 -> TransactionDetail exists
             -5 -> Goods amount is not enough for selling
         */
-        public async Task<int> CreateTransactionDetailAsync(GoodsTransactionDetail transactionDetail)
+        public async Task<IActionResult> CreateTransactionDetailAsync(CreateGoodsTransactionDetailDto request)
         {
+            var transactionDetail = _mapper.Map<GoodsTransactionDetail>(request);
             var validity = await CheckTransferDetailValidity(transactionDetail);
-            if (validity < -1)
-            {
+
+            if (validity.GetType() != typeof(NoContentResult))
                 return validity;
-            }
 
             await _context.GoodsTransactionsDetails.AddAsync(transactionDetail);
 
@@ -47,21 +54,14 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return -1;
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
 
-            return transactionDetail.Id;
+            return new OkObjectResult(new { id = transactionDetail.Id});
         }
 
-        /*
-            Returns:
-            1 -> Successfully update data
-            -1 -> Transaction detail not found
-            -2 -> Goods amount is not enough
-            -3 -> Internal server error
-        */
-        public async Task<int> UpdateTransactionDetailAsync(
-            GoodsTransactionDetail request)
+        public async Task<IActionResult> UpdateTransactionDetailAsync(
+            UpdateGoodsTransactionDetailDto request)
         {
             var transactionDetail = await _context.GoodsTransactionsDetails
                 .Include(d => d.TheGoods)
@@ -70,17 +70,23 @@ namespace DodoApp.Repository
 
             if (transactionDetail == null)
             {
-                return -1;
+                return new NotFoundObjectResult(new
+                {
+                    errors = new string[] { "Detil transaksi tidak ditemukan" }
+                });
             }
 
             if (request.GoodsAmount > transactionDetail.TheGoods.StockAvailable
                 && transactionDetail
                     .TheGoodsTransactionHeader.TransactionType == "sell")
-                return -2;
+                return new BadRequestObjectResult(new
+                {
+                    errors = new string[] { "Stok barang tidak mencukupi" }
+                });
 
             _context.Entry(transactionDetail).State = EntityState.Modified;
-            transactionDetail.PricePerItem = request.PricePerItem;
-            transactionDetail.GoodsAmount = request.GoodsAmount;
+            transactionDetail.PricePerItem = (int)request.PricePerItem;
+            transactionDetail.GoodsAmount = (int)request.GoodsAmount;
 
             try
             {
@@ -88,20 +94,18 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return -3;
+                return new StatusCodeResult((int)HttpStatusCode
+                    .InternalServerError);
             }
 
-            return 1;
+            return new NoContentResult();
         }
 
-        /*
-            Return value
-            -1: internal server error
-            >= 1: id of created header
-        */
-        public async Task<int> CreateTransactionHeaderAsync(
-            GoodsTransactionHeader transactionHeader)
+        public async Task<IActionResult> CreateTransactionHeaderAsync(
+            CreateGoodsTransactionHeaderDto request)
         {
+            var transactionHeader = _mapper.Map<GoodsTransactionHeader>(request);
+
             transactionHeader.CreatedDate = DateTime.Now;
             await _context.GoodsTransactionHeaders.AddAsync(transactionHeader);
 
@@ -111,57 +115,69 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return -1;
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
 
-            return transactionHeader.Id;
+            return new OkObjectResult(new { id = transactionHeader.Id });
         }
 
-        public async Task<HttpStatusCode> DeleteTransactionDetail(int id)
+        public async Task<IActionResult> DeleteTransactionDetail(int id)
         {
             var detail = await _context.GoodsTransactionsDetails.FindAsync(id);
             if (detail == null)
             {
-                return HttpStatusCode.NotFound;
+                return new NotFoundObjectResult(new
+                {
+                    errors = new string[] { "Detil transaksi tidak ditemukan" }
+                });
             }
 
             _context.GoodsTransactionsDetails.Remove(detail);
             await _context.SaveChangesAsync();
 
-            return HttpStatusCode.OK;
+            return new NoContentResult();
         }
 
-        public async Task<HttpStatusCode> DeleteTransactionHeaderAsync(int id)
+        public async Task<IActionResult> DeleteTransactionHeaderAsync(int id)
         {
             var header = await _context.GoodsTransactionHeaders.FindAsync(id);
             if (header == null)
             {
-                return HttpStatusCode.NotFound;
+                return new NotFoundObjectResult(new 
+                    { 
+                        errors = new string[] { "Transaksi tidak ditemukan" }
+                    });
             }
 
             _context.GoodsTransactionHeaders.Remove(header);
             await _context.SaveChangesAsync();
 
-            return HttpStatusCode.NoContent;
+            return new NoContentResult();
         }
 
-        public async Task<GoodsTransactionHeader> GetGoodsTransactionHeaderByIdAsync(int id)
+        public async Task<ActionResult<ReadGoodsTransactionHeaderDto>> GetGoodsTransactionHeaderByIdAsync(int id)
         {
-            var goods = await _context.GoodsTransactionHeaders
+            var transactionHeader = await _context.GoodsTransactionHeaders
                 .Include(g => g.GoodsTransactionDetails)
                 .ThenInclude(c => c.TheGoods)
                 .FirstOrDefaultAsync(g => g.Id == id);
-
-            return goods;
+            
+            if (transactionHeader == null)
+            {
+                return new NotFoundObjectResult(new { errors = new string[] { "Transaksi barang tidak ditemukan" }});
+            }
+            return new OkObjectResult(
+                _mapper
+                    .Map<ReadGoodsTransactionHeaderDto>(transactionHeader));
         }
 
-        public async Task<PageWrapper<List<GoodsTransactionHeader>>> GetGoodsTransactionHeadersAsync(
+        public async Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> GetGoodsTransactionHeadersAsync(
             PageFilter pageFilter, FilterGoodsTransactionHeader filter)
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
 
             var qry = from s in _context.GoodsTransactionHeaders
-                      select new GoodsTransactionHeader
+                      select new ReadGoodsTransactionHeaderDto
                       {
                           Id = s.Id,
                           CreatedDate = s.CreatedDate,
@@ -169,12 +185,12 @@ namespace DodoApp.Repository
                           ReceiveDate = s.ReceiveDate,
                           TransactionType = s.TransactionType,
                           Vendor = s.Vendor,
-                          GoodsTransactionDetails = s.GoodsTransactionDetails
+                          GoodsTransactionDetails = _mapper.Map<List<ReadGoodsTransactionDetailDto>>(s.GoodsTransactionDetails)
                       };
 
             if (filter != null)
             {
-                var predicate = PredicateBuilder.True<GoodsTransactionHeader>();
+                var predicate = PredicateBuilder.True<ReadGoodsTransactionHeaderDto>();
 
                 if (filter.PurchaseDateFrom != null)
                     predicate = predicate.And(h 
@@ -199,25 +215,34 @@ namespace DodoApp.Repository
                 );
             }
 
-            return await Pagination<GoodsTransactionHeader>.LoadPageAsync(
-                qry, validPageFilter);
+            return new OkObjectResult(await Pagination<ReadGoodsTransactionHeaderDto>.LoadPageAsync(
+                qry, validPageFilter));
         }
 
-        /*
-            Returns:
-            1 -> Successfully edited data
-            -1 -> Header Not found
-            -2 -> One of the goods stock is not enough
-            -3 -> Internal server error
-        */
-        public async Task<int> UpdateTransactionHeaderAsync(GoodsTransactionHeader transactionHeader)
+        public async Task<IActionResult> UpdateTransactionHeaderAsync(
+            UpdateGoodsTransactionHeaderDto request)
         {
-            var result = await ModifyGoodsAndCurrencyData(transactionHeader.Id);
+            var transactionHeader = await _context.GoodsTransactionHeaders
+                .Include(h => h.GoodsTransactionDetails)
+                .ThenInclude(d => d.TheGoods)
+                .FirstOrDefaultAsync(h => h.Id == request.Id);
+            
+            if (transactionHeader == null)
+            {
+                return new NotFoundObjectResult(new 
+                    { 
+                        errors = new string[] 
+                        { 
+                            "Transaksi barang tidak ditemukan" 
+                        }
+                    });
+            }
 
-            if (result < 0)
-                return result;
+            var result = await ModifyGoodsAndCurrencyData(transactionHeader);
 
-            _context.Entry(transactionHeader).State = EntityState.Modified;
+            _context
+                .Entry(transactionHeader)
+                .State = EntityState.Modified;
 
             try
             {
@@ -225,20 +250,14 @@ namespace DodoApp.Repository
             }
             catch (DbUpdateConcurrencyException)
             {
-                return -3;
+                return new StatusCodeResult(
+                    (int) HttpStatusCode.InternalServerError);
             }
 
-            return 1;
+            return result;
         }
 
-        /*
-            Returns:
-            -2 -> Transaction header not found
-            -3 -> Goods not found
-            -4 -> Transaction detail exists
-            -5 -> Goods amount is not enough
-        */
-        private async Task<int> CheckTransferDetailValidity(
+        private async Task<IActionResult> CheckTransferDetailValidity(
             GoodsTransactionDetail transactionDetail)
         {
             var header = await _context.GoodsTransactionHeaders
@@ -247,7 +266,13 @@ namespace DodoApp.Repository
 
             if (header == null)
             {
-                return -2;
+                return new NotFoundObjectResult(new 
+                { 
+                    errors = new string[] 
+                    {
+                        "Transaksi tidak ditemukan"
+                    }
+                });
             }
 
             var goods = await _context.Goods
@@ -255,7 +280,13 @@ namespace DodoApp.Repository
 
             if (goods == null)
             {
-                return -3;
+                return new NotFoundObjectResult(new
+                {
+                    errors = new string[]
+                    {
+                        "Barang tidak ditemukan"
+                    }
+                });
             }
 
             if (await _context.GoodsTransactionsDetails.AnyAsync(q =>
@@ -263,42 +294,40 @@ namespace DodoApp.Repository
                 q.GoodsTransactionHeaderId == 
                     transactionDetail.GoodsTransactionHeaderId) == true)
             {
-                return -4;
+                return new BadRequestObjectResult(new
+                {
+                    errors = new string[] { "Detil transaksi sudah ada" }
+                });
             }
 
 
             if (goods.StockAvailable < transactionDetail.GoodsAmount 
                 && header.TransactionType == "sell")
             {
-                return -5;
+                return new BadRequestObjectResult(new
+                {
+                    errros = new string[] { "Stok barang tidak mencukupi" }
+                });
             }
-            return 0;
+            return new NoContentResult();
         }
 
-        /*
-            Returns:
-            -1 -> Header not found
-            -2 -> One of goods stock is not enough
-            -3 -> Internal server error
-        */
-        private async Task<int> ModifyGoodsAndCurrencyData(int headerId)
+        private async Task<IActionResult> ModifyGoodsAndCurrencyData(GoodsTransactionHeader header)
         {
-            var header = await _context.GoodsTransactionHeaders
-                .Include(h => h.GoodsTransactionDetails)
-                .ThenInclude(d => d.TheGoods)
-                .FirstOrDefaultAsync(h => h.Id == headerId);
-            
-            if (header == null)
-            {
-                return -1;
-            }
 
+            // Modify Goods Stock
             foreach(var detail in header.GoodsTransactionDetails)
             {
                 if (header.TransactionType == "sell")
                 {
                     if (detail.TheGoods.StockAvailable < detail.GoodsAmount)
-                        return -2;
+                        return new BadRequestObjectResult(new 
+                        { 
+                            errors = new string[] 
+                            { 
+                                "Terdapat stok barang tidak mencukupi" 
+                            }
+                        });
                     detail.TheGoods.StockAvailable -= detail.GoodsAmount;
                 }
                 else
@@ -307,18 +336,10 @@ namespace DodoApp.Repository
                 }
             }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return -3;
-            }
-
+            // Create Currency Report
             CreateCurrencyDto request = new CreateCurrencyDto 
             {
-                TransactionHeaderId = headerId,
+                TransactionHeaderId = header.Id,
                 DateOfChange = DateTime.Now,
                 ChangeDescription = header.TransactionType == "sell" ? 
                     "Transaksi penjualan barang" : "Transaksi restok barang"
@@ -326,9 +347,7 @@ namespace DodoApp.Repository
 
             await _currencyRepo.CreateCurrencyReportAsync(request);
 
-            _context.Entry(header).State = EntityState.Detached;
-
-            return 1;
+            return new NoContentResult();
         }
     }
 }
