@@ -3,17 +3,20 @@
     <h3 class="text-bold q-mx-lg q-mt-sm">
       {{ transactionType === 'sell' ? 'Menjual' : 'Membeli' }}
     </h3>
-    <GoodsTable/>
+    <goods-table />
   </q-page>
 </template>
 
 <script lang="ts">
-import GoodsTable from 'components/goods-transaction/GoodsTable.vue';
+import GoodsTable from 'components/goods/GoodsTable.vue';
 import { defineComponent } from 'vue';
 
-export default defineComponent ({
+export default defineComponent({
   components: {
     GoodsTable
   },
-})
+  props: {
+    transactionType: String
+  }
+});
 </script>

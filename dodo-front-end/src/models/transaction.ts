@@ -19,3 +19,9 @@ export interface ITransactionDetail {
   theGoods: IGoods;
 }
 
+export interface ITransactionHeaderFilter {
+  purchaseDateFrom: string;
+  purchaseDateTo: string;
+  receiveDateFrom: string;
+  receiveDateTo: string;
+}
