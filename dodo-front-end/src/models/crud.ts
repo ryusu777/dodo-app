@@ -1,7 +1,5 @@
 import { api } from 'src/boot/axios';
 import { ICreateResponse, IPagination } from './responses.interface';
-import { Dialog } from 'quasar';
-import BaseDialog from 'components/ui/BaseDialog.vue';
 import { IPageFilter } from './requests.interface';
 import { AxiosResponse } from 'axios';
 
@@ -53,22 +51,12 @@ export async function update<T>(entityRequest: T, route: string) {
   }
 }
 
-export function remove(route: string, id: number) {
-  Dialog.create({
-    component: BaseDialog,
-    componentProps: {
-      title: 'Hapus barang',
-      body: 'Yakin ingin menghapus barang?',
-      okLabel: 'Hapus',
-      cancelLabel: 'Tidak'
-    }
-  }).onOk(async () => {
-    try {
-      await api.delete(`${route}/${id}`);
+export async function remove(route: string, id: number) {
+  try {
+    await api.delete(`${route}/${id}`);
 
-      return id;
-    } catch {
-      return null;
-    }
-  });
+    return id;
+  } catch {
+    return null;
+  }
 }
