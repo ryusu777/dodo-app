@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import { IGoods } from 'src/models/goods';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
 import { IPagination, ICreateResponse } from 'src/models/responses.interface';
@@ -32,9 +32,6 @@ export default defineComponent({
     const filter = ref('');
 
     onMounted(async () => await sendGetGoods({ page: 1, rowsPerPage: 5 }));
-
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
 
     async function sendGetGoods(requestPagination: IPageFilter) {
       try {
@@ -55,9 +52,7 @@ export default defineComponent({
           requestPagination.searchText = response.data.searchText;
           requestPagination.rowsPerPage = response.data.itemPerPage;
         }
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     function sendDeleteRequest(id: number) {
@@ -77,9 +72,7 @@ export default defineComponent({
             rows.value.findIndex((item) => item.id == id),
             1
           );
-        } catch (err) {
-          notifyError?.(err);
-        }
+        } catch {}
       });
     }
 
@@ -87,9 +80,7 @@ export default defineComponent({
       try {
         await api.put(`/goods/${goods.id || -1}`, goods);
         rows.value[rows.value.findIndex((item) => item.id == goods.id)] = goods;
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     async function sendCreateRequest(goods: IGoods): Promise<void> {
@@ -113,9 +104,7 @@ export default defineComponent({
           stockAvailable: goods.stockAvailable,
           purchasePrice: goods.purchasePrice
         });
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     return {

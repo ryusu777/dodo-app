@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
+import { Notify } from 'quasar';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -19,6 +20,28 @@ const api = axios.create({
     AccessControlAllowOrigin: '*'
   }
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (err) => {
+    if (axios.isAxiosError(err)) {
+      const { response } = err;
+      // eslint-disable-next-line
+      if (response?.data.errors)
+        // eslint-disable-next-line
+        response?.data.errors.forEach((element: string) => {
+          Notify.create({
+            message: element
+          });
+        });
+      else
+        Notify.create({
+          message: 'Terjadi kesalahan'
+        });
+      throw err;
+    }
+  }
+);
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

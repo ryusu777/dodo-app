@@ -38,7 +38,6 @@ import BaseButton from 'components/ui/BaseButton.vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import TransactionDetailForm from './TransactionDetailForm.vue';
 import { api } from 'src/boot/axios';
-import axios, { AxiosError } from 'axios';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 
@@ -56,17 +55,6 @@ export default defineComponent({
     const $router = useRouter();
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
-    function notifyError(err: unknown | AxiosError) {
-      if (axios.isAxiosError(err)) {
-        const { response } = err;
-        // eslint-disable-next-line
-        response?.data.errors.forEach((element: string) => {
-          $q.notify({
-            message: element
-          });
-        });
-      }
-    }
     async function sendCompleteTransaction() {
       const transactionHeader = props.transactionHeader;
       if (!transactionHeader.goodsTransactionDetails.length) {
@@ -87,9 +75,7 @@ export default defineComponent({
             message: 'Berhasil menyelesaikan transaksi'
           });
           await $router.push('/');
-        } catch (err) {
-          notifyError?.(err);
-        }
+        } catch {}
       }
     }
 

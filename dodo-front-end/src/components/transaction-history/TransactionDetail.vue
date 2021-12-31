@@ -38,8 +38,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import BaseCard from '../ui/BaseCard.vue';
 import { api } from 'boot/axios';
-import axios, { AxiosError } from 'axios';
-import { date, useQuasar } from 'quasar';
+import { date } from 'quasar';
 import TransactionDetailForm from '../goods-transaction/TransactionDetailForm.vue';
 
 export default defineComponent({
@@ -52,19 +51,6 @@ export default defineComponent({
   },
   setup(props) {
     const transactionHeader = ref<ITransactionHeader>();
-    const $q = useQuasar();
-    function notifyError(err: unknown | AxiosError) {
-      if (axios.isAxiosError(err)) {
-        const { response } = err;
-        // eslint-disable-next-line
-        response?.data.errors.forEach((element: string) => {
-          $q.notify({
-            message: element
-          });
-        });
-      }
-    }
-
     onMounted(async () => {
       try {
         const response = await api.get<ITransactionHeader>(
@@ -72,9 +58,7 @@ export default defineComponent({
         );
 
         transactionHeader.value = response.data;
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     });
 
     function formattedDate(value: Date | undefined) {

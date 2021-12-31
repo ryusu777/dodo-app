@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import TransactionTable from 'components/transaction-history/TransactionTable.vue';
-import { defineComponent, ref, inject, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { IPageFilter } from 'src/models/requests.interface';
 import {
   ITransactionHeader,
@@ -21,7 +21,7 @@ import {
 } from 'src/models/transaction';
 import { api } from 'boot/axios';
 import { IPagination } from 'src/models/responses.interface';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { useQuasar } from 'quasar';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 
@@ -38,9 +38,6 @@ export default defineComponent({
     });
 
     onMounted(async () => await sendGetHeaders({ page: 1, rowsPerPage: 5 }));
-
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
 
     const rows = ref<ITransactionHeader[]>([]);
 
@@ -61,9 +58,7 @@ export default defineComponent({
           requestPagination.searchText = response.data.searchText;
           requestPagination.rowsPerPage = response.data.itemPerPage;
         }
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     function showDetail(
@@ -104,9 +99,7 @@ export default defineComponent({
           requestPagination.value.page = response.data.pageNumber;
           requestPagination.value.rowsPerPage = response.data.itemPerPage;
         }
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     return {

@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import CurrencyTable from 'components/currency/CurrencyTable.vue';
 import { ICurrency } from 'src/models/currency';
 import { api } from 'boot/axios';
 import { IPageFilter } from 'src/models/requests.interface';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 import { useQuasar } from 'quasar';
 export default defineComponent({
@@ -34,9 +34,6 @@ export default defineComponent({
     });
 
     onMounted(async () => await sendGetCurrency({ page: 1, rowsPerPage: 5 }));
-
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
 
     const rows = ref<ICurrency[]>([]);
 
@@ -59,9 +56,7 @@ export default defineComponent({
           requestPagination.searchText = response.data.searchText;
           requestPagination.rowsPerPage = response.data.itemPerPage;
         }
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     async function sendCreateRequest(currency: ICurrency): Promise<void> {
@@ -79,9 +74,7 @@ export default defineComponent({
             rows.value[0].currencyAmount || currency?.changingAmount || 0,
           dateOfChange: new Date()
         });
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     function showDetail(id: number) {

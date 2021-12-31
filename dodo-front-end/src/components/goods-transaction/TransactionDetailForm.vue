@@ -87,11 +87,7 @@ import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import {
-  ITransactionHeader,
-  ITransactionDetail
-} from 'src/models/transaction';
-import axios, { AxiosError } from 'axios';
+import { ITransactionHeader, ITransactionDetail } from 'src/models/transaction';
 import { LooseDictionary, QPopupProxy, useQuasar } from 'quasar';
 
 export default defineComponent({
@@ -115,18 +111,6 @@ export default defineComponent({
     const pricePerItemRequest = ref<number>();
     const modelHeader = ref(props.transactionHeader);
 
-    function notifyError(err: unknown | AxiosError): void {
-      if (axios.isAxiosError(err)) {
-        const { response } = err;
-        // eslint-disable-next-line
-        response?.data.errors.forEach((element: string) => {
-          $q.notify({
-            message: element
-          });
-        });
-      }
-    }
-
     function removeDetail(id: number) {
       $q.dialog({
         component: BaseDialog,
@@ -148,9 +132,7 @@ export default defineComponent({
           $q.notify({
             message: 'Berhasil menghapus barang'
           });
-        } catch (err) {
-          notifyError(err);
-        }
+        } catch {}
       });
     }
 
@@ -171,9 +153,7 @@ export default defineComponent({
         detail.pricePerItem = pricePerItemRequest.value;
 
         popupRef.value?.hide();
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     function clearInput() {
