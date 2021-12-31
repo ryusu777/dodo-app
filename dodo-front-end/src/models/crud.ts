@@ -9,7 +9,7 @@ export async function get<T>(
 ): Promise<T | IPagination<T> | null> {
   if (pagination) {
     try {
-      const response: AxiosResponse<IPagination<T>> = await api.get('/goods', {
+      const response: AxiosResponse<IPagination<T>> = await api.get(route, {
         params: {
           ...pagination
         }
@@ -22,7 +22,7 @@ export async function get<T>(
   }
 
   try {
-    const response: AxiosResponse<T> = await api.get('route');
+    const response: AxiosResponse<T> = await api.get(route);
     return response.data;
   } catch {
     return null;
