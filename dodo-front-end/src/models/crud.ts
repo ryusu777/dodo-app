@@ -28,11 +28,9 @@ export async function get<T>(
     return null;
   }
 }
-export async function create<T>(entityRequest: T, route: string) {
+export async function create<T>(route: string, entityRequest: T) {
   try {
-    const response = await api.post<ICreateResponse>(route, {
-      entityRequest
-    });
+    const response = await api.post<ICreateResponse>(route, entityRequest);
     return {
       id: response.data.id,
       ...entityRequest
@@ -42,7 +40,7 @@ export async function create<T>(entityRequest: T, route: string) {
   }
 }
 
-export async function update<T>(entityRequest: T, route: string) {
+export async function update<T>(route: string, entityRequest: T) {
   try {
     await api.put(route, entityRequest);
     return entityRequest;
@@ -60,3 +58,5 @@ export async function remove(route: string, id: number) {
     return null;
   }
 }
+
+export default { get, create, update, remove };
