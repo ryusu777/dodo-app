@@ -1,5 +1,10 @@
 <template>
-  <q-table grid @request="$emit('getAll', requestPagination)" :rows="rows">
+  <q-table
+    grid
+    :rows="rows"
+    v-model:pagination="modelPagination"
+    @request="$emit('paging', $event.pagination)"
+  >
     <template v-slot:top-right>
       <base-button
         :label="sortByStock ? 'Kembalikan ke semula' : 'Stok terkecil'"
@@ -14,7 +19,8 @@
         borderless
         dense
         debounce="300"
-        v-model="filter"
+        :model-value="modelPagination.searchText"
+        @update:model-value="$emit('filter', $event)"
         placeholder="Search"
       >
         <template v-slot:append>
@@ -78,14 +84,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType, watch } from 'vue';
+import { defineComponent, ref, PropType, computed } from 'vue';
 import { IGoods } from 'src/models/goods';
-import { IPageFilter } from 'src/models/requests.interface';
 import { useQuasar } from 'quasar';
 import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
+import { IPageFilter } from 'src/models/requests.interface';
 
 export default defineComponent({
   components: {
@@ -93,41 +99,31 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'getAll', 'update', 'delete'],
+  emits: ['create', 'paging', 'update', 'delete', 'filter'],
   props: {
     rows: {
       type: Array as PropType<IGoods[]>,
       required: false
+    },
+    pagination: {
+      type: Object as PropType<IPageFilter>,
+      required: true
     }
   },
   setup(props, { emit }) {
     const $q = useQuasar();
     const filter = ref('');
 
-    const requestPagination = ref<IPageFilter>({
-      page: 1,
-      rowsPerPage: 5
+    const modelPagination = computed({
+      get(): Omit<IPageFilter, 'descending'> {
+        return props.pagination;
+      },
+      set(val: Omit<IPageFilter, 'descending'>) {
+        emit('paging', val);
+      }
     });
 
     const sortByStock = ref(false);
-
-    watch(
-      () => sortByStock.value,
-      (newVal: boolean) => {
-        if (newVal) {
-          requestPagination.value = {
-            page: 1,
-            rowsPerPage: 5,
-            sortBy: 'StockAvailable',
-            descending: 'ASC'
-          };
-        } else {
-          requestPagination.value.sortBy = undefined;
-          requestPagination.value.descending = undefined;
-        }
-        emit('getAll', requestPagination.value);
-      }
-    );
 
     function showAddDialog() {
       $q.dialog({
@@ -155,7 +151,7 @@ export default defineComponent({
     return {
       filter,
       sortByStock,
-      requestPagination,
+      modelPagination,
       showAddDialog,
       showUpdateDialog
     };
