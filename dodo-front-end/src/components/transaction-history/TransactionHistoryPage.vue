@@ -56,7 +56,7 @@ export default defineComponent({
           requestPagination.rowsNumber = response.data.rowsNumber;
           requestPagination.page = response.data.pageNumber;
           requestPagination.searchText = response.data.searchText;
-          requestPagination.rowsPerPage = response.data.itemPerPage;
+          requestPagination.rowsPerPage = response.data.rowsPerPage;
         }
       } catch {}
     }
@@ -97,7 +97,7 @@ export default defineComponent({
           rows.value = response.data.data;
           requestPagination.value.rowsNumber = response.data.rowsNumber;
           requestPagination.value.page = response.data.pageNumber;
-          requestPagination.value.rowsPerPage = response.data.itemPerPage;
+          requestPagination.value.rowsPerPage = response.data.rowsPerPage;
         }
       } catch {}
     }

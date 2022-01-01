@@ -54,7 +54,7 @@ export default defineComponent({
           requestPagination.rowsNumber = response.data.rowsNumber;
           requestPagination.page = response.data.pageNumber;
           requestPagination.searchText = response.data.searchText;
-          requestPagination.rowsPerPage = response.data.itemPerPage;
+          requestPagination.rowsPerPage = response.data.rowsPerPage;
         }
       } catch {}
     }
