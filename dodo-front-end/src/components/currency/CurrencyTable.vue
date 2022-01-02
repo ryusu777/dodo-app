@@ -1,5 +1,10 @@
 <template>
-  <q-table grid @request="$emit('getAll', requestPagination)" :rows="rows">
+  <q-table
+    grid
+    @request="$emit('paging', $event.pagination)"
+    :rows="rows"
+    v-model:pagination="modelPagination"
+  >
     <template v-slot:top-right>
       <!-- TODO: Convert profit to fund -->
       <base-button label="Tambah" @click="showAddDialog" class="q-mr-md" />
@@ -50,7 +55,7 @@
               <base-button
                 label="Detail"
                 v-if="props.row.transactionHeaderId !== null"
-                @click="$emit('get', props.row.id)"
+                @click="$emit('get', props.row.transactionHeaderId)"
               />
             </q-card-section>
           </q-card-section>
@@ -61,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, ref, PropType, computed } from 'vue';
 import { ICurrency } from 'src/models/currency';
 import { IPageFilter } from 'src/models/requests.interface';
 import { date, useQuasar } from 'quasar';
@@ -74,11 +79,15 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'getAll', 'get'],
+  emits: ['create', 'get', 'paging'],
   props: {
     rows: {
       type: Array as PropType<ICurrency[]>,
       required: false
+    },
+    pagination: {
+      type: Object as PropType<IPageFilter>,
+      required: true
     }
   },
 
@@ -86,9 +95,14 @@ export default defineComponent({
     const $q = useQuasar();
     const filter = ref('');
 
-    const requestPagination = ref<IPageFilter>({
-      page: 1,
-      rowsPerPage: 5
+    const modelPagination = computed({
+      get(): Omit<IPageFilter, 'descending'> {
+        return props.pagination;
+      },
+      set() {
+        // Dummy code
+        console.log();
+      }
     });
 
     function showAddDialog() {
@@ -110,8 +124,8 @@ export default defineComponent({
     return {
       filter,
       showAddDialog,
-      requestPagination,
-      formattedDate
+      formattedDate,
+      modelPagination
     };
   }
 });

@@ -118,8 +118,8 @@ export default defineComponent({
       get(): Omit<IPageFilter, 'descending'> {
         return props.pagination;
       },
-      set(val: Omit<IPageFilter, 'descending'>) {
-        emit('paging', val);
+      set() {
+        console.log();
       }
     });
 

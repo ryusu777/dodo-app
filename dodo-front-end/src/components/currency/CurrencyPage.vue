@@ -2,80 +2,34 @@
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Data Keuangan</h3>
     <currency-table
-      :rows="rows"
+      :rows="grid.data"
       row-key="id"
-      @create="sendCreateRequest"
-      @get-all="sendGetCurrency"
+      :pagination="pageFilter"
+      @create="create"
+      @paging="paging"
       @get="showDetail"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+// TODO: Currency creation should re-getAll currency data
+import { defineComponent, onBeforeMount } from 'vue';
 import CurrencyTable from 'components/currency/CurrencyTable.vue';
-import { ICurrency } from 'src/models/currency';
-import { api } from 'boot/axios';
-import { IPageFilter } from 'src/models/requests.interface';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { AxiosResponse } from 'axios';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 import { useQuasar } from 'quasar';
+import { useCrudEntity } from 'src/models/crud';
+import { ICurrency } from 'src/models/currency';
 export default defineComponent({
   components: {
     CurrencyTable
   },
   setup() {
     const $q = useQuasar();
-    const filter = ref('');
-    const requestPagination = ref<IPageFilter>({
-      page: 1,
-      rowsPerPage: 5
-    });
+    const { grid, create, getAll, paging, pageFilter } =
+      useCrudEntity<ICurrency>('/currency');
 
-    onMounted(async () => await sendGetCurrency({ page: 1, rowsPerPage: 5 }));
-
-    const rows = ref<ICurrency[]>([]);
-
-    async function sendGetCurrency(requestPagination: IPageFilter) {
-      try {
-        const response: AxiosResponse<IPagination<ICurrency>> = await api.get(
-          '/currency',
-          {
-            params: {
-              ...requestPagination,
-              searchText: filter.value
-            }
-          }
-        );
-
-        if (response.data.data) {
-          rows.value = response.data.data;
-          requestPagination.rowsNumber = response.data.rowsNumber;
-          requestPagination.page = response.data.pageNumber;
-          requestPagination.searchText = response.data.searchText;
-          requestPagination.rowsPerPage = response.data.rowsPerPage;
-        }
-      } catch {}
-    }
-
-    async function sendCreateRequest(currency: ICurrency): Promise<void> {
-      try {
-        const response = await api.post<ICreateResponse>('/currency', {
-          changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription
-        });
-        // TODO: Create Currency should return created result
-        rows.value.unshift({
-          id: response.data.id,
-          changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription,
-          currencyAmount:
-            rows.value[0].currencyAmount || currency?.changingAmount || 0,
-          dateOfChange: new Date()
-        });
-      } catch {}
-    }
+    onBeforeMount(async () => await getAll());
 
     function showDetail(id: number) {
       $q.dialog({
@@ -88,11 +42,10 @@ export default defineComponent({
     }
 
     return {
-      rows,
-      filter,
-      requestPagination,
-      sendCreateRequest,
-      sendGetCurrency,
+      grid,
+      create,
+      paging,
+      pageFilter,
       showDetail
     };
   }
