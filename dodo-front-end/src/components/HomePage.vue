@@ -54,11 +54,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import { ICreateResponse, IPagination } from 'src/models/responses.interface';
 import { api } from 'boot/axios';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
 import BaseButton from 'components/ui/BaseButton.vue';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
@@ -72,10 +72,7 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const $router = useRouter();
-
-    const notifyError: ((err: unknown | AxiosError) => void) | undefined =
-      inject('notifyError');
+    const router = useRouter();
 
     async function sendSellTransactionHeader(): Promise<void> {
       try {
@@ -86,10 +83,8 @@ export default defineComponent({
           }
         );
 
-        await $router.push(`/transaction/sell/${response.data.id || 0}`);
-      } catch (err) {
-        notifyError?.(err);
-      }
+        await router.push(`/transaction/sell/${response.data.id || 0}`);
+      } catch {}
     }
 
     function showAddDialog() {
@@ -109,9 +104,7 @@ export default defineComponent({
           changingAmount: currency.changingAmount,
           changeDescription: currency.changeDescription
         });
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
 
       await sendGetLastCurrency();
     }
@@ -125,10 +118,8 @@ export default defineComponent({
           }
         );
 
-        await $router.push(`/transaction/purchase/${response.data.id || 0}`);
-      } catch (err) {
-        notifyError?.(err);
-      }
+        await router.push(`/transaction/purchase/${response.data.id || 0}`);
+      } catch {}
     }
 
     const currencyAmount = ref<number>();
@@ -146,9 +137,7 @@ export default defineComponent({
         if (response.data.data) {
           currencyAmount.value = response.data.data[0].currencyAmount;
         }
-      } catch (err) {
-        notifyError?.(err);
-      }
+      } catch {}
     }
 
     onMounted(async () => await sendGetLastCurrency());
@@ -157,8 +146,7 @@ export default defineComponent({
       showAddDialog,
       sendSellTransactionHeader,
       sendPurchaseTransactionHeader,
-      currencyAmount,
-      $router
+      currencyAmount
     };
   }
 });
