@@ -37,8 +37,7 @@ export default defineComponent({
       required: true
     },
     transactionType: {
-      type: String as PropType<'sell' | 'purchase'>,
-      required: true
+      type: String as PropType<'sell' | 'purchase'>
     },
     transactionIsDone: Boolean
   },
@@ -52,7 +51,7 @@ export default defineComponent({
     async function doTransaction() {
       console.log(props.transactionType);
       await $router.push(
-        `/transaction/${props.transactionType}/${props.headerId}`
+        `/transaction/${props.transactionType || ''}/${props.headerId}`
       );
     }
 
