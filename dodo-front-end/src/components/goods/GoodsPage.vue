@@ -17,14 +17,15 @@
 <script lang="ts">
 import { defineComponent, onBeforeMount } from 'vue';
 import GoodsTable from 'components/goods/GoodsTable.vue';
-import { useGoods } from 'src/models/goods';
+import { useCrudEntity } from 'src/models/crud';
+import { IGoods } from 'src/models/goods';
 export default defineComponent({
   components: {
     GoodsTable
   },
   setup() {
-    const { grid, pageFilter, create, get, paging, getAll, update, remove } =
-      useGoods();
+    const { grid, pageFilter, create, paging, getAll, update, remove } =
+      useCrudEntity<IGoods>('/goods');
 
     async function onFilter(searchText: string) {
       await paging({
@@ -40,9 +41,7 @@ export default defineComponent({
       pageFilter,
       onFilter,
       create,
-      get,
       paging,
-      getAll,
       update,
       remove
     };
