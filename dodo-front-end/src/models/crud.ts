@@ -3,6 +3,7 @@ import { api } from 'src/boot/axios';
 import { ICreateResponse, IPagination } from './responses.interface';
 import { IPageFilter } from './requests.interface';
 import { AxiosResponse } from 'axios';
+import { LooseDictionary } from 'quasar';
 
 const crud = {
   async get<T>(
@@ -56,6 +57,24 @@ const crud = {
       await api.delete(`${route}/${id}`);
 
       return id;
+    } catch {
+      return null;
+    }
+  },
+
+  async filter<T>(
+    route: string,
+    pageFilter: IPageFilter,
+    filter: LooseDictionary
+  ) {
+    try {
+      const response = await api.post<IPagination<T>>(route, filter, {
+        params: {
+          ...pageFilter
+        }
+      });
+
+      return response.data;
     } catch {
       return null;
     }
@@ -121,6 +140,21 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
       );
   }
 
+  async function filter(filter: LooseDictionary) {
+    const response = await crud.filter<T>(
+      `${route.value}-filter`,
+      pageFilter.value,
+      filter
+    );
+
+    if (response) {
+      grid.value = response;
+      pageFilter.value.page = grid.value.pageNumber;
+      pageFilter.value.rowsNumber = grid.value.rowsNumber;
+      pageFilter.value.rowsPerPage = grid.value.rowsPerPage;
+    }
+  }
+
   return {
     grid,
     pageFilter,
@@ -130,7 +164,8 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
     create,
     update,
     remove,
-    search
+    search,
+    filter
   };
 }
 

@@ -3,8 +3,9 @@
     grid
     :rows="rows"
     :filter="filter"
+    v-model:pagination="modelPagination"
     hide-header
-    @request="$emit('getAll', requestPagination)"
+    @request="$emit('paging', $event.pagination)"
   >
     <template v-slot:top-right>
       <base-input-date
@@ -38,7 +39,7 @@
       <base-button
         label="Submit"
         @click="
-          $emit('date-filter', {
+          $emit('filter', {
             purchaseDateFrom,
             purchaseDateTo,
             receiveDateFrom,
@@ -76,20 +77,14 @@
 
             <q-card-section class="text-right">
               <p class="text-overline q-ma-none" style="line-height: 15px">
-                {{ formattedDate(props.row.createdDate) }}
+                Dibuat:
+                <strong>{{ formattedDate(props.row.createdDate) }}</strong>
               </p>
               <q-card-actions align="right">
                 <!-- TODO: Delete transaction -->
                 <base-button
                   label="Detail"
-                  @click="
-                    $emit(
-                      'get',
-                      props.row.id,
-                      props.row.transactionType,
-                      !!props.row.purchaseDate
-                    )
-                  "
+                  @click="$emit('get', props.row.id)"
                 />
               </q-card-actions>
             </q-card-section>
@@ -102,7 +97,7 @@
 
 <script lang="ts">
 // TODO: Set purchase date or receive date on calendar
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, ref, computed, PropType } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import { IPageFilter } from 'src/models/requests.interface';
 import BaseInputDate from 'components/ui/BaseInputDate.vue';
@@ -116,20 +111,34 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'getAll', 'get', 'date-filter'],
+  emits: ['create', 'paging', 'get', 'filter'],
   props: {
     rows: {
       type: Array as PropType<ITransactionHeader[]>,
       required: false
+    },
+    pagination: {
+      type: Object as PropType<IPageFilter>,
+      required: true
     }
   },
 
-  setup() {
+  setup(props) {
     const filter = ref('');
 
     const requestPagination = ref<IPageFilter>({
       page: 1,
       rowsPerPage: 5
+    });
+
+    const modelPagination = computed({
+      get(): Omit<IPageFilter, 'descending'> {
+        return props.pagination;
+      },
+      set() {
+        // Dummy code
+        console.log();
+      }
     });
 
     const purchaseDateFrom = ref('');
@@ -156,7 +165,8 @@ export default defineComponent({
       purchaseDateFrom,
       purchaseDateTo,
       requestPagination,
-      clearFilter
+      clearFilter,
+      modelPagination
     };
   }
 });

@@ -2,28 +2,23 @@
   <q-page class="column items-left q-mt-xl q-px-sm">
     <h3 class="text-bold q-mx-lg q-mt-sm">Histori Transaksi</h3>
     <transaction-table
-      :rows="rows"
+      :rows="grid.data"
+      :pagination="pageFilter"
       row-key="id"
-      @get-all="sendGetHeaders"
+      @paging="paging"
       @get="showDetail"
-      @date-filter="sendHeaderFilter"
+      @filter="filter"
     />
   </q-page>
 </template>
 
 <script lang="ts">
 import TransactionTable from 'components/transaction-history/TransactionTable.vue';
-import { defineComponent, ref, onMounted } from 'vue';
-import { IPageFilter } from 'src/models/requests.interface';
-import {
-  ITransactionHeader,
-  ITransactionHeaderFilter
-} from 'src/models/transaction';
-import { api } from 'boot/axios';
-import { IPagination } from 'src/models/responses.interface';
-import { AxiosResponse } from 'axios';
+import { defineComponent, onMounted } from 'vue';
+import { ITransactionHeader } from 'src/models/transaction';
 import { useQuasar } from 'quasar';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
+import { useCrudEntity } from 'src/models/crud';
 
 export default defineComponent({
   components: {
@@ -31,82 +26,27 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const filter = ref('');
-    const requestPagination = ref<IPageFilter>({
-      page: 1,
-      rowsPerPage: 5
-    });
+    const { grid, pageFilter, paging, getAll, get, filter } =
+      useCrudEntity<ITransactionHeader>('/transaction/header');
 
-    onMounted(async () => await sendGetHeaders({ page: 1, rowsPerPage: 5 }));
+    onMounted(async () => await getAll());
 
-    const rows = ref<ITransactionHeader[]>([]);
-
-    async function sendGetHeaders(requestPagination: IPageFilter) {
-      try {
-        const response: AxiosResponse<IPagination<ITransactionHeader>> =
-          await api.get('/transaction/header', {
-            params: {
-              ...requestPagination,
-              searchText: filter.value
-            }
-          });
-
-        if (response.data.data) {
-          rows.value = response.data.data;
-          requestPagination.rowsNumber = response.data.rowsNumber;
-          requestPagination.page = response.data.pageNumber;
-          requestPagination.searchText = response.data.searchText;
-          requestPagination.rowsPerPage = response.data.rowsPerPage;
-        }
-      } catch {}
-    }
-
-    function showDetail(
-      id: number,
-      transactionType: string,
-      transactionIsDone: boolean
-    ) {
+    async function showDetail(id: number) {
+      const transactionHeader = (await get(id)) as ITransactionHeader;
       $q.dialog({
         component: TransactionDetailDialog,
         componentProps: {
-          headerId: id,
-          transactionType,
-          transactionIsDone
+          transactionHeader
         }
       });
     }
 
-    async function sendHeaderFilter(filter: ITransactionHeaderFilter) {
-      try {
-        const response = await api.post<IPagination<ITransactionHeader>>(
-          '/transaction/header-filter',
-          {
-            purchaseDateFrom: filter.purchaseDateFrom || null,
-            purchaseDateTo: filter.purchaseDateTo || null,
-            receiveDateFrom: filter.receiveDateFrom || null,
-            receiveDateTo: filter.receiveDateTo || null
-          },
-          {
-            params: {
-              ...requestPagination.value
-            }
-          }
-        );
-
-        if (response.data.data) {
-          rows.value = response.data.data;
-          requestPagination.value.rowsNumber = response.data.rowsNumber;
-          requestPagination.value.page = response.data.pageNumber;
-          requestPagination.value.rowsPerPage = response.data.rowsPerPage;
-        }
-      } catch {}
-    }
-
     return {
-      rows,
       showDetail,
-      sendHeaderFilter,
-      sendGetHeaders
+      paging,
+      filter,
+      grid,
+      pageFilter
     };
   }
 });

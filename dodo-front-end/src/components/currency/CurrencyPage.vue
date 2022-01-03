@@ -20,6 +20,7 @@ import TransactionDetailDialog from 'components/transaction-history/TransactionD
 import { useQuasar } from 'quasar';
 import { useCrudEntity } from 'src/models/crud';
 import { ICurrency } from 'src/models/currency';
+import { ITransactionHeader } from 'src/models/transaction';
 export default defineComponent({
   components: {
     CurrencyTable
@@ -31,12 +32,13 @@ export default defineComponent({
 
     onBeforeMount(async () => await getAll());
 
-    function showDetail(id: number) {
+    async function showDetail(id: number) {
+      const { get } = useCrudEntity<ITransactionHeader>('/transaction/header');
+      const transactionHeader = (await get(id)) as ITransactionHeader;
       $q.dialog({
         component: TransactionDetailDialog,
         componentProps: {
-          headerId: id,
-          transactionIsDone: true
+          transactionHeader
         }
       });
     }

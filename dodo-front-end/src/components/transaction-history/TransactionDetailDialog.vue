@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO: Fixed dialog width -->
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <base-card>
       <q-card-section>
@@ -11,9 +12,10 @@
             class="q-mb-sm"
           />
         </q-card-actions>
-        <transaction-detail :header-id="headerId" />
+        <transaction-detail :transaction-header="transactionHeader" />
         <base-button
-          v-if="!transactionIsDone"
+          class="q-mt-md"
+          v-if="!transactionHeader?.purchaseDate"
           label="Lakukan transaksi"
           @click="doTransaction"
         />
@@ -29,17 +31,11 @@ import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import TransactionDetail from './TransactionDetail.vue';
 import { useRouter } from 'vue-router';
+import { ITransactionHeader } from 'src/models/transaction';
 
 export default defineComponent({
   props: {
-    headerId: {
-      type: [Number, String],
-      required: true
-    },
-    transactionType: {
-      type: String as PropType<'sell' | 'purchase'>
-    },
-    transactionIsDone: Boolean
+    transactionHeader: Object as PropType<ITransactionHeader>
   },
   emits: [...useDialogPluginComponent.emits],
   setup(props) {
@@ -49,9 +45,10 @@ export default defineComponent({
     const $router = useRouter();
 
     async function doTransaction() {
-      console.log(props.transactionType);
       await $router.push(
-        `/transaction/${props.transactionType || ''}/${props.headerId}`
+        `/transaction/${props.transactionHeader?.transactionType || ''}/${
+          props.transactionHeader?.id || -1
+        }`
       );
     }
 

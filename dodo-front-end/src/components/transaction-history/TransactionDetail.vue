@@ -34,40 +34,24 @@
 
 <script lang="ts">
 // REFACTOR: Move request to page component
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import BaseCard from '../ui/BaseCard.vue';
-import { api } from 'boot/axios';
 import { date } from 'quasar';
 import TransactionDetailForm from '../goods-transaction/TransactionDetailForm.vue';
 
 export default defineComponent({
   components: { BaseCard, TransactionDetailForm },
   props: {
-    headerId: {
-      type: [Number, String],
-      required: true
-    }
+    transactionHeader: Object as PropType<ITransactionHeader>
   },
-  setup(props) {
-    const transactionHeader = ref<ITransactionHeader>();
-    onMounted(async () => {
-      try {
-        const response = await api.get<ITransactionHeader>(
-          `/transaction/header/${props.headerId}`
-        );
-
-        transactionHeader.value = response.data;
-      } catch {}
-    });
-
+  setup() {
     function formattedDate(value: Date | undefined) {
       if (value) return date.formatDate(value, 'dddd, D MMMM YYYY');
       return undefined;
     }
 
     return {
-      transactionHeader,
       formattedDate
     };
   }
