@@ -9,7 +9,7 @@
       @create="create"
       @update="update"
       @delete="remove"
-      @filter="onFilter"
+      @search="search"
     />
   </q-page>
 </template>
@@ -24,7 +24,7 @@ export default defineComponent({
     GoodsTable
   },
   setup() {
-    const { grid, pageFilter, create, paging, getAll, update, remove } =
+    const { grid, pageFilter, create, paging, getAll, update, remove, search } =
       useCrudEntity<IGoods>('/goods');
 
     async function onFilter(searchText: string) {
@@ -43,7 +43,8 @@ export default defineComponent({
       create,
       paging,
       update,
-      remove
+      remove,
+      search
     };
   }
 });

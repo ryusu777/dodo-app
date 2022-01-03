@@ -20,7 +20,7 @@
         dense
         debounce="300"
         :model-value="modelPagination.searchText"
-        @update:model-value="$emit('filter', $event)"
+        @update:model-value="$emit('search', $event)"
         placeholder="Search"
       >
         <template v-slot:append>
@@ -99,7 +99,7 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'paging', 'update', 'delete', 'filter'],
+  emits: ['create', 'paging', 'update', 'delete', 'search'],
   props: {
     rows: {
       type: Array as PropType<IGoods[]>,

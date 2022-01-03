@@ -89,6 +89,11 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
     await getAll();
   }
 
+  async function search(searchText: string) {
+    pageFilter.value.searchText = searchText;
+    await getAll();
+  }
+
   async function create(entity: T) {
     const response = await crud.create<T>(route.value, entity);
     if (response && grid.value.data) {
@@ -124,7 +129,8 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
     paging,
     create,
     update,
-    remove
+    remove,
+    search
   };
 }
 
