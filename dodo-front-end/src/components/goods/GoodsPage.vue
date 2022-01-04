@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts">
+// TODO: Create goods request dialog should closes when request is success
 import { defineComponent, onBeforeMount } from 'vue';
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import { useCrudEntity } from 'src/models/crud';

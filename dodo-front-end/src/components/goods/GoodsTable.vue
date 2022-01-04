@@ -84,6 +84,7 @@
 </template>
 
 <script lang="ts">
+// REFACTOR: Add dialog and show dialog should be outside of table component
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { IGoods } from 'src/models/goods';
 import { useQuasar } from 'quasar';

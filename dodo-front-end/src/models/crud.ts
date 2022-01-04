@@ -131,6 +131,7 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
       ] = entity;
   }
 
+  // TODO: Show confirmation dialog
   async function remove(id: number) {
     const response = await crud.remove(route.value, id);
     if (response && grid.value.data)

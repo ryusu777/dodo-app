@@ -56,6 +56,7 @@
           style="height: 90px"
         >
           <q-card-section horizontal class="row">
+            <!-- TODO: Visual presentation of completed or not completed transaction -->
             <q-card-section class="col">
               <!-- TODO: Transaction title -->
               <p
