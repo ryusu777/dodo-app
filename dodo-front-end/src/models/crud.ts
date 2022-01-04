@@ -125,10 +125,15 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
       `${route.value}/${entity.id || -1}`,
       entity
     );
-    if (response && grid.value.data)
-      grid.value.data[
-        grid.value.data.findIndex((item) => item.id == entity.id)
-      ] = entity;
+    if (response && grid.value.data) {
+      const selectedData =
+        grid.value.data[
+          grid.value.data.findIndex((item) => item.id == entity.id)
+        ];
+      for (const key in entity) {
+        selectedData[key] = entity[key];
+      }
+    }
   }
 
   // TODO: Show confirmation dialog
