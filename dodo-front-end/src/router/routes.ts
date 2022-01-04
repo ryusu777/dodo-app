@@ -12,12 +12,22 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'transaction/:transactionType/:id',
-        component: () => import('components/goods-transaction/GoodsTransactionPage.vue'),
-        props: true
+        component: () =>
+          import('components/goods-transaction/GoodsTransactionPage.vue'),
+        props: (route) => {
+          let id = Number.parseInt(route.params.id as string);
+          if (Number.isNaN(id)) id = -1;
+
+          return {
+            transactionType: route.params.transactionType || '',
+            id
+          };
+        }
       },
       {
         path: 'transaction-history',
-        component: () => import('components/transaction-history/TransactionHistoryPage.vue')
+        component: () =>
+          import('components/transaction-history/TransactionHistoryPage.vue')
       },
       {
         path: 'currency',
