@@ -6,11 +6,15 @@
     @request="$emit('paging', $event.pagination)"
   >
     <template v-slot:top-right>
+      <slot name="top-right"></slot>
       <base-button
+        v-if="!transactionType"
         :label="sortByStock ? 'Kembalikan ke semula' : 'Stok terkecil'"
         @click="sortByStock = !sortByStock"
+        class="q-mr-md"
       />
       <base-button
+        v-if="!transactionType"
         label="Tambah Barang"
         @click="showAddDialog"
         class="q-mr-md"
@@ -68,12 +72,54 @@
               >
                 Rp {{ props.row.purchasePrice }}
               </p>
-              <q-card-actions align="right">
+              <q-card-actions v-if="!transactionType" align="right">
                 <base-button
                   @click="$emit('delete', props.row.id)"
                   icon="delete"
                 />
                 <base-button icon="edit" @click="showUpdateDialog(props.row)" />
+              </q-card-actions>
+              <q-card-actions v-else align="right">
+                <base-button label="Tambah" />
+                <q-popup-proxy :breakpoint="100">
+                  <base-card class="q-pa-sm">
+                    <base-input
+                      v-model="props.row.transactionAmount"
+                      class="col-12 q-my-sm"
+                      label="Jumlah Barang"
+                      type="number"
+                    />
+                    <base-input
+                      v-if="transactionType == 'sell'"
+                      v-model="props.row.sellPrice"
+                      class="col-12 q-my-sm"
+                      label="Harga Jual"
+                      type="number"
+                    />
+                    <base-button
+                      label="Submit"
+                      :disabled="
+                        !(
+                          props.row.transactionAmount &&
+                          (transactionType === 'sell'
+                            ? props.row.sellPrice
+                            : true)
+                        )
+                      "
+                      @click="
+                        $emit('add-to-cart', {
+                          goodsId: props.row.id,
+                          goodsAmount: props.row.transactionAmount,
+                          pricePerItem:
+                            transactionType === 'sell'
+                              ? props.row.sellPrice
+                              : undefined
+                        })
+                      "
+                      v-close-popup="1"
+                    />
+                  </base-card>
+                </q-popup-proxy>
               </q-card-actions>
             </q-card-section>
           </q-card-section>
@@ -100,7 +146,7 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'paging', 'update', 'delete', 'search'],
+  emits: ['create', 'paging', 'update', 'delete', 'search', 'add-to-cart'],
   props: {
     rows: {
       type: Array as PropType<IGoods[]>,
@@ -109,7 +155,8 @@ export default defineComponent({
     pagination: {
       type: Object as PropType<IPageFilter>,
       required: true
-    }
+    },
+    transactionType: String
   },
   setup(props, { emit }) {
     const $q = useQuasar();

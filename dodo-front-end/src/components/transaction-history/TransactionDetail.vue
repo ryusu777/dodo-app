@@ -46,9 +46,10 @@
 
     <q-card-section>
       <p class="text-h5 text-bold">Daftar Barang</p>
+      <transaction-detail-table
         v-if="transactionHeader"
-        :transaction-header="transactionHeader"
-      ></transaction-detail-form>
+        :rows="transactionHeader.goodsTransactionDetails"
+      ></transaction-detail-table>
     </q-card-section>
   </base-card>
 </template>
@@ -59,10 +60,10 @@ import { defineComponent, PropType } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import BaseCard from '../ui/BaseCard.vue';
 import { date } from 'quasar';
-import TransactionDetailForm from '../goods-transaction/TransactionDetailForm.vue';
+import TransactionDetailTable from '../goods-transaction/TransactionDetailTable.vue';
 
 export default defineComponent({
-  components: { BaseCard, TransactionDetailForm },
+  components: { BaseCard, TransactionDetailTable },
   props: {
     transactionHeader: Object as PropType<ITransactionHeader>
   },

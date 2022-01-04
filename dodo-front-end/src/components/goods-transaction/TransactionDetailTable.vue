@@ -1,11 +1,5 @@
 <template>
-  <q-table
-    grid
-    :rows="modelHeader?.goodsTransactionDetails"
-    row-key="id"
-    hide-header
-    hide-pagination
-  >
+  <q-table grid :rows="rows" row-key="id" hide-pagination>
     <template v-slot:item="props">
       <div class="q-pa-xs col-12">
         <base-card
@@ -39,7 +33,7 @@
                 <base-button
                   v-if="editable"
                   icon="delete"
-                  @click="removeGoods(props.row.id)"
+                  @click="$emit('delete', props.row.id)"
                 />
                 <base-button v-if="editable" icon="edit">
                   <q-popup-proxy
@@ -65,7 +59,14 @@
                       />
                       <base-button
                         label="Submit"
-                        @click="sendUpdateDetail(props.row.id, props.row)"
+                        @click="
+                          $emit('update', {
+                            id: props.row.id,
+                            goodsAmount: goodsAmountRequest,
+                            pricePerItem: pricePerItemRequest
+                          })
+                        "
+                        v-close-popup="1"
                       />
                     </base-card>
                   </q-popup-proxy>
@@ -82,79 +83,30 @@
 <script lang="ts">
 // TODO: Receive or purchase/sell button
 import { defineComponent, ref, PropType } from 'vue';
-import { api } from 'boot/axios';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import BaseDialog from 'components/ui/BaseDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import { ITransactionHeader, ITransactionDetail } from 'src/models/transaction';
-import { LooseDictionary, QPopupProxy, useQuasar } from 'quasar';
+import { ITransactionDetail } from 'src/models/transaction';
+import { QPopupProxy } from 'quasar';
 
 export default defineComponent({
   props: {
-    transactionHeader: {
-      type: Object as PropType<ITransactionHeader>,
+    rows: {
+      type: Array as PropType<ITransactionDetail[]>,
       required: true
     },
     editable: Boolean
   },
+  emits: ['update', 'delete'],
   components: {
     BaseButton,
     BaseCard,
     BaseInput
   },
-  setup(props) {
-    const $q = useQuasar();
+  setup() {
     const popupRef = ref<InstanceType<typeof QPopupProxy>>();
-    const rows = ref<ITransactionDetail[]>([]);
     const goodsAmountRequest = ref<number>();
     const pricePerItemRequest = ref<number>();
-    const modelHeader = ref(props.transactionHeader);
-
-    function removeDetail(id: number) {
-      $q.dialog({
-        component: BaseDialog,
-        componentProps: {
-          title: 'Hapus barang',
-          body: 'Yakin ingin menghapus barang?',
-          okLabel: 'Hapus',
-          cancelLabel: 'Tidak'
-        }
-      }).onOk(async () => {
-        try {
-          await api.delete(`/transaction/detail/${id}`);
-          modelHeader.value?.goodsTransactionDetails.splice(
-            modelHeader.value?.goodsTransactionDetails.findIndex(
-              (item) => item.id === id
-            ),
-            1
-          );
-          $q.notify({
-            message: 'Berhasil menghapus barang'
-          });
-        } catch {}
-      });
-    }
-
-    async function sendUpdateDetail(id: number, detail: LooseDictionary) {
-      try {
-        await api.put(`/transaction/detail/${id}`, {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          id: detail.id || 0,
-          goodsAmount: goodsAmountRequest.value,
-          pricePerItem: pricePerItemRequest.value
-        });
-
-        $q.notify({
-          message: 'Berhasil mengubah data'
-        });
-
-        detail.goodsAmount = goodsAmountRequest.value;
-        detail.pricePerItem = pricePerItemRequest.value;
-
-        popupRef.value?.hide();
-      } catch {}
-    }
 
     function clearInput() {
       goodsAmountRequest.value = 0;
@@ -168,14 +120,10 @@ export default defineComponent({
 
     return {
       popupRef,
-      rows,
       goodsAmountRequest,
       pricePerItemRequest,
-      removeGoods: removeDetail,
-      sendUpdateDetail,
       clearInput,
-      setInput,
-      modelHeader
+      setInput
     };
   }
 });
