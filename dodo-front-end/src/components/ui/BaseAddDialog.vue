@@ -18,7 +18,9 @@
 
         <q-card-actions class="column items-end q-pa-sm">
           <div>
-            <base-button @click="$emit('submit')">Submit</base-button>
+            <base-button v-if="submitLabel" @click="$emit('submit')">{{
+              submitLabel
+            }}</base-button>
           </div>
         </q-card-actions>
       </base-card>
@@ -50,6 +52,7 @@ export default defineComponent({
       type: Boolean,
       required: true
     },
+    submitLabel: String,
     width: String,
     disableClose: Boolean
   },
