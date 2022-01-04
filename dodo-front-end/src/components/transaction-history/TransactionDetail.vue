@@ -8,23 +8,44 @@
             : 'Pengeluaran'
         }}
       </p>
-      <p class="text-bold">
-        Total Harga: Rp. {{ transactionHeader?.totalPrice }}
-      </p>
-      <p>Vendor: {{ transactionHeader?.vendor }}</p>
-      <p>
-        Tanggal bayar: <br />
-        <strong>{{ formattedDate(transactionHeader?.purchaseDate) }}</strong>
-      </p>
-      <p>
-        Tanggal menerima barang: <br />
-        <strong>{{ formattedDate(transactionHeader?.receiveDate) }}</strong>
-      </p>
+
+      <q-field label="Total Harga" stack-label>
+        Rp. {{ transactionHeader?.totalPrice || 0 }}
+      </q-field>
+
+      <q-field label="Vendor" stack-label>
+        {{ transactionHeader?.vendor }}
+      </q-field>
+
+      <q-field label="Tanggal Bayar" stack-label>
+        <strong
+          :class="
+            transactionHeader?.purchaseDate === null
+              ? 'text-negative'
+              : 'text-positive'
+          "
+        >
+          {{ formattedDate(transactionHeader?.purchaseDate) || 'Belum bayar' }}
+        </strong>
+      </q-field>
+
+      <q-field label="Tanggal Terima" stack-label>
+        <strong
+          :class="
+            transactionHeader?.receiveDate === null
+              ? 'text-negative'
+              : 'text-positive'
+          "
+        >
+          {{
+            formattedDate(transactionHeader?.receiveDate) || 'Belum diterima'
+          }}
+        </strong>
+      </q-field>
     </q-card-section>
 
     <q-card-section>
-      <p class="text-h5 text-bold">Transaction Detail</p>
-      <transaction-detail-form
+      <p class="text-h5 text-bold">Daftar Barang</p>
         v-if="transactionHeader"
         :transaction-header="transactionHeader"
       ></transaction-detail-form>
