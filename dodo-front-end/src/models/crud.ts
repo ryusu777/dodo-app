@@ -81,6 +81,7 @@ const crud = {
   }
 };
 
+// TODO: Request success or fail should be returned
 export function useCrudEntity<T extends { id?: number }>(routing: string) {
   const route = ref(routing);
   const grid = ref({}) as Ref<IPagination<T>>;

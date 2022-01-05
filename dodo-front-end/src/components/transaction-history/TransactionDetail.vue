@@ -55,7 +55,6 @@
 </template>
 
 <script lang="ts">
-// REFACTOR: Move request to page component
 import { defineComponent, PropType } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import BaseCard from '../ui/BaseCard.vue';
