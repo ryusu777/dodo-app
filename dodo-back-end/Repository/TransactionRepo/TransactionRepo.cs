@@ -240,6 +240,8 @@ namespace DodoApp.Repository
 
             var result = await ModifyGoodsAndCurrencyData(transactionHeader);
 
+            transactionHeader.PurchaseDate = request.PurchaseDate;
+            transactionHeader.ReceiveDate = request.ReceiveDate;
             _context
                 .Entry(transactionHeader)
                 .State = EntityState.Modified;
