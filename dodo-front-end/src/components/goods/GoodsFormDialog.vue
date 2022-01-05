@@ -23,7 +23,7 @@ import { useDialogPluginComponent } from 'quasar';
 import BaseCard from 'components/ui/BaseCard.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import GoodsForm from './GoodsForm.vue';
-import { IGoods } from 'src/models/interfaces/goods.interface';
+import { IGoods } from 'src/models/goods';
 
 export default defineComponent({
   props: {

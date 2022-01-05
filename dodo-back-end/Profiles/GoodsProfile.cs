@@ -11,7 +11,6 @@ namespace DodoApp.Profiles
         {
             CreateMap<Goods, ReadGoodsDto>();
             CreateMap<CreateGoodsDto, Goods>();
-            CreateMap<UpdateGoodsDto, Goods>();
         }
     }
 }

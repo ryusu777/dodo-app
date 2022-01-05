@@ -1,4 +1,4 @@
-import { ITransactionHeader } from './transaction.interface';
+import { ITransactionHeader } from './transaction';
 
 export interface ICurrency {
   id?: number;

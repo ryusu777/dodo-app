@@ -37,7 +37,7 @@ namespace DodoApp.Helpers
                 Data = rows,
                 PageNumber = pageIndex,
                 TotalPage = pageCount,
-                ItemPerPage = filter.RowsPerPage,
+                RowsPerPage = filter.RowsPerPage,
                 RowsNumber = itemCount,
                 SortBy = filter.SortBy,
                 Descending = filter.Descending,

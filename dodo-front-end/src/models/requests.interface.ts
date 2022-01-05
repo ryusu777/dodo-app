@@ -4,4 +4,5 @@ export interface IPageFilter {
   rowsNumber?: number;
   sortBy?: string;
   searchText?: string;
+  descending?: string;
 }

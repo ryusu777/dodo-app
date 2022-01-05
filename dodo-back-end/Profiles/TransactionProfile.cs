@@ -14,9 +14,8 @@ namespace DodoApp.Profiles
             CreateMap<GoodsTransactionHeader, ReadGoodsTransactionHeaderDto>();
             CreateMap<UpdateGoodsTransactionHeaderDto, GoodsTransactionHeader>();
             CreateMap<CreateGoodsTransactionDetailDto, GoodsTransactionDetail>();
-            CreateMap<UpdateGoodsTransactionDetailDto, GoodsTransactionDetail>();
             CreateMap<GoodsTransactionDetail, ReadGoodsTransactionDetailDto>();
-            CreateMap<PageWrapper<List<GoodsTransactionHeader>>, PageWrapper<List<ReadGoodsTransactionHeaderDto>>>();
+            CreateMap<List<GoodsTransactionDetail>, List<ReadGoodsTransactionDetailDto>>();
         }
     }
 }

@@ -30,7 +30,7 @@
 import { defineComponent, ref, PropType } from 'vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
-import { ICurrency } from 'src/models/interfaces/currency.interface';
+import { ICurrency } from 'src/models/currency';
 
 export default defineComponent({
   emits: ['submit'],
