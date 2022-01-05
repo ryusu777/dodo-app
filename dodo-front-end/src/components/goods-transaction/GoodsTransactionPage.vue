@@ -33,6 +33,12 @@
         @delete="removeDetail"
         @update="updateDetail"
       />
+      <base-button
+        label="Selesaikan transaksi"
+        class="q-mt-sm"
+        color="primary"
+        @click="updateHeaderHandler"
+      />
     </base-add-dialog>
   </q-page>
 </template>
@@ -72,9 +78,8 @@ export default defineComponent({
       search: searchGoods
     } = useCrudEntity<IGoods>('/goods');
 
-    const { get: getHeader } = useCrudEntity<ITransactionHeader>(
-      '/transaction/header'
-    );
+    const { get: getHeader, update: updateHeader } =
+      useCrudEntity<ITransactionHeader>('/transaction/header');
 
     const transactionHeader = ref<ITransactionHeader>();
 
@@ -84,6 +89,15 @@ export default defineComponent({
       )) as ITransactionHeader;
 
       gridDetail.value.data = transactionHeader.value.goodsTransactionDetails;
+    }
+
+    async function updateHeaderHandler() {
+      const request = transactionHeader.value as ITransactionHeader;
+      request.purchaseDate = new Date().toISOString();
+      request.receiveDate = new Date().toISOString();
+      delete request.goodsTransactionDetails;
+      // TODO: Successfull request should redirect user
+      await updateHeader(request);
     }
 
     const {
@@ -142,7 +156,8 @@ export default defineComponent({
       searchGoods,
       createAndGetDetail,
       updateDetail,
-      removeDetail
+      removeDetail,
+      updateHeaderHandler
     };
   }
 });
