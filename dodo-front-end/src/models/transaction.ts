@@ -2,11 +2,11 @@ import { IGoods } from './goods';
 
 export interface ITransactionHeader {
   id?: number;
-  purchaseDate: Date | string;
-  receiveDate: Date | string;
-  createdDate: Date | string;
-  vendor: string;
-  totalPrice: number;
+  purchaseDate?: Date | string;
+  receiveDate?: Date | string;
+  createdDate?: Date | string;
+  vendor?: string;
+  totalPrice?: number;
   transactionType: 'sell' | 'purchase';
   goodsTransactionDetails?: Array<ITransactionDetail>;
 }

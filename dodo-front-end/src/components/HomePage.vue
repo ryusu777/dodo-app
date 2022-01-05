@@ -8,7 +8,9 @@
           Data Keuangan
         </p>
         <p class="col-5 text-left text-h6">Keuangan sekarang:</p>
-        <p class="col-5 text-right text-h6">Rp {{ currencyAmount }}</p>
+        <p class="col-5 text-right text-h6" v-if="gridCurrency.data[0]">
+          Rp {{ gridCurrency.data[0].currencyAmount || null }}
+        </p>
       </div>
       <div class="row justify-end q-my-md">
         <base-button
@@ -41,29 +43,28 @@
         class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
         label="Penjualan"
         style="height: 90px"
-        @click="sendSellTransactionHeader()"
+        @click="createHeaderHandler('sell')"
       />
       <q-btn
         class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
         label="Pembelian"
         style="height: 90px"
-        @click="sendPurchaseTransactionHeader()"
+        @click="createHeaderHandler('purchase')"
       />
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, onBeforeMount } from 'vue';
 import BaseCard from 'components/ui/BaseCard.vue';
-import { ICreateResponse, IPagination } from 'src/models/responses.interface';
-import { api } from 'boot/axios';
-import { AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
 import BaseButton from 'components/ui/BaseButton.vue';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
 import { ICurrency } from 'src/models/currency';
 import { useQuasar } from 'quasar';
+import { useCrudEntity } from 'src/models/crud';
+import { ITransactionHeader } from 'src/models/transaction';
 
 export default defineComponent({
   components: {
@@ -74,18 +75,26 @@ export default defineComponent({
     const $q = useQuasar();
     const router = useRouter();
 
-    async function sendSellTransactionHeader(): Promise<void> {
-      try {
-        const response = await api.post<ICreateResponse>(
-          '/transaction/header',
-          {
-            transactionType: 'sell'
-          }
-        );
+    const { grid: gridHeader, create: createHeader } =
+      useCrudEntity<ITransactionHeader>('/transaction/header');
 
-        await router.push(`/transaction/sell/${response.data.id || 0}`);
-      } catch {}
+    async function createHeaderHandler(
+      transactionType: 'sell' | 'purchase'
+    ): Promise<void> {
+      await createHeader({
+        transactionType
+      });
+      if (gridHeader.value.data)
+        await router.push(
+          `/transaction/${transactionType}/${gridHeader.value.data[0].id || -1}`
+        );
     }
+
+    const {
+      grid: gridCurrency,
+      create: createCurrency,
+      paging: pagingCurrency
+    } = useCrudEntity<ICurrency>('/currency');
 
     function showAddDialog() {
       $q.dialog({
@@ -94,59 +103,17 @@ export default defineComponent({
           title: 'Tambah Daftar'
         }
       }).onOk(async (currency: ICurrency) => {
-        await sendCreateRequest(currency);
+        await createCurrency(currency);
+        await pagingCurrency({ rowsPerPage: 1 });
       });
     }
 
-    async function sendCreateRequest(currency: ICurrency): Promise<void> {
-      try {
-        await api.post<ICreateResponse>('/currency', {
-          changingAmount: currency.changingAmount,
-          changeDescription: currency.changeDescription
-        });
-      } catch {}
-
-      await sendGetLastCurrency();
-    }
-
-    async function sendPurchaseTransactionHeader(): Promise<void> {
-      try {
-        const response = await api.post<ICreateResponse>(
-          '/transaction/header',
-          {
-            transactionType: 'purchase'
-          }
-        );
-
-        await router.push(`/transaction/purchase/${response.data.id || 0}`);
-      } catch {}
-    }
-
-    const currencyAmount = ref<number>();
-    async function sendGetLastCurrency() {
-      try {
-        const response: AxiosResponse<IPagination<ICurrency>> = await api.get(
-          '/currency',
-          {
-            params: {
-              rowsPerPage: 1
-            }
-          }
-        );
-
-        if (response.data.data) {
-          currencyAmount.value = response.data.data[0].currencyAmount;
-        }
-      } catch {}
-    }
-
-    onMounted(async () => await sendGetLastCurrency());
+    onBeforeMount(async () => await pagingCurrency({ rowsPerPage: 1 }));
 
     return {
       showAddDialog,
-      sendSellTransactionHeader,
-      sendPurchaseTransactionHeader,
-      currencyAmount
+      createHeaderHandler,
+      gridCurrency
     };
   }
 });
