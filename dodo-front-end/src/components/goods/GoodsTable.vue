@@ -110,7 +110,7 @@
                           pricePerItem:
                             transactionType === 'sell'
                               ? props.row.sellPrice
-                              : undefined
+                              : props.row.purchasePrice
                         })
                       "
                       v-close-popup="1"
