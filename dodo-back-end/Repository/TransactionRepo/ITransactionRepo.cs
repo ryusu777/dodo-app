@@ -13,6 +13,7 @@ namespace DodoApp.Repository
         // TODO: Deleting empty transaction interface & implementation
         // TODO: Purchasing goods should check if fund is available
         // TODO: Implement receive date and purchase date
+        // TODO: Goods transaction completion should modify corresponding currency (fund or profit)
         Task<IActionResult> CreateTransactionHeaderAsync(
             CreateGoodsTransactionHeaderDto request);
         Task<IActionResult> UpdateTransactionHeaderAsync(
