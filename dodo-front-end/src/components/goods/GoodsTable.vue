@@ -13,12 +13,6 @@
         @click="sortByStock = !sortByStock"
         class="q-mr-md"
       />
-      <base-button
-        v-if="!transactionType"
-        label="Tambah Barang"
-        @click="showAddDialog"
-        class="q-mr-md"
-      />
       <base-input
         borderless
         dense
@@ -77,7 +71,10 @@
                   @click="$emit('delete', props.row.id)"
                   icon="delete"
                 />
-                <base-button icon="edit" @click="showUpdateDialog(props.row)" />
+                <base-button
+                  icon="edit"
+                  @click="$emit('update-request', props.row)"
+                />
               </q-card-actions>
               <q-card-actions v-else align="right">
                 <base-button label="Tambah" />
@@ -130,11 +127,8 @@
 </template>
 
 <script lang="ts">
-// REFACTOR: Add dialog and show dialog should be outside of table component
-import { defineComponent, ref, PropType, computed } from 'vue';
+import { defineComponent, ref, PropType, computed, watch } from 'vue';
 import { IGoods } from 'src/models/goods';
-import { useQuasar } from 'quasar';
-import GoodsFormDialog from 'components/goods/GoodsFormDialog.vue';
 import BaseInput from 'components/ui/BaseInput.vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
@@ -146,7 +140,7 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'paging', 'update', 'delete', 'search', 'add-to-cart'],
+  emits: ['paging', 'update-request', 'delete', 'search', 'add-to-cart'],
   props: {
     rows: {
       type: Array as PropType<IGoods[]>,
@@ -159,7 +153,6 @@ export default defineComponent({
     transactionType: String
   },
   setup(props, { emit }) {
-    const $q = useQuasar();
     const filter = ref('');
 
     const modelPagination = computed({
@@ -173,35 +166,21 @@ export default defineComponent({
 
     const sortByStock = ref(false);
 
-    function showAddDialog() {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          title: 'Tambah Barang'
-        }
-      }).onOk((goods: IGoods) => {
-        emit('create', goods);
-      });
-    }
-
-    function showUpdateDialog(goods: IGoods) {
-      $q.dialog({
-        component: GoodsFormDialog,
-        componentProps: {
-          goods,
-          title: 'Ubah data barang'
-        }
-      }).onOk((goods: IGoods) => {
-        emit('update', goods);
-      });
-    }
+    watch(
+      () => sortByStock.value,
+      () => {
+        emit('paging', {
+          ...props.pagination,
+          sortBy: sortByStock.value ? 'StockAvailable' : null,
+          descending: sortByStock.value ? 'ASC' : null
+        });
+      }
+    );
 
     return {
       filter,
       sortByStock,
-      modelPagination,
-      showAddDialog,
-      showUpdateDialog
+      modelPagination
     };
   }
 });

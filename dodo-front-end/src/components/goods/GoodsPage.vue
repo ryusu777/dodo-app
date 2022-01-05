@@ -6,23 +6,34 @@
       :pagination="pageFilter"
       row-key="id"
       @paging="paging"
-      @create="create"
-      @update="update"
+      @update-request="updateGoods"
       @delete="remove"
       @search="search"
-    />
+    >
+      <template #top-right>
+        <base-button
+          label="Tambah Barang"
+          @click="createGoods"
+          class="q-mr-md"
+        />
+      </template>
+    </goods-table>
   </q-page>
 </template>
 
 <script lang="ts">
 // TODO: Create goods request dialog should closes when request is success
 import { defineComponent, onBeforeMount } from 'vue';
-import GoodsTable from 'components/goods/GoodsTable.vue';
 import { useCrudEntity } from 'src/models/crud';
 import { IGoods } from 'src/models/goods';
+import { useQuasar } from 'quasar';
+import GoodsTable from 'components/goods/GoodsTable.vue';
+import GoodsFormDialog from './GoodsFormDialog.vue';
+import BaseButton from '../ui/BaseButton.vue';
 export default defineComponent({
   components: {
-    GoodsTable
+    GoodsTable,
+    BaseButton
   },
   setup() {
     const { grid, pageFilter, create, paging, getAll, update, remove, search } =
@@ -37,13 +48,37 @@ export default defineComponent({
 
     onBeforeMount(async () => await getAll());
 
+    const $q = useQuasar();
+
+    function createGoods() {
+      $q.dialog({
+        component: GoodsFormDialog,
+        componentProps: {
+          title: 'Tambah Barang'
+        }
+      }).onOk(async (goods: IGoods) => {
+        await create(goods);
+      });
+    }
+
+    function updateGoods(goods: IGoods) {
+      $q.dialog({
+        component: GoodsFormDialog,
+        componentProps: {
+          goods,
+          title: 'Ubah data barang'
+        }
+      }).onOk(async (goods: IGoods) => {
+        await update(goods);
+      });
+    }
     return {
       grid,
       pageFilter,
       onFilter,
-      create,
+      createGoods,
       paging,
-      update,
+      updateGoods,
       remove,
       search
     };
