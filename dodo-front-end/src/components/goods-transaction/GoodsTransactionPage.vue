@@ -30,7 +30,7 @@
         v-if="gridDetail.data"
         :rows="gridDetail.data"
         editable
-        @delete="removeDetail"
+        @delete="confirmRemoveDetail"
         @update="updateDetail"
       />
       <base-button
@@ -107,6 +107,19 @@ export default defineComponent({
       remove: removeDetail
     } = useCrudEntity<ITransactionDetail>('/transaction/detail');
 
+    function confirmRemoveDetail(id: number) {
+      $q.dialog({
+        component: BaseDialog,
+        componentProps: {
+          body: 'Yakin untuk menghapus barang?',
+          okLabel: 'Ya',
+          cancelLabel: 'Tidak'
+        }
+      }).onOk(async () => {
+        await removeDetail(id);
+      });
+    }
+
     async function createAndGetDetail(entity: ITransactionDetail) {
       await createDetail(entity);
       await getDetails();
@@ -156,7 +169,7 @@ export default defineComponent({
       searchGoods,
       createAndGetDetail,
       updateDetail,
-      removeDetail,
+      confirmRemoveDetail,
       updateHeaderHandler
     };
   }

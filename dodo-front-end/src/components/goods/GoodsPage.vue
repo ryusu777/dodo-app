@@ -7,7 +7,7 @@
       row-key="id"
       @paging="paging"
       @update-request="updateGoods"
-      @delete="remove"
+      @delete="confirmRemove"
       @search="search"
     >
       <template #top-right>
@@ -30,6 +30,7 @@ import { useQuasar } from 'quasar';
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import GoodsFormDialog from './GoodsFormDialog.vue';
 import BaseButton from '../ui/BaseButton.vue';
+import BaseDialog from '../ui/BaseDialog.vue';
 export default defineComponent({
   components: {
     GoodsTable,
@@ -38,13 +39,6 @@ export default defineComponent({
   setup() {
     const { grid, pageFilter, create, paging, getAll, update, remove, search } =
       useCrudEntity<IGoods>('/goods');
-
-    async function onFilter(searchText: string) {
-      await paging({
-        ...pageFilter.value,
-        searchText
-      });
-    }
 
     onBeforeMount(async () => await getAll());
 
@@ -72,15 +66,27 @@ export default defineComponent({
         await update(goods);
       });
     }
+
+    function confirmRemove(id: number) {
+      $q.dialog({
+        component: BaseDialog,
+        componentProps: {
+          body: 'Yakin ingin menghapus data barang?',
+          okLabel: 'Ya',
+          cancelLabel: 'Tidak'
+        }
+      }).onOk(async () => {
+        await remove(id);
+      });
+    }
     return {
       grid,
       pageFilter,
-      onFilter,
       createGoods,
       paging,
       updateGoods,
-      remove,
-      search
+      search,
+      confirmRemove
     };
   }
 });
