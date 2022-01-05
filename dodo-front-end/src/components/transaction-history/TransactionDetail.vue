@@ -47,7 +47,7 @@
     <q-card-section>
       <p class="text-h5 text-bold">Daftar Barang</p>
       <transaction-detail-table
-        v-if="transactionHeader"
+        v-if="transactionHeader?.goodsTransactionDetails"
         :rows="transactionHeader.goodsTransactionDetails"
       ></transaction-detail-table>
     </q-card-section>
@@ -68,7 +68,7 @@ export default defineComponent({
     transactionHeader: Object as PropType<ITransactionHeader>
   },
   setup() {
-    function formattedDate(value: Date | undefined) {
+    function formattedDate(value: Date | string | undefined) {
       if (value) return date.formatDate(value, 'dddd, D MMMM YYYY');
       return undefined;
     }
