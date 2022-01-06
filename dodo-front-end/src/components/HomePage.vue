@@ -7,19 +7,23 @@
         <p class="col-10 text-center text-bold text-h4 q-ma-md">
           Data Keuangan
         </p>
-        <p class="col-10 text-left text-h6">Keuangan sekarang:</p>
-        <p class="col-10 text-right text-h6" v-if="gridCurrency.data[0]">
-          Jumlah keuntungan: Rp {{ gridCurrency.data[0].profitAmount || null }}
+        <p class="col-10 text-left text-h6" v-if="gridCurrency.data[0]">
+          Keuntungan: Rp {{ gridCurrency.data[0].profitAmount || null }}
         </p>
-        <p class="col-10 text-right text-h6" v-if="gridCurrency.data[0]">
-          Jumlah modal: Rp {{ gridCurrency.data[0].fundAmount || null }}
+        <p class="col-10 text-left text-h6" v-if="gridCurrency.data[0]">
+          Modal: Rp {{ gridCurrency.data[0].fundAmount || null }}
         </p>
       </div>
-      <div class="row justify-end q-my-md">
+      <div class="row justify-around q-my-md">
         <base-button
-          class="col-5 text-h6 self-end"
+          class="col-5 text-h6"
           @click="showAddDialog()"
           label="Tambah"
+        />
+        <base-button
+          class="col-5 text-h6"
+          @click="showConversionDialog()"
+          label="Konversi"
         />
       </div>
     </base-card>
@@ -64,6 +68,7 @@ import BaseCard from 'components/ui/BaseCard.vue';
 import { useRouter } from 'vue-router';
 import BaseButton from 'components/ui/BaseButton.vue';
 import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
+import CurrencyConversionFormDialog from './currency/CurrencyConversionFormDialog.vue';
 import { ICurrency } from 'src/models/currency';
 import { useQuasar } from 'quasar';
 import { useCrudEntity } from 'src/models/crud';
@@ -111,10 +116,26 @@ export default defineComponent({
       });
     }
 
+    function showConversionDialog() {
+      if (gridCurrency.value.data)
+        $q.dialog({
+          component: CurrencyConversionFormDialog,
+          componentProps: {
+            title: 'Konversi keuntungan permodalan',
+            fundAmount: gridCurrency.value.data[0].fundAmount || 0,
+            profitAmount: gridCurrency.value.data[0].profitAmount || 0
+          }
+        }).onOk(async (currency: ICurrency) => {
+          await createCurrency(currency);
+          await pagingCurrency({ rowsPerPage: 1 });
+        });
+    }
+
     onBeforeMount(async () => await pagingCurrency({ rowsPerPage: 1 }));
 
     return {
       showAddDialog,
+      showConversionDialog,
       createHeaderHandler,
       gridCurrency
     };

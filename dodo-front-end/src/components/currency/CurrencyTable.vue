@@ -5,18 +5,25 @@
     :rows="rows"
     v-model:pagination="modelPagination"
   >
-    <template v-slot:top-right>
-      <!-- TODO: Convert profit to fund -->
-      <base-button label="Tambah" @click="showAddDialog" class="q-mr-md" />
-    </template>
     <template v-slot:item="props">
       <div class="q-pa-xs col-12">
         <base-card :class="props.selected ? 'bg-grey-2' : ''">
           <q-card-section horizontal class="row">
             <q-card-section class="col q-pt-sm">
               <p
+                class="text-bold text-h5 q-pa-none q-ma-none text-green-8"
+                v-if="
+                  (props.row.changingProfitAmount < 0 &&
+                    props.row.changingFundAmount > 0) ||
+                  (props.row.changingProfitAmount > 0 &&
+                    props.row.changingFundAmount < 0)
+                "
+              >
+                Konversi
+              </p>
+              <p
                 class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
-                v-if="props.row.changingProfitAmount < 0"
+                v-else-if="props.row.changingProfitAmount < 0"
               >
                 Pengeluaran
               </p>
@@ -90,8 +97,7 @@
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { ICurrency } from 'src/models/currency';
 import { IPageFilter } from 'src/models/requests.interface';
-import { date, useQuasar } from 'quasar';
-import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
+import { date } from 'quasar';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 
@@ -112,8 +118,7 @@ export default defineComponent({
     }
   },
 
-  setup(props, { emit }) {
-    const $q = useQuasar();
+  setup(props) {
     const filter = ref('');
 
     const modelPagination = computed({
@@ -126,17 +131,6 @@ export default defineComponent({
       }
     });
 
-    function showAddDialog() {
-      $q.dialog({
-        component: CurrencyFormDialog,
-        componentProps: {
-          title: 'Tambah Daftar'
-        }
-      }).onOk((currency: ICurrency) => {
-        emit('create', currency);
-      });
-    }
-
     function formattedDate(value: Date | undefined) {
       if (value) return date.formatDate(value, 'dddd, D MMMM YYYY');
       return undefined;
@@ -144,7 +138,6 @@ export default defineComponent({
 
     return {
       filter,
-      showAddDialog,
       formattedDate,
       modelPagination
     };
