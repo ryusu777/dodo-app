@@ -4,12 +4,20 @@
     <q-radio v-model="type" val="expenses" label="Pengeluaran" />
 
     <BaseInput
-      v-model="changingAmount"
+      v-model="changingProfitAmount"
       class="col-12 q-my-sm"
-      label="Nilai"
+      label="Keuntungan"
       type="number"
       lazy-rules
-      :rules="[requiredRule]"
+    />
+
+    <BaseInput
+      v-if="type !== 'expenses'"
+      v-model="changingFundAmount"
+      class="col-12 q-my-sm"
+      label="Permodalan"
+      type="number"
+      lazy-rules
     />
 
     <BaseInput
@@ -46,27 +54,41 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const currencyId = ref(props.currency?.id || null);
-    const changingAmount = ref(props.currency?.changingAmount || 0);
+    const changingProfitAmount = ref(props.currency?.changingProfitAmount || 0);
+    const changingFundAmount = ref(props.currency?.changingFundAmount || 0);
     const changeDescription = ref(props.currency?.changeDescription || '');
     const type = ref('income');
 
     function submitData() {
-      emit('submit', {
-        id: currencyId.value,
-        changingAmount: type.value === 'expenses' ? (-1 * changingAmount.value) : changingAmount.value,
-        changeDescription: changeDescription.value,
-      });
+      if (
+        !(changingProfitAmount.value === 0 && changingFundAmount.value === 0)
+      ) {
+        emit('submit', {
+          id: currencyId.value,
+          changingProfitAmount:
+            type.value === 'expenses'
+              ? -1 * changingProfitAmount.value
+              : changingProfitAmount.value,
+          changingFundAmount:
+            type.value === 'expenses'
+              ? -1 * changingFundAmount.value
+              : changingFundAmount.value,
+          changeDescription: changeDescription.value
+        });
+      }
     }
 
     function reset() {
-      changingAmount.value = 0;
+      changingFundAmount.value = 0;
+      changingProfitAmount.value = 0;
       changeDescription.value = '';
     }
 
     return {
       type,
       currencyId,
-      changingAmount,
+      changingFundAmount,
+      changingProfitAmount,
       changeDescription,
       submitData,
       reset,

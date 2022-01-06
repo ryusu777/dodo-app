@@ -7,9 +7,12 @@
         <p class="col-10 text-center text-bold text-h4 q-ma-md">
           Data Keuangan
         </p>
-        <p class="col-5 text-left text-h6">Keuangan sekarang:</p>
-        <p class="col-5 text-right text-h6" v-if="gridCurrency.data[0]">
-          Rp {{ gridCurrency.data[0].currencyAmount || null }}
+        <p class="col-10 text-left text-h6">Keuangan sekarang:</p>
+        <p class="col-10 text-right text-h6" v-if="gridCurrency.data[0]">
+          Jumlah keuntungan: Rp {{ gridCurrency.data[0].profitAmount || null }}
+        </p>
+        <p class="col-10 text-right text-h6" v-if="gridCurrency.data[0]">
+          Jumlah modal: Rp {{ gridCurrency.data[0].fundAmount || null }}
         </p>
       </div>
       <div class="row justify-end q-my-md">
@@ -100,7 +103,7 @@ export default defineComponent({
       $q.dialog({
         component: CurrencyFormDialog,
         componentProps: {
-          title: 'Tambah Daftar'
+          title: 'Perubahan Keuangan'
         }
       }).onOk(async (currency: ICurrency) => {
         await createCurrency(currency);

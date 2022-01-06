@@ -16,30 +16,53 @@
             <q-card-section class="col q-pt-sm">
               <p
                 class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
-                v-if="props.row.changingAmount <= 0"
+                v-if="props.row.changingProfitAmount < 0"
               >
                 Pengeluaran
               </p>
               <p
                 class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
-                v-if="props.row.changingAmount > 0"
+                v-else-if="
+                  props.row.changingProfitAmount > 0 &&
+                  props.row.changingFundAmount > 0
+                "
               >
-                Pemasukkan
+                Penjualan barang
+              </p>
+              <p
+                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                v-else-if="props.row.changingProfitAmount > 0"
+              >
+                Pemasukan keuntungan
+              </p>
+              <p
+                class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                v-else-if="props.row.changingFundAmount < 0"
+              >
+                Restock barang
+              </p>
+              <p
+                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                v-else-if="props.row.changingFundAmount > 0"
+              >
+                Pemasukan permodalan
               </p>
               <div class="column">
                 <p
-                  class="q-mb-none q-mt-none"
-                  v-if="props.row.changingAmount < 0"
+                  class="q-pa-none q-ma-none"
+                  v-if="props.row.changingProfitAmount"
                 >
-                  <b>Changing: </b>Rp{{ -1 * props.row.changingAmount }}
+                  <b>Perubahan keuntungan: </b
+                  >{{ props.row.changingProfitAmount }}
                 </p>
                 <p
-                  class="q-mb-none q-mt-none"
-                  v-if="props.row.changingAmount > 0"
+                  class="q-pa-none q-ma-none"
+                  v-if="props.row.changingFundAmount"
                 >
-                  <b>Changing: </b>Rp{{ props.row.changingAmount }}
+                  <b>Perubahan permodalan: </b
+                  >{{ props.row.changingFundAmount }}
                 </p>
-                <p class="q-my-none">
+                <p class="q-my-none" v-if="!props.row.transactionHeaderId">
                   <b>Deskripsi: </b>{{ props.row.changeDescription }}
                 </p>
               </div>
@@ -49,10 +72,8 @@
               <p class="text-overline q-ma-none" style="line-height: 15px">
                 {{ formattedDate(props.row.dateOfChange) }}
               </p>
-              <p class="q-mb-none">
-                <b>Currency: </b>Rp{{ props.row.currencyAmount }}
-              </p>
               <base-button
+                class="q-mt-sm"
                 label="Detail"
                 v-if="props.row.transactionHeaderId !== null"
                 @click="$emit('get', props.row.transactionHeaderId)"
