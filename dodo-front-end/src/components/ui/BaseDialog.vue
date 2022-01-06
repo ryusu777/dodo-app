@@ -32,14 +32,8 @@ import BaseButton from './BaseButton.vue';
 
 export default {
   props: {
-    title: {
-      type: String,
-      required: true
-    },
-    body: {
-      type: String,
-      required: true
-    },
+    title: String,
+    body: String,
     okLabel: String,
     cancelLabel: String
   },
