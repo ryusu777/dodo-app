@@ -26,11 +26,13 @@ namespace DodoApp.Repository
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> CreateCurrencyReportAsync(CreateCurrencyDto request)
+        public async Task<IActionResult> CreateCurrencyReportAsync(
+            CreateCurrencyDto request)
         {
             if (request.TransactionHeaderId != null && await _context.Currencies
                 .FirstOrDefaultAsync(c => 
-                    c.TransactionHeaderId == request.TransactionHeaderId) != null)
+                    c.TransactionHeaderId == 
+                        request.TransactionHeaderId) != null)
             {
                 return new BadRequestObjectResult(new { errors = new string[] 
                     { "Record keuangan sudah ada" }});
@@ -42,29 +44,49 @@ namespace DodoApp.Repository
             {
                 header = await _context.GoodsTransactionHeaders
                     .Include(h => h.GoodsTransactionDetails)
+                    .ThenInclude(d => d.TheGoods)
                     .FirstOrDefaultAsync(h => 
                         h.Id == currency.TransactionHeaderId);
 
                 if (header == null)
                     return new BadRequestObjectResult(new 
                     { 
-                        errors = new string[] { "Transaksi barang tidak ditemukan" }
+                        errors = new string[] 
+                        { "Transaksi barang tidak ditemukan" }
                     });
                 
-                currency.ChangingAmount = _mapper
+                if (header.TransactionType == "purchase") 
+                {
+                    currency.ChangingFundAmount = -1 * _mapper
                     .Map<ReadGoodsTransactionHeaderDto>(header).TotalPrice;
-                
-                if (header.TransactionType == "purchase")
-                    currency.ChangingAmount *= -1;
+
+                    currency.ChangingProfitAmount = 0;
+                }
+                else
+                {
+                    currency.ChangingFundAmount = 0;
+                    currency.ChangingProfitAmount = 0;
+                    foreach (var detail in header.GoodsTransactionDetails)
+                    {
+                        currency.ChangingProfitAmount += 
+                            detail.PricePerItem - detail.TheGoods.PurchasePrice;
+                        currency.ChangingFundAmount += 
+                            detail.TheGoods.PurchasePrice;
+                    }
+                }
             }
 
             var latestCurrency = await _context.Currencies
                 .OrderBy(c => c.Id)
                 .LastOrDefaultAsync();
-            var latestCurrencyAmount = (int?)latestCurrency.CurrencyAmount ?? 0;
+            var latestProfitAmount = (int?)latestCurrency.ProfitAmount ?? 0;
+            var latestFundAmount = (int?)latestCurrency.FundAmount ?? 0;
 
-            currency.CurrencyAmount = 
-                latestCurrencyAmount + currency.ChangingAmount;
+            currency.ProfitAmount = 
+                latestProfitAmount + currency.ChangingProfitAmount;
+
+            currency.FundAmount = latestFundAmount + currency.ChangingFundAmount;
+
             await _context.Currencies.AddAsync(currency);
 
             try
@@ -92,8 +114,10 @@ namespace DodoApp.Repository
             {
                 Id = s.Id,
                 ChangeDescription = s.ChangeDescription,
-                ChangingAmount = s.ChangingAmount,
-                CurrencyAmount = s.CurrencyAmount,
+                ChangingFundAmount = s.ChangingFundAmount,
+                ChangingProfitAmount = s.ChangingProfitAmount,
+                ProfitAmount = s.ProfitAmount,
+                FundAmount = s.FundAmount,
                 DateOfChange = s.DateOfChange,
                 TransactionHeaderId = s.TransactionHeaderId
             });
