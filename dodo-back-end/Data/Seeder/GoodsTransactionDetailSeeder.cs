@@ -27,7 +27,7 @@ namespace DodoApp.Data.Seeder
                 new GoodsTransactionDetail
                 {
                     Id = 3,
-                    GoodsAmount = 3,
+                    GoodsAmount = 1,
                     GoodsTransactionHeaderId = 2,
                     PricePerItem = 20000,
                     GoodsId = 3,
@@ -36,7 +36,7 @@ namespace DodoApp.Data.Seeder
                 {
                     Id = 4,
                     GoodsAmount = 1,
-                    GoodsTransactionHeaderId = 1,
+                    GoodsTransactionHeaderId = 2,
                     PricePerItem = 70000,
                     GoodsId = 1,
                 }

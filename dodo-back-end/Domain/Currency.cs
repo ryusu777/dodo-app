@@ -6,14 +6,17 @@ namespace DodoApp.Domain
 {
     public class Currency
     {
-        // TODO: Profit and funding property
         [Key]
         public int Id { get; set; }
         public int? TransactionHeaderId { get; set; }
         [Required]
-        public int CurrencyAmount { get; set; }
+        public int ProfitAmount { get; set; }
         [Required]
-        public int ChangingAmount { get; set; }
+        public int FundAmount { get; set; }
+        [Required]
+        public int ChangingProfitAmount { get; set; }
+        [Required]
+        public int ChangingFundAmount { get; set; }
         [Required]
         public DateTime DateOfChange { get; set; }
         public string ChangeDescription { get; set; }

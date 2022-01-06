@@ -14,8 +14,10 @@ namespace DodoApp.Data.Seeder
                     Id = 1,
                     ChangeDescription = "Menjual Barang",
                     DateOfChange = new DateTime(2021, 11, 1),
-                    ChangingAmount = 220000,
-                    CurrencyAmount = 500000,
+                    ProfitAmount = 40000,
+                    FundAmount = 110000,
+                    ChangingFundAmount = 110000,
+                    ChangingProfitAmount = 40000,
                     TransactionHeaderId = 1
                 },
                 new Currency
@@ -23,8 +25,10 @@ namespace DodoApp.Data.Seeder
                     Id = 2,
                     ChangeDescription = "Membeli Barang",
                     DateOfChange = new DateTime(2021, 11, 5),
-                    ChangingAmount = -60000,
-                    CurrencyAmount = 440000,
+                    ChangingFundAmount = -90000,
+                    ChangingProfitAmount = 0,
+                    FundAmount = 20000,
+                    ProfitAmount = 40000,
                     TransactionHeaderId = 2
                 },
                 new Currency
@@ -32,8 +36,10 @@ namespace DodoApp.Data.Seeder
                     Id = 3,
                     ChangeDescription = "Bayar Listrik",
                     DateOfChange = new DateTime(2021, 11, 25),
-                    ChangingAmount = -250000,
-                    CurrencyAmount = 190000
+                    ChangingProfitAmount = -25000,
+                    ChangingFundAmount = 0,
+                    FundAmount = 20000,
+                    ProfitAmount = 15000
                 }
             );
         }
