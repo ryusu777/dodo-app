@@ -69,9 +69,9 @@ namespace DodoApp.Repository
                     foreach (var detail in header.GoodsTransactionDetails)
                     {
                         currency.ChangingProfitAmount += 
-                            detail.PricePerItem - detail.TheGoods.PurchasePrice;
+                            (detail.PricePerItem - detail.TheGoods.PurchasePrice) * detail.GoodsAmount;
                         currency.ChangingFundAmount += 
-                            detail.TheGoods.PurchasePrice;
+                            detail.TheGoods.PurchasePrice * detail.GoodsAmount;
                     }
                 }
             }
