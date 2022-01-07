@@ -78,7 +78,12 @@
                 <strong>{{ formattedDate(props.row.createdDate) }}</strong>
               </p>
               <q-card-actions align="right">
-                <!-- TODO: Delete transaction -->
+                <base-button
+                  icon="delete"
+                  color="negative"
+                  @click="$emit('delete', props.row.id)"
+                  v-if="!(props.row.purchaseDate || props.row.receiveDate)"
+                />
                 <base-button
                   label="Detail"
                   @click="$emit('get', props.row.id)"
@@ -108,7 +113,7 @@ export default defineComponent({
     BaseButton,
     BaseCard
   },
-  emits: ['create', 'paging', 'get', 'filter'],
+  emits: ['create', 'paging', 'get', 'filter', 'delete'],
   props: {
     rows: {
       type: Array as PropType<ITransactionHeader[]>,

@@ -8,6 +8,7 @@
       @paging="paging"
       @get="showDetail"
       @filter="filter"
+      @delete="confirmDelete"
     />
   </q-page>
 </template>
@@ -19,6 +20,7 @@ import { ITransactionHeader } from 'src/models/transaction';
 import { useQuasar } from 'quasar';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 import { useCrudEntity } from 'src/models/crud';
+import BaseDialog from '../ui/BaseDialog.vue';
 
 export default defineComponent({
   components: {
@@ -26,7 +28,7 @@ export default defineComponent({
   },
   setup() {
     const $q = useQuasar();
-    const { grid, pageFilter, paging, getAll, get, filter } =
+    const { grid, pageFilter, paging, getAll, get, filter, remove } =
       useCrudEntity<ITransactionHeader>('/transaction/header');
 
     onMounted(async () => await getAll());
@@ -41,12 +43,24 @@ export default defineComponent({
       });
     }
 
+    function confirmDelete(id: number) {
+      $q.dialog({
+        component: BaseDialog,
+        componentProps: {
+          body: 'Yakin ingin menghapus transaksi?',
+          okLabel: 'Ya',
+          cancelLabel: 'Tidak'
+        }
+      }).onOk(async () => await remove(id));
+    }
+
     return {
       showDetail,
       paging,
       filter,
       grid,
-      pageFilter
+      pageFilter,
+      confirmDelete
     };
   }
 });

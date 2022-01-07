@@ -141,6 +141,22 @@ namespace DodoApp.Repository
                     });
             }
 
+            if (header.PurchaseDate != null)
+            {
+                return new BadRequestObjectResult(new { errors = new string[]
+                {
+                    "Transaksi telah dibayar, tidak bisa dihapus"
+                }});
+            }
+
+            if (header.ReceiveDate != null)
+            {
+                return new BadRequestObjectResult(new { errors = new string[]
+                {
+                    "Transaksi telah diterima, tidak bisa dihapus"
+                }});
+            }
+
             _context.GoodsTransactionHeaders.Remove(header);
             await _context.SaveChangesAsync();
 
