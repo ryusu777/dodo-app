@@ -10,6 +10,7 @@ using DodoApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace DodoApp.Repository
 {
@@ -123,6 +124,33 @@ namespace DodoApp.Repository
             });
 
             return new OkObjectResult(await Pagination<ReadCurrencyDto>.LoadPageAsync(qry, validPageFilter));
+        }
+
+        public async Task<ActionResult<List<ReadCurrencyDto>>> GetSummaryAsync(GetCurrencySummaryDto request)
+        {
+            DateTime dateFrom = (DateTime)request.DateFrom;
+            DateTime? dateTo = request.DateTo?.AddDays(1) ?? dateFrom.AddDays(1);
+            
+            var currencies = await _context.Currencies
+                .Where(c => 
+                    c.DateOfChange >= request.DateFrom && 
+                    c.DateOfChange < dateTo
+                )
+                .OrderBy(c => c.DateOfChange)
+                .Select(c => new ReadCurrencyDto
+                {
+                    Id = c.Id,
+                    ChangeDescription = c.ChangeDescription,
+                    ChangingFundAmount = c.FundAmount,
+                    ChangingProfitAmount = c.ChangingProfitAmount,
+                    DateOfChange = c.DateOfChange,
+                    FundAmount = c.FundAmount,
+                    ProfitAmount = c.ProfitAmount,
+                    TransactionHeaderId = c.TransactionHeaderId
+                })
+                .ToListAsync();
+            
+            return new OkObjectResult(currencies);
         }
     }
 }

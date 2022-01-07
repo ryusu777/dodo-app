@@ -38,5 +38,12 @@ namespace DodoApp.Controllers.V1
         {
             return await _repo.GetCurrenciesAsync(pageFilter);
         }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<List<ReadCurrencyDto>>> GetSummary(
+            [FromQuery] GetCurrencySummaryDto request)
+        {
+            return await _repo.GetSummaryAsync(request);
+        }
     }
 }

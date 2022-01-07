@@ -14,5 +14,7 @@ namespace DodoApp.Repository
         Task<IActionResult> CreateCurrencyReportAsync(CreateCurrencyDto request);
         Task<ActionResult<PageWrapper<List<ReadCurrencyDto>>>> GetCurrenciesAsync(
             PageFilter pageFilter);
+        Task<ActionResult<List<ReadCurrencyDto>>> GetSummaryAsync(
+            GetCurrencySummaryDto request);
     }
 }
