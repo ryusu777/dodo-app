@@ -60,13 +60,13 @@
             <q-card-section class="col">
               <!-- TODO: Transaction title -->
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
                 v-if="props.row.transactionType === 'sell'"
               >
                 Penjualan
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                class="text-bold text-h6 q-pa-none q-ma-none text-yellow-10"
                 v-else
               >
                 Pembelian

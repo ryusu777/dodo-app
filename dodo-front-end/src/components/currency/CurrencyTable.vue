@@ -11,7 +11,7 @@
           <q-card-section horizontal class="row">
             <q-card-section class="col q-pt-sm">
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-green-8"
+                class="text-bold text-h6 q-pa-none q-ma-none text-green-8"
                 v-if="
                   (props.row.changingProfitAmount < 0 &&
                     props.row.changingFundAmount > 0) ||
@@ -22,13 +22,13 @@
                 Konversi
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                class="text-bold text-h6 q-pa-none q-ma-none text-yellow-10"
                 v-else-if="props.row.changingProfitAmount < 0"
               >
                 Pengeluaran
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
                 v-else-if="
                   props.row.changingProfitAmount > 0 &&
                   props.row.changingFundAmount > 0
@@ -37,19 +37,19 @@
                 Penjualan barang
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
                 v-else-if="props.row.changingProfitAmount > 0"
               >
                 Pemasukan keuntungan
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-yellow-10"
+                class="text-bold text-h6 q-pa-none q-ma-none text-yellow-10"
                 v-else-if="props.row.changingFundAmount < 0"
               >
                 Restock barang
               </p>
               <p
-                class="text-bold text-h5 q-pa-none q-ma-none text-indigo-8"
+                class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
                 v-else-if="props.row.changingFundAmount > 0"
               >
                 Pemasukan permodalan
@@ -59,15 +59,23 @@
                   class="q-pa-none q-ma-none"
                   v-if="props.row.changingProfitAmount"
                 >
-                  <b>Perubahan keuntungan: </b
-                  >{{ props.row.changingProfitAmount }}
+                  <b>Keuntungan: </b
+                  >{{
+                    props.row.changingProfitAmount > 0
+                      ? `+${props.row.changingProfitAmount}`
+                      : props.row.changingProfitAmount
+                  }}
                 </p>
                 <p
                   class="q-pa-none q-ma-none"
                   v-if="props.row.changingFundAmount"
                 >
-                  <b>Perubahan permodalan: </b
-                  >{{ props.row.changingFundAmount }}
+                  <b>Permodalan: </b
+                  >{{
+                    props.row.changingFundAmount > 0
+                      ? `+${props.row.changingFundAmount}`
+                      : props.row.changingFundAmount
+                  }}
                 </p>
                 <p class="q-my-none" v-if="!props.row.transactionHeaderId">
                   <b>Deskripsi: </b>{{ props.row.changeDescription }}
@@ -132,7 +140,7 @@ export default defineComponent({
     });
 
     function formattedDate(value: Date | undefined) {
-      if (value) return date.formatDate(value, 'dddd, D MMMM YYYY');
+      if (value) return date.formatDate(value, 'ddd, D MMM YYYY');
       return undefined;
     }
 
