@@ -16,6 +16,7 @@ namespace DodoApp.Data.Seeder
                     ReceiveDate = new DateTime(2021, 11, 2),
                     CreatedDate = DateTime.Now,
                     TransactionType = "sell",
+                    Title = "Dimas kanjeng"
                 },
                 new GoodsTransactionHeader
                 {
@@ -24,6 +25,7 @@ namespace DodoApp.Data.Seeder
                     ReceiveDate = new DateTime(2021, 11, 3),
                     CreatedDate = DateTime.Now,
                     TransactionType = "purchase",
+                    Title = "Ita jaya motor"
                 }
             );
         }

@@ -7,7 +7,6 @@ namespace DodoApp.Domain
 {
     public class GoodsTransactionHeader
     {
-        // TODO: Transaction title
         [Key]
         public int Id { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -21,6 +20,8 @@ namespace DodoApp.Domain
         [StringLength(10)]
         [Required]
         public string TransactionType { get; set; }
+
+        public string Title { get; set; }
 
         [InverseProperty(nameof(GoodsTransactionDetail.TheGoodsTransactionHeader))]
         public virtual ICollection<GoodsTransactionDetail> GoodsTransactionDetails{ get; set;}

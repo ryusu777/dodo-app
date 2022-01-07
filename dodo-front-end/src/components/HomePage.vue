@@ -50,20 +50,36 @@
         class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
         label="Penjualan"
         style="height: 90px"
-        @click="createHeaderHandler('sell')"
+        @click="showHeaderForm('sell')"
       />
       <q-btn
         class="col-6 text-subtitle1 q-pa-sm text-weight-bold"
         label="Pembelian"
         style="height: 90px"
-        @click="createHeaderHandler('purchase')"
+        @click="showHeaderForm('purchase')"
       />
     </div>
+    <teleport to="body">
+      <base-add-dialog
+        v-model="showCreateHeaderForm"
+        title="Buat transaksi barang"
+        submit-label="Buat"
+        @submit="createHeaderHandler"
+      >
+        <base-input v-model="transactionTitle" label="Judul" class="q-mb-sm" />
+        <base-input
+          v-if="transactionType === 'purchase'"
+          v-model="transactionVendor"
+          label="Vendor"
+          color="primary"
+        />
+      </base-add-dialog>
+    </teleport>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount } from 'vue';
+import { defineComponent, onBeforeMount, ref } from 'vue';
 import BaseCard from 'components/ui/BaseCard.vue';
 import { useRouter } from 'vue-router';
 import BaseButton from 'components/ui/BaseButton.vue';
@@ -73,30 +89,19 @@ import { ICurrency } from 'src/models/currency';
 import { useQuasar } from 'quasar';
 import { useCrudEntity } from 'src/models/crud';
 import { ITransactionHeader } from 'src/models/transaction';
+import BaseAddDialog from './ui/BaseAddDialog.vue';
+import BaseInput from './ui/BaseInput.vue';
 
 export default defineComponent({
   components: {
     BaseCard,
-    BaseButton
+    BaseButton,
+    BaseAddDialog,
+    BaseInput
   },
   setup() {
     const $q = useQuasar();
     const router = useRouter();
-
-    const { grid: gridHeader, create: createHeader } =
-      useCrudEntity<ITransactionHeader>('/transaction/header');
-
-    async function createHeaderHandler(
-      transactionType: 'sell' | 'purchase'
-    ): Promise<void> {
-      await createHeader({
-        transactionType
-      });
-      if (gridHeader.value.data)
-        await router.push(
-          `/transaction/${transactionType}/${gridHeader.value.data[0].id || -1}`
-        );
-    }
 
     const {
       grid: gridCurrency,
@@ -133,11 +138,46 @@ export default defineComponent({
 
     onBeforeMount(async () => await pagingCurrency({ rowsPerPage: 1 }));
 
+    const showCreateHeaderForm = ref(false);
+    const transactionVendor = ref('');
+    const transactionTitle = ref('');
+    const transactionType = ref<'sell' | 'purchase'>('sell');
+    const { grid: gridHeader, create: createHeader } =
+      useCrudEntity<ITransactionHeader>('/transaction/header');
+
+    function showHeaderForm(type: 'sell' | 'purchase') {
+      transactionType.value = type;
+      showCreateHeaderForm.value = true;
+    }
+
+    async function createHeaderHandler(): Promise<void> {
+      await createHeader({
+        transactionType: transactionType.value,
+        vendor: transactionVendor.value.length
+          ? transactionVendor.value
+          : undefined,
+        title: transactionTitle.value.length
+          ? transactionTitle.value
+          : undefined
+      });
+      if (gridHeader.value.data)
+        await router.push(
+          `/transaction/${transactionType.value}/${
+            gridHeader.value.data[0].id || -1
+          }`
+        );
+    }
+
     return {
       showAddDialog,
       showConversionDialog,
       createHeaderHandler,
-      gridCurrency
+      showHeaderForm,
+      gridCurrency,
+      showCreateHeaderForm,
+      transactionVendor,
+      transactionTitle,
+      transactionType
     };
   }
 });

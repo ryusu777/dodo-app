@@ -51,25 +51,21 @@
     </template>
     <template v-slot:item="props">
       <div class="q-pa-xs col-12">
-        <base-card
-          :class="props.selected ? 'bg-grey-2' : ''"
-          style="height: 90px"
-        >
+        <base-card :class="props.selected ? 'bg-grey-2' : ''">
           <q-card-section horizontal class="row">
             <!-- TODO: Visual presentation of completed or not completed transaction -->
             <q-card-section class="col">
-              <!-- TODO: Transaction title -->
               <p
                 class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
                 v-if="props.row.transactionType === 'sell'"
               >
-                Penjualan
+                {{ props.row.title || 'Penjualan' }}
               </p>
               <p
                 class="text-bold text-h6 q-pa-none q-ma-none text-yellow-10"
                 v-else
               >
-                Pembelian
+                {{ props.row.title || 'Pembelian' }}
               </p>
               <div class="row">
                 <p class="q-pr-md">Rp {{ props.row.totalPrice }}</p>

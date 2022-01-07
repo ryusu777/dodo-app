@@ -30,14 +30,6 @@ namespace DodoApp.Repository
             _mapper = mapper;
         }
 
-        /*
-            return values
-            -1 -> Internal error
-            -2 -> TransactionHeader doesn't exists
-            -3 -> Goods doesn't exists
-            -4 -> TransactionDetail exists
-            -5 -> Goods amount is not enough for selling
-        */
         public async Task<IActionResult> CreateTransactionDetailAsync(CreateGoodsTransactionDetailDto request)
         {
             var transactionDetail = _mapper.Map<GoodsTransactionDetail>(request);
@@ -185,6 +177,7 @@ namespace DodoApp.Repository
                           ReceiveDate = s.ReceiveDate,
                           TransactionType = s.TransactionType,
                           Vendor = s.Vendor,
+                          Title = s.Title,
                           GoodsTransactionDetails = _mapper.Map<List<ReadGoodsTransactionDetailDto>>(s.GoodsTransactionDetails)
                       };
 

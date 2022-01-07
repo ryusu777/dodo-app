@@ -22,6 +22,7 @@ namespace DodoApp.Contracts.V1.Responses
         }
         public string Vendor { get; set; }
         public string TransactionType { get; set; }
+        public string Title { get; set; }
         public List<ReadGoodsTransactionDetailDto> GoodsTransactionDetails { get; set; }
     }
 }

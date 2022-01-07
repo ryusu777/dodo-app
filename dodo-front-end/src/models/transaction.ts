@@ -8,6 +8,7 @@ export interface ITransactionHeader {
   vendor?: string;
   totalPrice?: number;
   transactionType: 'sell' | 'purchase';
+  title?: string;
   goodsTransactionDetails?: Array<ITransactionDetail>;
 }
 export interface ITransactionDetail {
