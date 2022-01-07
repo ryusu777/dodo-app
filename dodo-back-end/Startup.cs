@@ -16,6 +16,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
+/* TODO: Currency summary per days
+    ReadCurrencySummaryPerDayDto:
+        Day: the day of the summary being taken
+        TotalFundChange; of the day
+        TotalProfitChange; of the day
+        FundAmount; of the day
+        ProfitAmount; of the day
+    
+    ReadCurrencySummaryPerTransactionDto: ReadCurrencyDto
+*/
 namespace DodoApp
 {
     public class Startup
