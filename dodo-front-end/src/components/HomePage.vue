@@ -1,8 +1,6 @@
 <template>
   <q-page>
     <base-card class="q-ma-lg q-py-lg q-px-md">
-      <!-- TODO: Profit or fund amount -->
-      <!-- TODO: Summary of today's income and expenses amount -->
       <div class="row justify-evenly">
         <p class="col-10 text-center text-bold text-h4 q-ma-md">
           Data Keuangan
