@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'currency',
         component: () => import('components/currency/CurrencyPage.vue')
+      },
+      {
+        path: 'currency-summary',
+        component: () =>
+          import('components/currency-summary/CurrencySummaryPage.vue')
       }
     ]
   },

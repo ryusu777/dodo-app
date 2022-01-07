@@ -73,7 +73,8 @@ export default defineComponent({
             type.value === 'expenses'
               ? -1 * changingFundAmount.value
               : changingFundAmount.value,
-          changeDescription: changeDescription.value
+          changeDescription: changeDescription.value,
+          dateOfChange: new Date().toISOString()
         });
       }
     }
