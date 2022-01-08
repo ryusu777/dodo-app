@@ -126,31 +126,55 @@ namespace DodoApp.Repository
             return new OkObjectResult(await Pagination<ReadCurrencyDto>.LoadPageAsync(qry, validPageFilter));
         }
 
-        public async Task<ActionResult<List<ReadCurrencyDto>>> GetSummaryAsync(GetCurrencySummaryDto request)
+        public async Task<IActionResult> GetSummaryAsync(GetCurrencySummaryDto request)
         {
             DateTime dateFrom = (DateTime)request.DateFrom;
-            DateTime? dateTo = request.DateTo?.AddDays(1) ?? dateFrom.AddDays(1);
+            DateTime? dateTo = request.DateTo;
             
-            var currencies = await _context.Currencies
-                .Where(c => 
-                    c.DateOfChange >= request.DateFrom && 
-                    c.DateOfChange < dateTo
-                )
-                .OrderBy(c => c.DateOfChange)
-                .Select(c => new ReadCurrencyDto
-                {
-                    Id = c.Id,
-                    ChangeDescription = c.ChangeDescription,
-                    ChangingFundAmount = c.FundAmount,
-                    ChangingProfitAmount = c.ChangingProfitAmount,
-                    DateOfChange = c.DateOfChange,
-                    FundAmount = c.FundAmount,
-                    ProfitAmount = c.ProfitAmount,
-                    TransactionHeaderId = c.TransactionHeaderId
-                })
-                .ToListAsync();
-            
-            return new OkObjectResult(currencies);
+            if (dateTo != null) {
+                dateTo = dateTo?.AddDays(1);
+                var currencies = await _context.Currencies
+                    .Where(c => 
+                        c.DateOfChange >= dateFrom && 
+                        c.DateOfChange < dateTo
+                    )
+                    .ToListAsync();
+                
+                var groupedCurrencies = currencies
+                    .GroupBy(c => c.DateOfChange.Date)
+                    .Select(c => new ReadCurrencySummaryPerDayDto
+                    {
+                        Day = c.First().DateOfChange.Date,
+                        TotalFundChange = c.Aggregate(0, (sum, val) => sum + val.ChangingFundAmount),
+                        TotalProfitChange = c.Aggregate(0, (sum, val) => sum + val.ChangingProfitAmount),
+                        ProfitAmount = c.Last().ProfitAmount,
+                        FundAmount = c.Last().FundAmount
+                    })
+                    .ToList();
+                return new OkObjectResult(groupedCurrencies);
+            }
+            else
+            {
+                var currencies = await _context.Currencies
+                    .Where(c => 
+                        c.DateOfChange >= dateFrom && 
+                        c.DateOfChange < dateFrom.AddDays(1)
+                    )
+                    .OrderBy(c => c.DateOfChange)
+                    .Select(c => new ReadCurrencyDto
+                    {
+                        Id = c.Id,
+                        ChangeDescription = c.ChangeDescription,
+                        ChangingFundAmount = c.FundAmount,
+                        ChangingProfitAmount = c.ChangingProfitAmount,
+                        DateOfChange = c.DateOfChange,
+                        FundAmount = c.FundAmount,
+                        ProfitAmount = c.ProfitAmount,
+                        TransactionHeaderId = c.TransactionHeaderId
+                    })
+                    .ToListAsync();
+                return new OkObjectResult(currencies);
+            }
         }
     }
 }

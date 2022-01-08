@@ -24,7 +24,7 @@ namespace DodoApp.Data.Seeder
                 {
                     Id = 2,
                     ChangeDescription = "Membeli Barang",
-                    DateOfChange = new DateTime(2021, 11, 5),
+                    DateOfChange = new DateTime(2021, 11, 1),
                     ChangingFundAmount = -90000,
                     ChangingProfitAmount = 0,
                     FundAmount = 20000,

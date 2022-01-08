@@ -11,3 +11,11 @@ export interface ICurrency {
   changeDescription?: string;
   theGoodsTransactionHeader?: ITransactionHeader;
 }
+
+export interface ICurrencySummaryPerDay {
+  day?: Date;
+  fundAmount?: number;
+  profitAmount?: number;
+  totalFundChange: number;
+  totalProfitChange: number;
+}

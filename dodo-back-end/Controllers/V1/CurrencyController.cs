@@ -40,7 +40,7 @@ namespace DodoApp.Controllers.V1
         }
 
         [HttpGet("summary")]
-        public async Task<ActionResult<List<ReadCurrencyDto>>> GetSummary(
+        public async Task<IActionResult> GetSummary(
             [FromQuery] GetCurrencySummaryDto request)
         {
             return await _repo.GetSummaryAsync(request);
