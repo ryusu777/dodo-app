@@ -3,7 +3,12 @@
 </template>
 
 <script lang="ts">
-// TODO: Sorting functionality for all tables
+// TODO: Filtering functionality for all tables
+/* 
+  TODO: Loading state of data
+  HomePage: Loading current currency data
+  Pages: Fetching tables data
+*/
 // REFACTOR: Entity that extends cruds
 import { defineComponent } from 'vue';
 
