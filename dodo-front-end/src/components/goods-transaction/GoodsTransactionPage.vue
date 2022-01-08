@@ -33,12 +33,31 @@
         @delete="confirmRemoveDetail"
         @update="updateDetail"
       />
-      <base-button
-        label="Selesaikan transaksi"
-        class="q-mt-sm"
-        color="primary"
-        @click="updateHeaderHandler"
-      />
+      <div class="q-mt-sm row justify-between q-gutter-y-md">
+        <base-button
+          label="Terima"
+          color="secondary"
+          class="col-5"
+          :disabled="transactionHeader?.receiveDate"
+          @click="updateHeaderHandler(true, false)"
+        />
+        <base-button
+          label="Bayar"
+          color="secondary"
+          class="col-5"
+          :disabled="transactionHeader?.purchaseDate"
+          @click="updateHeaderHandler(false, true)"
+        />
+        <base-button
+          label="Terima & Bayar"
+          class="col-12"
+          color="primary"
+          :disabled="
+            transactionHeader?.purchaseDate || transactionHeader?.receiveDate
+          "
+          @click="updateHeaderHandler(true, true)"
+        />
+      </div>
     </base-add-dialog>
   </q-page>
 </template>
@@ -91,13 +110,30 @@ export default defineComponent({
       gridDetail.value.data = transactionHeader.value.goodsTransactionDetails;
     }
 
-    async function updateHeaderHandler() {
-      const request = transactionHeader.value as ITransactionHeader;
-      request.purchaseDate = new Date().toISOString();
-      request.receiveDate = new Date().toISOString();
+    async function updateHeaderHandler(receive: boolean, purchase: boolean) {
+      if (!transactionHeader.value?.goodsTransactionDetails?.length) {
+        $q.notify({
+          message: 'Keranjang kosong'
+        });
+        return;
+      }
+
+      const request = {
+        ...transactionHeader.value
+      };
+
+      if (purchase && !request.purchaseDate)
+        request.purchaseDate = new Date().toISOString();
+
+      if (receive && !request.receiveDate)
+        request.receiveDate = new Date().toISOString();
+
       delete request.goodsTransactionDetails;
       // TODO: Successfull request should redirect user
       await updateHeader(request);
+
+      transactionHeader.value.purchaseDate = request.purchaseDate;
+      transactionHeader.value.receiveDate = request.receiveDate;
     }
 
     const {
@@ -143,7 +179,10 @@ export default defineComponent({
         return;
       }
 
-      if (transactionHeader.value.purchaseDate) {
+      if (
+        transactionHeader.value.purchaseDate &&
+        transactionHeader.value.receiveDate
+      ) {
         $q.dialog({
           component: BaseDialog,
           componentProps: {

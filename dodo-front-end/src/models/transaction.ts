@@ -1,6 +1,12 @@
 import { IGoods } from './goods';
 
 export interface ITransactionHeader {
+  [index: string]:
+    | number
+    | Date
+    | string
+    | undefined
+    | Array<ITransactionDetail>;
   id?: number;
   purchaseDate?: Date | string;
   receiveDate?: Date | string;

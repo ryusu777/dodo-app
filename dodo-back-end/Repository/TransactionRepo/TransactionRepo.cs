@@ -247,10 +247,31 @@ namespace DodoApp.Repository
                     });
             }
 
-            var result = await ModifyGoodsAndCurrencyData(transactionHeader);
 
-            transactionHeader.PurchaseDate = request.PurchaseDate;
-            transactionHeader.ReceiveDate = request.ReceiveDate;
+            if (transactionHeader.ReceiveDate == null &&
+                request.ReceiveDate != null)
+            {
+                transactionHeader.ReceiveDate = request.ReceiveDate;
+                var goodsResult = ModifyGoods(transactionHeader);
+
+                if ((goodsResult as NoContentResult) == null)
+                {
+                    return goodsResult;
+                }
+            }
+
+            if (transactionHeader.PurchaseDate == null && 
+                request.PurchaseDate != null)
+            {
+                transactionHeader.PurchaseDate = request.PurchaseDate;
+                var currencyResult = await CreateCurrencyReportAsync(transactionHeader);
+
+                if ((currencyResult as OkObjectResult) == null)
+                {
+                    return currencyResult;
+                }
+            }
+
             _context
                 .Entry(transactionHeader)
                 .State = EntityState.Modified;
@@ -265,7 +286,7 @@ namespace DodoApp.Repository
                     (int) HttpStatusCode.InternalServerError);
             }
 
-            return result;
+            return new NoContentResult();
         }
 
         private async Task<IActionResult> CheckTransferDetailValidity(
@@ -323,42 +344,43 @@ namespace DodoApp.Repository
             return new NoContentResult();
         }
 
-        private async Task<IActionResult> ModifyGoodsAndCurrencyData(GoodsTransactionHeader header)
+        private IActionResult ModifyGoods(
+            GoodsTransactionHeader header)
         {
-
-            // Modify Goods Stock
-            foreach(var detail in header.GoodsTransactionDetails)
-            {
-                if (header.TransactionType == "sell")
+            if (header.ReceiveDate != null)
+                foreach(var detail in header.GoodsTransactionDetails)
                 {
-                    if (detail.TheGoods.StockAvailable < detail.GoodsAmount)
-                        return new BadRequestObjectResult(new 
-                        { 
-                            errors = new string[] 
+                    if (header.TransactionType == "sell")
+                    {
+                        if (detail.TheGoods.StockAvailable < detail.GoodsAmount)
+                            return new BadRequestObjectResult(new 
                             { 
-                                "Terdapat stok barang tidak mencukupi" 
-                            }
-                        });
-                    detail.TheGoods.StockAvailable -= detail.GoodsAmount;
+                                errors = new string[] 
+                                { 
+                                    "Terdapat stok barang tidak mencukupi" 
+                                }
+                            });
+                        detail.TheGoods.StockAvailable -= detail.GoodsAmount;
+                    }
+                    else
+                    {
+                        detail.TheGoods.StockAvailable += detail.GoodsAmount;
+                    }
                 }
-                else
-                {
-                    detail.TheGoods.StockAvailable += detail.GoodsAmount;
-                }
-            }
+            return new NoContentResult();
+        }
 
-            // Create Currency Report
+        private async Task<IActionResult> CreateCurrencyReportAsync(
+            GoodsTransactionHeader header)
+        {
             CreateCurrencyDto request = new CreateCurrencyDto 
             {
                 TransactionHeaderId = header.Id,
-                DateOfChange = DateTime.Now,
                 ChangeDescription = header.TransactionType == "sell" ? 
                     "Transaksi penjualan barang" : "Transaksi restok barang"
             };
 
-            await _currencyRepo.CreateCurrencyReportAsync(request);
-
-            return new NoContentResult();
+            return await _currencyRepo.CreateCurrencyReportAsync(request);
         }
     }
 }
