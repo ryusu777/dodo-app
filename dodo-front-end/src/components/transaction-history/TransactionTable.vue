@@ -67,9 +67,30 @@
               >
                 {{ props.row.title || 'Pembelian' }}
               </p>
-              <div class="row">
-                <p class="q-pr-md">Rp {{ props.row.totalPrice }}</p>
+              <div class="col">
+                <p class="q-pr-md text-bold" style="line-height: 15px">
+                  Rp {{ props.row.totalPrice }}
+                </p>
+                <p
+                  class="text-overline q-ma-none"
+                  style="line-height: 15px"
+                  :class="
+                    props.row.purchaseDate ? 'text-positive' : 'text-negative'
+                  "
+                >
+                  {{ props.row.purchaseDate ? 'Dibayar' : 'Belum dibayar' }}
+                </p>
+                <p
+                  class="text-overline q-ma-none"
+                  style="line-height: 15px"
+                  :class="
+                    props.row.receiveDate ? 'text-positive' : 'text-negative'
+                  "
+                >
+                  {{ props.row.receiveDate ? 'Diterima' : 'Belum diterima' }}
+                </p>
               </div>
+              <div class="q-mr-md"></div>
             </q-card-section>
 
             <q-card-section class="text-right">
