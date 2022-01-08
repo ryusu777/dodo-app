@@ -13,7 +13,6 @@
 </template>
 
 <script lang="ts">
-// TODO: Currency creation should re-getAll currency data
 import { defineComponent, onBeforeMount } from 'vue';
 import CurrencyTable from 'components/currency/CurrencyTable.vue';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';

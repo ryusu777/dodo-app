@@ -7,7 +7,6 @@ namespace DodoApp.Contracts.V1.Requests
         public int? TransactionHeaderId { get; set; }
         public int? ChangingProfitAmount { get; set; }
         public int? ChangingFundAmount { get; set; }
-        public DateTime? DateOfChange { get; set; }
         public string ChangeDescription { get; set; }
     }
 }

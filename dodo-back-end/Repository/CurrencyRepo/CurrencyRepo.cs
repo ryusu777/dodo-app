@@ -88,6 +88,8 @@ namespace DodoApp.Repository
 
             currency.FundAmount = latestFundAmount + currency.ChangingFundAmount;
 
+            currency.DateOfChange = DateTime.Now;
+
             await _context.Currencies.AddAsync(currency);
 
             try
@@ -138,6 +140,7 @@ namespace DodoApp.Repository
                         c.DateOfChange >= dateFrom && 
                         c.DateOfChange < dateTo
                     )
+                    .OrderBy(c => c.DateOfChange)
                     .ToListAsync();
                 
                 var groupedCurrencies = currencies
