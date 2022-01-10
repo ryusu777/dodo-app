@@ -11,7 +11,6 @@ namespace DodoApp.Repository
     public interface ITransactionRepo
     {
         // TODO: Purchasing goods should check if fund is available
-        // TODO: Implement receive date and purchase date
         Task<IActionResult> CreateTransactionHeaderAsync(
             CreateGoodsTransactionHeaderDto request);
         Task<IActionResult> UpdateTransactionHeaderAsync(
