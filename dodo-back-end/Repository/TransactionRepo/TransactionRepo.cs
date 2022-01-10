@@ -168,24 +168,34 @@ namespace DodoApp.Repository
             var transactionHeader = await _context.GoodsTransactionHeaders
                 .Include(g => g.GoodsTransactionDetails)
                 .ThenInclude(c => c.TheGoods)
+                .Select(s => new ReadGoodsTransactionHeaderDto
+                {
+                    Id = s.Id,
+                    CreatedDate = s.CreatedDate,
+                    PurchaseDate = s.PurchaseDate,
+                    ReceiveDate = s.ReceiveDate,
+                    TransactionType = s.TransactionType,
+                    Vendor = s.Vendor,
+                    Title = s.Title,
+                    GoodsTransactionDetails = _mapper.Map<List<ReadGoodsTransactionDetailDto>>(s.GoodsTransactionDetails),
+                    TotalPrice = s.GoodsTransactionDetails.Sum((detail) => detail.GoodsAmount * detail.PricePerItem)
+                })
                 .FirstOrDefaultAsync(g => g.Id == id);
             
             if (transactionHeader == null)
             {
                 return new NotFoundObjectResult(new { errors = new string[] { "Transaksi barang tidak ditemukan" }});
             }
-            return new OkObjectResult(
-                _mapper
-                    .Map<ReadGoodsTransactionHeaderDto>(transactionHeader));
+            return new OkObjectResult(transactionHeader);
         }
 
         public async Task<ActionResult<PageWrapper<List<ReadGoodsTransactionHeaderDto>>>> GetGoodsTransactionHeadersAsync(
             PageFilter pageFilter, FilterGoodsTransactionHeader filter)
         {
             var validPageFilter = new PageFilter(pageFilter.Page, pageFilter.RowsPerPage, pageFilter.SortBy, pageFilter.Descending, pageFilter.SearchText);
-
-            var qry = from s in _context.GoodsTransactionHeaders
-                      select new ReadGoodsTransactionHeaderDto
+            
+            var qry = _context.GoodsTransactionHeaders
+                .Select(s => new ReadGoodsTransactionHeaderDto
                       {
                           Id = s.Id,
                           CreatedDate = s.CreatedDate,
@@ -194,8 +204,8 @@ namespace DodoApp.Repository
                           TransactionType = s.TransactionType,
                           Vendor = s.Vendor,
                           Title = s.Title,
-                          GoodsTransactionDetails = _mapper.Map<List<ReadGoodsTransactionDetailDto>>(s.GoodsTransactionDetails)
-                      };
+                          TotalPrice = s.GoodsTransactionDetails.Sum((detail) => detail.GoodsAmount * detail.PricePerItem)
+                      });
 
             if (filter != null)
             {
