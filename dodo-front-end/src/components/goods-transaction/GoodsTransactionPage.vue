@@ -130,10 +130,26 @@ export default defineComponent({
 
       delete request.goodsTransactionDetails;
       // TODO: Successfull request should redirect user
-      await updateHeader(request);
+      const result = await updateHeader(request);
 
-      transactionHeader.value.purchaseDate = request.purchaseDate;
-      transactionHeader.value.receiveDate = request.receiveDate;
+      if (result) {
+        transactionHeader.value.purchaseDate = request.purchaseDate;
+        transactionHeader.value.receiveDate = request.receiveDate;
+        showDetail.value = false;
+      }
+
+      if (
+        transactionHeader.value.purchaseDate &&
+        transactionHeader.value.receiveDate
+      ) {
+        $q.dialog({
+          component: BaseDialog,
+          componentProps: {
+            body: 'Transaksi telah selesai dilakukan',
+            okLabel: 'Menu utama'
+          }
+        }).onOk(() => router.push('/'));
+      }
     }
 
     const {

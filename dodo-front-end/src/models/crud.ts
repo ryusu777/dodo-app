@@ -31,6 +31,7 @@ const crud = {
       return null;
     }
   },
+
   async create<T>(route: string, entityRequest: T) {
     try {
       const response = await api.post<ICreateResponse>(route, entityRequest);
@@ -81,7 +82,6 @@ const crud = {
   }
 };
 
-// TODO: Request success or fail should be returned
 export function useCrudEntity<T extends { id?: number }>(routing: string) {
   const route = ref(routing);
   const grid = ref({ data: [] }) as Ref<IPagination<T>>;
@@ -116,10 +116,11 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
 
   async function create(entity: T) {
     const response = await crud.create<T>(route.value, entity);
-    console.log(response);
     if (response && grid.value.data) {
       grid.value.data.unshift(response);
+      return true;
     }
+    return false;
   }
 
   async function update(entity: T) {
@@ -132,19 +133,26 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
         grid.value.data[
           grid.value.data.findIndex((item) => item.id == entity.id)
         ];
-      for (const key in entity) {
-        selectedData[key] = entity[key];
-      }
+
+      if (selectedData)
+        for (const key in entity) {
+          selectedData[key] = entity[key];
+        }
+      return true;
     }
+    return false;
   }
 
   async function remove(id: number) {
     const response = await crud.remove(route.value, id);
-    if (response && grid.value.data)
+    if (response && grid.value.data) {
       grid.value.data.splice(
         grid.value.data.findIndex((item) => item.id == id),
         1
       );
+      return true;
+    }
+    return false;
   }
 
   async function filter(filter: LooseDictionary) {
