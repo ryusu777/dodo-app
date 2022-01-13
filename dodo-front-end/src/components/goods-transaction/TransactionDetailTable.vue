@@ -81,7 +81,6 @@
 </template>
 
 <script lang="ts">
-// TODO: Receive or purchase/sell button
 import { defineComponent, ref, PropType } from 'vue';
 import BaseButton from 'components/ui/BaseButton.vue';
 import BaseCard from 'components/ui/BaseCard.vue';

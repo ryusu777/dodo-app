@@ -14,7 +14,6 @@ namespace DodoApp.Controllers.V1
     [ApiController]
     public class CurrencyController : ControllerBase
     {
-        // TODO: Converting profit to fund
         private readonly ICurrencyRepo _repo;
         private readonly IMapper _mapper;
 

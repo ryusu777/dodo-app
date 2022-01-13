@@ -53,7 +53,6 @@
       <div class="q-pa-xs col-12">
         <base-card :class="props.selected ? 'bg-grey-2' : ''">
           <q-card-section horizontal class="row">
-            <!-- TODO: Visual presentation of completed or not completed transaction -->
             <q-card-section class="col">
               <p
                 class="text-bold text-h6 q-pa-none q-ma-none text-indigo-8"
@@ -119,7 +118,6 @@
 </template>
 
 <script lang="ts">
-// TODO: Set purchase date or receive date on calendar
 import { defineComponent, ref, computed, PropType } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import { IPageFilter } from 'src/models/requests.interface';
