@@ -15,7 +15,9 @@
         <transaction-detail :transaction-header="transactionHeader" />
         <base-button
           class="q-mt-md"
-          v-if="!transactionHeader?.purchaseDate"
+          v-if="
+            !(transactionHeader?.purchaseDate && transactionHeader?.receiveDate)
+          "
           label="Lakukan transaksi"
           @click="doTransaction"
         />
