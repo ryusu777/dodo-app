@@ -35,8 +35,8 @@ const crud = {
     try {
       const response = await api.post<ICreateResponse>(route, entityRequest);
       return {
-        id: response.data.id,
-        ...entityRequest
+        ...entityRequest,
+        id: response.data.id
       };
     } catch {
       return null;
@@ -116,6 +116,7 @@ export function useCrudEntity<T extends { id?: number }>(routing: string) {
 
   async function create(entity: T) {
     const response = await crud.create<T>(route.value, entity);
+    console.log(response);
     if (response && grid.value.data) {
       grid.value.data.unshift(response);
     }
