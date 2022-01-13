@@ -58,8 +58,11 @@ namespace DodoApp.Repository
                 
                 if (header.TransactionType == "purchase") 
                 {
-                    currency.ChangingFundAmount = -1 * _mapper
-                    .Map<ReadGoodsTransactionHeaderDto>(header).TotalPrice;
+                    int total = 0;
+
+                    foreach (var detail in header.GoodsTransactionDetails)
+                        total += detail.PricePerItem;
+                    currency.ChangingFundAmount = -1 * total;
 
                     currency.ChangingProfitAmount = 0;
                 }
@@ -78,7 +81,7 @@ namespace DodoApp.Repository
             }
 
             var latestCurrency = await _context.Currencies
-                .OrderBy(c => c.Id)
+                .OrderBy(c => c.DateOfChange)
                 .LastOrDefaultAsync();
             var latestProfitAmount = (int?)latestCurrency.ProfitAmount ?? 0;
             var latestFundAmount = (int?)latestCurrency.FundAmount ?? 0;
