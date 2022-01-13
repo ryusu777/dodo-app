@@ -58,7 +58,9 @@
 
             <q-card-section class="text-right">
               <p class="text-overline q-ma-none" style="line-height: 15px">
-                Stok: {{ props.row.stockAvailable }}
+                Stok: {{ props.row.stockAvailable }}/{{
+                  props.row.minimalAvailable
+                }}
               </p>
               <p
                 class="text-overline q-ma-none self-end"
