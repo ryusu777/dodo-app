@@ -13,6 +13,7 @@ export interface ICurrency {
 }
 
 export interface ICurrencySummaryPerDay {
+  id?: number;
   day?: Date;
   fundAmount?: number;
   profitAmount?: number;

@@ -56,7 +56,7 @@ export default defineComponent({
     const daySummary = computed(() => {
       return (
         props.rows?.reduce((result, curr) => {
-          result.push(date.formatDate(curr.day, 'MMM d, YY') || '');
+          result.push(date.formatDate(curr.day, 'MMM D, YY') || '');
           return result;
         }, [] as Array<string>) || []
       );

@@ -9,7 +9,7 @@
   HomePage: Loading current currency data
   Pages: Fetching tables data
 */
-// REFACTOR: Entity that extends cruds
+// REFACTOR: Entity that extends cruds for pages
 import { defineComponent } from 'vue';
 
 export default defineComponent({
