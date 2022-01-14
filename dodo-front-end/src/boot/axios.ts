@@ -21,9 +21,15 @@ const api = axios.create({
   }
 });
 
-// TODO: Successful request message
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.status === 204)
+      Notify.create({
+        message: 'Permintaan berhasil'
+      });
+
+    return response;
+  },
   (err) => {
     if (axios.isAxiosError(err)) {
       const { response } = err;
