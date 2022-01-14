@@ -19,8 +19,8 @@ import { defineComponent, onMounted } from 'vue';
 import { ITransactionHeader } from 'src/models/transaction';
 import { useQuasar } from 'quasar';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
-import { useCrudEntity } from 'src/models/crud';
 import BaseDialog from '../ui/BaseDialog.vue';
+import { useCrudEntity } from 'src/models/use-crud-entity';
 
 export default defineComponent({
   components: {

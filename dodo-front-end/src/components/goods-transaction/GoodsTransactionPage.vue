@@ -65,7 +65,6 @@
 <script lang="ts">
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import { useQuasar } from 'quasar';
-import { useCrudEntity } from 'src/models/crud';
 import { IGoods } from 'src/models/goods';
 import { ITransactionDetail, ITransactionHeader } from 'src/models/transaction';
 import { defineComponent, onBeforeMount, ref } from 'vue';
@@ -74,6 +73,7 @@ import BaseDialog from '../ui/BaseDialog.vue';
 import BaseButton from '../ui/BaseButton.vue';
 import { useRouter } from 'vue-router';
 import TransactionDetailTable from './TransactionDetailTable.vue';
+import { useCrudEntity } from 'src/models/use-crud-entity';
 
 export default defineComponent({
   components: {

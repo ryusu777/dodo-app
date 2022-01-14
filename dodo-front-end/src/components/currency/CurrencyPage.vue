@@ -17,9 +17,9 @@ import { defineComponent, onBeforeMount } from 'vue';
 import CurrencyTable from 'components/currency/CurrencyTable.vue';
 import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
 import { useQuasar } from 'quasar';
-import { useCrudEntity } from 'src/models/crud';
 import { ICurrency } from 'src/models/currency';
 import { ITransactionHeader } from 'src/models/transaction';
+import { useCrudEntity } from 'src/models/use-crud-entity';
 export default defineComponent({
   components: {
     CurrencyTable

@@ -24,13 +24,13 @@
 <script lang="ts">
 // TODO: Create goods request dialog should closes when request is success
 import { defineComponent, onBeforeMount } from 'vue';
-import { useCrudEntity } from 'src/models/crud';
 import { IGoods } from 'src/models/goods';
 import { useQuasar } from 'quasar';
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import GoodsFormDialog from './GoodsFormDialog.vue';
 import BaseButton from '../ui/BaseButton.vue';
 import BaseDialog from '../ui/BaseDialog.vue';
+import { useCrudEntity } from 'src/models/use-crud-entity';
 export default defineComponent({
   components: {
     GoodsTable,

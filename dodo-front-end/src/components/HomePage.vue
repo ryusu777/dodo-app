@@ -85,10 +85,10 @@ import CurrencyFormDialog from 'components/currency/CurrencyFormDialog.vue';
 import CurrencyConversionFormDialog from './currency/CurrencyConversionFormDialog.vue';
 import { ICurrency } from 'src/models/currency';
 import { useQuasar } from 'quasar';
-import { useCrudEntity } from 'src/models/crud';
 import { ITransactionHeader } from 'src/models/transaction';
 import BaseAddDialog from './ui/BaseAddDialog.vue';
 import BaseInput from './ui/BaseInput.vue';
+import { useCrudEntity } from 'src/models/use-crud-entity';
 
 export default defineComponent({
   components: {
