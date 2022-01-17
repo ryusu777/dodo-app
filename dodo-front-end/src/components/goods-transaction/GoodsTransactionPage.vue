@@ -63,9 +63,14 @@
 </template>
 
 <script lang="ts">
+/* 
+  TODO: Showing goods optimization
+  - Only show available goods
+  - Don't show goods in cart
+*/
+// TODO: Better visualization of cart
 import GoodsTable from 'components/goods/GoodsTable.vue';
 import { useQuasar } from 'quasar';
-import { IGoods } from 'src/models/goods';
 import { ITransactionDetail, ITransactionHeader } from 'src/models/transaction';
 import { defineComponent, onBeforeMount, ref } from 'vue';
 import BaseAddDialog from '../ui/BaseAddDialog.vue';
@@ -75,6 +80,7 @@ import { useRouter } from 'vue-router';
 import TransactionDetailTable from './TransactionDetailTable.vue';
 import { useCrudEntity } from 'src/models/use-crud-entity';
 import { useTransactionHeaderEntity } from 'src/models/use-transaction-header-entity';
+import { useGoodsEntity } from 'src/models/use-goods-entity';
 
 export default defineComponent({
   components: {
@@ -96,7 +102,7 @@ export default defineComponent({
       getAll: getAllGoods,
       paging: pagingGoods,
       search: searchGoods
-    } = useCrudEntity<IGoods>('/goods');
+    } = useGoodsEntity();
 
     const { get: getHeader, update: updateHeader } =
       useTransactionHeaderEntity();

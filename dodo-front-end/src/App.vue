@@ -8,6 +8,7 @@
   TODO: Loading state of data
   HomePage: Loading current currency data
   Pages: Fetching tables data
+  Transaction: Fetching transaction detail data
 */
 // REFACTOR: Entity that extends cruds for pages
 import { defineComponent } from 'vue';
