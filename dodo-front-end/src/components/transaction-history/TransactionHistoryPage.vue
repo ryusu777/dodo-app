@@ -8,7 +8,7 @@
       @paging="paging"
       @get="showDetail"
       @filter="filter"
-      @delete="confirmDelete"
+      @delete="remove"
     />
   </q-page>
 </template>
@@ -16,43 +16,17 @@
 <script lang="ts">
 import TransactionTable from 'components/transaction-history/TransactionTable.vue';
 import { defineComponent, onMounted } from 'vue';
-import { ITransactionHeader } from 'src/models/transaction';
-import { useQuasar } from 'quasar';
-import TransactionDetailDialog from 'components/transaction-history/TransactionDetailDialog.vue';
-import BaseDialog from '../ui/BaseDialog.vue';
-import { useCrudEntity } from 'src/models/use-crud-entity';
+import { useTransactionHeaderEntity } from 'src/models/use-transaction-header-entity';
 
 export default defineComponent({
   components: {
     TransactionTable
   },
   setup() {
-    const $q = useQuasar();
-    const { grid, pageFilter, paging, getAll, get, filter, remove } =
-      useCrudEntity<ITransactionHeader>('/transaction/header');
+    const { grid, pageFilter, paging, getAll, filter, remove, showDetail } =
+      useTransactionHeaderEntity();
 
     onMounted(async () => await getAll());
-
-    async function showDetail(id: number) {
-      const transactionHeader = (await get(id)) as ITransactionHeader;
-      $q.dialog({
-        component: TransactionDetailDialog,
-        componentProps: {
-          transactionHeader
-        }
-      });
-    }
-
-    function confirmDelete(id: number) {
-      $q.dialog({
-        component: BaseDialog,
-        componentProps: {
-          body: 'Yakin ingin menghapus transaksi?',
-          okLabel: 'Ya',
-          cancelLabel: 'Tidak'
-        }
-      }).onOk(async () => await remove(id));
-    }
 
     return {
       showDetail,
@@ -60,7 +34,7 @@ export default defineComponent({
       filter,
       grid,
       pageFilter,
-      confirmDelete
+      remove
     };
   }
 });

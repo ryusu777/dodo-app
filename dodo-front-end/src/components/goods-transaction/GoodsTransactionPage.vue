@@ -74,6 +74,7 @@ import BaseButton from '../ui/BaseButton.vue';
 import { useRouter } from 'vue-router';
 import TransactionDetailTable from './TransactionDetailTable.vue';
 import { useCrudEntity } from 'src/models/use-crud-entity';
+import { useTransactionHeaderEntity } from 'src/models/use-transaction-header-entity';
 
 export default defineComponent({
   components: {
@@ -98,7 +99,7 @@ export default defineComponent({
     } = useCrudEntity<IGoods>('/goods');
 
     const { get: getHeader, update: updateHeader } =
-      useCrudEntity<ITransactionHeader>('/transaction/header');
+      useTransactionHeaderEntity();
 
     const transactionHeader = ref<ITransactionHeader>();
 
@@ -129,7 +130,6 @@ export default defineComponent({
         request.receiveDate = new Date().toISOString();
 
       delete request.goodsTransactionDetails;
-      // TODO: Successfull request should redirect user
       const result = await updateHeader(request);
 
       if (result) {
