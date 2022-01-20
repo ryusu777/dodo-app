@@ -5,12 +5,30 @@
         <p class="col-10 text-center text-bold text-h4 q-ma-md">
           Data Keuangan
         </p>
-        <p class="col-10 text-left text-h6" v-if="gridCurrency.data[0]">
-          Keuntungan: Rp {{ gridCurrency.data[0].profitAmount || null }}
-        </p>
-        <p class="col-10 text-left text-h6" v-if="gridCurrency.data[0]">
-          Modal: Rp {{ gridCurrency.data[0].fundAmount || null }}
-        </p>
+        <table class="self-start col-10 text-left text-h6">
+          <tr>
+            <td>Keuntungan</td>
+            <td v-if="gridCurrency.data[0]">
+              : Rp.
+              {{
+                gridCurrency.data[0].profitAmount
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') || null
+              }}
+            </td>
+          </tr>
+          <tr>
+            <td>Modal</td>
+            <td v-if="gridCurrency.data[0]">
+              : Rp.
+              {{
+                gridCurrency.data[0].fundAmount
+                  ?.toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') || null
+              }}
+            </td>
+          </tr>
+        </table>
       </div>
       <div class="row justify-around q-my-md">
         <base-button

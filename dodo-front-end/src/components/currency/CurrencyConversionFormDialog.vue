@@ -3,7 +3,7 @@
     <base-card>
       <q-card-section>
         <q-card-actions class="row justify-between items-start">
-          <p class="text-h5 text-bold">{{ title || 'Dialog' }}</p>
+          <p class="text-h6 text-bold">{{ title || 'Dialog' }}</p>
           <base-button
             flat
             icon="close"
