@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
-import { Notify } from 'quasar';
+import { Notify, LoadingBar } from 'quasar';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -21,8 +21,15 @@ const api = axios.create({
   }
 });
 
+api.interceptors.request.use((config) => {
+  LoadingBar.start();
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => {
+    LoadingBar.stop();
+
     if (response.status === 204)
       Notify.create({
         message: 'Permintaan berhasil'
@@ -31,6 +38,8 @@ api.interceptors.response.use(
     return response;
   },
   (err) => {
+    LoadingBar.stop();
+
     if (axios.isAxiosError(err)) {
       const { response } = err;
       // eslint-disable-next-line
