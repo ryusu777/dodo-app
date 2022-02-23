@@ -7,6 +7,7 @@ using DodoApp.Installers;
 using DodoApp.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,14 @@ namespace DodoApp
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "dodo_back_end v1"));
             }
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseCors();
 
             app.UseRouting();
@@ -56,6 +65,8 @@ namespace DodoApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapFallbackToFile("/index.html");
             });
         }
     }

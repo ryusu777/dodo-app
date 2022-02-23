@@ -1,1 +1,7 @@
 .vscode
+DodoAppBackup.sql
+dumpsql.ps1
+recoversql.ps1
+Nginx/localhost.crt
+Nginx/localhost.key
+dodo-back-end/wwwroot

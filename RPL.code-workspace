@@ -7,6 +7,10 @@
 		{
 			"name": "FrontEnd",
 			"path": "./dodo-front-end"
+		},
+		{
+			"name": "Root",
+			"path": "./"
 		}
 	],
 	"settings": {
